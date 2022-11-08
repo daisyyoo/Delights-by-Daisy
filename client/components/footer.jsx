@@ -10,9 +10,9 @@ export default class Footer extends React.Component {
           <p>Email: daisyhyoo@gmail.com</p>
           <p>Instagram: delights.by.daisy</p>
         </div>
-        <div>
+        {/* <div>
           <img src='././server/img/logo.png' />
-        </div>
+        </div> */}
       </div>
     );
   }
