@@ -8,12 +8,14 @@ const styles = {
     cursor: 'pointer'
   },
   image: {
-    height: '300px',
+    height: '250px',
     objectFit: 'contain'
   },
-  description: {
-    height: '4.5rem',
-    overflow: 'hidden'
+  drkbrown: {
+    color: '#422300'
+  },
+  lgtbrown: {
+    color: '#693802'
   }
 };
 
@@ -38,8 +40,11 @@ export default class Catalog extends React.Component {
   render() {
     return (
       <div className="container">
-        <h1>Shop All</h1>
-        <hr />
+        <h1 style={styles.drkbrown}>Shop All</h1>
+        <div className="row">
+          <a style={styles.lgtbrown} href='#'>Home</a>
+          <p style={styles.lgtbrown}>{`${this.state.cookies.length} items`}</p>
+        </div>
         <div className="row">
           {
             this.state.cookies.map(product => (
@@ -62,22 +67,16 @@ function Product(props) {
     <a
       href={`#cookies?cookieId=${cookieId}`}
       style={styles.product}
-      className="text-dark card mb-4 shadow-sm text-decoration-none">
+      className="mb-4 shadow-sm text-decoration-none">
       <Card>
         <Card.Img variant="top" src={imageUrl} alt={flavor} style={styles.image}/>
         <Card.Body>
-          <Card.Title>{flavor}</Card.Title>
-          <Card.Text>
+          <Card.Title style={styles.drkbrown}>{flavor}</Card.Title>
+          <Card.Text style={styles.drkbrown}>
             { toDollars(price) }
           </Card.Text>
         </Card.Body>
       </Card>
-
-      {/* <img src={imageUrl} className="card-img-top" alt={flavor} style={styles.image} />
-      <div className="card-body">
-        <h5 className="card-title">{flavor}</h5>
-        <p className="card-text text-secondary">{price}</p>
-      </div> */}
     </a>
   );
 }
