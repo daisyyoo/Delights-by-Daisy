@@ -1,8 +1,16 @@
 import React from 'react';
-import Home from './pages/home';
+import Header from './components/header';
+import Footer from './components/footer';
+import PageContainer from './pages/pageContainer';
 
 export default class App extends React.Component {
   render() {
-    return <Home />;
+    return (
+      <>
+        <Header />
+        <PageContainer />
+        <Footer />
+      </>
+    );
   }
 }
