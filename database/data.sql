@@ -54,7 +54,7 @@ values
   'This is the result of a pleasant mistake. I had a batch of orange zest cookie dough that was too wet and a batch of earl grey dough that was too dry. I ended up test baking them together and to my pleasant surprise, they balanced each other out perfectly. Thus this cookie was born.'
 ),
 (
-  'Chocolate Peanut Butter',
+  'chocolate peanut butter',
   '400',
   '3.5',
   'These were inspired by dark chocolate peanut butter cups. The onyx cocoa powder not only provides the beautiful hue but also a more clean chocolate flavor to complement the peanut butter flavor.',

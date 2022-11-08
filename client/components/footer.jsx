@@ -3,13 +3,17 @@ import React from 'react';
 export default class Footer extends React.Component {
   render() {
     return (
-      <>
-        <h1>Delights by Daisy</h1>
-        <p>Contact Us!</p>
-        <p>Email: daisyhyoo@gmail.com</p>
-        <p>Instagram: delights.by.daisy</p>
-        <img>Insert logo here</img>
-      </>
+      <div>
+        <div>
+          <h4>Delights by Daisy</h4>
+          <p>Contact Us!</p>
+          <p>Email: daisyhyoo@gmail.com</p>
+          <p>Instagram: delights.by.daisy</p>
+        </div>
+        <div>
+          <img src='../../server/img/logo.png' />
+        </div>
+      </div>
     );
   }
 }
