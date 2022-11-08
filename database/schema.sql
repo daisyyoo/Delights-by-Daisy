@@ -28,6 +28,7 @@ CREATE TABLE "public"."cookies" (
 	"ingredients" TEXT NOT NULL,
 	"allergens" TEXT NOT NULL,
 	"backstory" TEXT NOT NULL,
+	"imageUrl" TEXT NOT NULL,
 	CONSTRAINT "cookies_pk" PRIMARY KEY ("cookieId")
 ) WITH (
   OIDS=FALSE

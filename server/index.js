@@ -16,10 +16,6 @@ const app = express();
 
 app.use(staticMiddleware);
 
-app.get('/api/hello', (req, res) => {
-  res.json({ hello: 'world' });
-});
-
 app.get('/cookies/shopAll', (req, res, next) => {
   const sql = `
   select *
