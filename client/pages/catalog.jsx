@@ -78,7 +78,7 @@ function Product(props) {
   const { cookieId, flavor, price, imageUrl } = props.product;
   return (
     <a
-      href={`#cookies?cookieId=${cookieId}`}
+      href={`#cookie?cookieId=${cookieId}`}
       style={styles.product}
       className="mb-4 text-decoration-none">
       <Card className="border-0">

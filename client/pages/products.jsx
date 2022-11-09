@@ -2,6 +2,7 @@ import React from 'react';
 import { toDollars } from '../lib/';
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
+import Accordion from 'react-bootstrap/Accordion';
 
 export default class ProductDetails extends React.Component {
   constructor(props) {
@@ -26,7 +27,7 @@ export default class ProductDetails extends React.Component {
       <>
         <div>
           <h1>{flavor}</h1>
-          <p>{weight}</p>
+          <p>{`${weight} oz`}</p>
         </div>
         <Card>
           <Card.Img variant="top" src={imageUrl} alt={flavor} />
@@ -43,11 +44,20 @@ export default class ProductDetails extends React.Component {
             <Button>Go To Basket</Button>
           </Card.Body>
         </Card>
-        <div>
-          {ingredients}
-          {allergens}
-          {backstory}
-        </div>
+        <Accordion>
+          <Accordion.Item eventKey="0">
+            <Accordion.Header>Ingredients</Accordion.Header>
+            <Accordion.Body>{ingredients}</Accordion.Body>
+          </Accordion.Item>
+          <Accordion.Item eventKey="1">
+            <Accordion.Header>Allergens</Accordion.Header>
+            <Accordion.Body>{allergens}</Accordion.Body>
+          </Accordion.Item>
+          <Accordion.Item eventKey="2">
+            <Accordion.Header>Backstory</Accordion.Header>
+            <Accordion.Body>{backstory}</Accordion.Body>
+          </Accordion.Item>
+        </Accordion>
       </>
     );
   }

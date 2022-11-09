@@ -32,7 +32,7 @@ export default class App extends React.Component {
     if (route.path === 'cookies') {
       return <Catalog />;
     }
-    if (route.path === 'cookies' && route.params.includes('cookieId')) {
+    if (route.path === 'cookie') {
       const cookieId = route.params.get('cookieId');
       return <ProductDetails cookieId={cookieId} />;
     }
