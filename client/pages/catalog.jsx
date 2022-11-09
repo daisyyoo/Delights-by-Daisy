@@ -11,11 +11,23 @@ const styles = {
     height: '150px',
     objectFit: 'cover'
   },
+  header: {
+    color: '#422300',
+    fontWeight: '600'
+  },
   title: {
+    color: '#422300',
+    fontSize: '1rem',
+    fontWeight: '600'
+  },
+  text: {
     color: '#422300'
   },
   description: {
     color: '#693802'
+  },
+  icon: {
+    fontSize: '0.8rem'
   }
 };
 
@@ -40,10 +52,10 @@ export default class Catalog extends React.Component {
   render() {
     return (
       <>
-        <h1 style={styles.title}>Shop All</h1>
+        <h1 className="py-1" style={styles.header}>Shop All</h1>
         <div className="d-flex justify-content-between">
           <a style={styles.description} className="text-decoration-none" href='#'>
-            <i className="fa-solid fa-chevron-left" />
+            <i className="fa-solid fa-chevron-left" style={styles.icon}/>
             {' Home'}
           </a>
           <p style={styles.description}>{`${this.state.cookies.length} items`}</p>
@@ -63,19 +75,17 @@ export default class Catalog extends React.Component {
 }
 
 function Product(props) {
-  // eslint-disable-next-line no-unused-vars
   const { cookieId, flavor, price, imageUrl } = props.product;
-  /* this anchor should go to product details at `#cookies?cookieId=${cookieId}` */
   return (
     <a
       href={`#cookies?cookieId=${cookieId}`}
       style={styles.product}
       className="mb-4 text-decoration-none">
-      <Card>
+      <Card className="border-0">
         <Card.Img variant="top" src={imageUrl} alt={flavor} style={styles.image} className=""/>
-        <Card.Body>
-          <Card.Title className="" style={styles.title}>{flavor}</Card.Title>
-          <Card.Text style={styles.title}>
+        <Card.Body className="p-0">
+          <Card.Title className="pt-2" style={styles.title}>{flavor}</Card.Title>
+          <Card.Text style={styles.text}>
             { toDollars(price) }
           </Card.Text>
         </Card.Body>
