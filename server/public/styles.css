@@ -1,0 +1,17 @@
+* {
+  font-family: "Open Sans", sans-serif;
+}
+
+h1,
+.navbar-brand {
+  font-family: Merriweather, serif;
+  font-weight: 600;
+}
+
+.color-nav {
+  background-color: #dc924e;
+}
+
+.navbar-toggler {
+  border: solid 1px #fdeedc;
+}
