@@ -2,10 +2,42 @@
   font-family: "Open Sans", sans-serif;
 }
 
-h1 {
+h1,
+.navbar-brand {
   font-family: Merriweather, serif;
+  font-weight: 600;
+}
+
+h1 {
+  padding: 0.5rem 0;
 }
 
 .color-nav {
   background-color: #dc924e;
+}
+
+.card-body {
+  padding: 0;
+}
+
+.card {
+  border: none;
+}
+
+.card-title {
+  font-weight: 600;
+  font-size: 1rem;
+  padding-top: 0.5rem;
+}
+
+.card-text {
+  font-size: 0.8rem;
+}
+
+.navbar-toggler {
+  border: solid 1px #fdeedc;
+}
+
+i {
+  font-size: 0.8rem;
 }

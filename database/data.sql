@@ -10,7 +10,7 @@ insert into "cookies" (
   )
 values
 (
-  'chocolate chip',
+  'Chocolate Chip',
   '400',
   '3.5',
   'This is my ideal chocolate chip cookie: crunchy edges, chewy center and lots of high quality chocolate with just enough sweetness to enjoy the cookie.',
@@ -20,7 +20,7 @@ values
   '/image/choc-chip.jpg'
 ),
 (
-  'white chocolate cranberry',
+  'White Chocolate Cranberry',
   '400',
   '3.5',
   'This is the most unadulterated cookie I make. I let the ingredients speak for themselves without the batter overpowering their natural sweetness. If you prefer natural sweetness and trail mix-like flavors, you''ll love this one.',
@@ -30,7 +30,7 @@ values
   '/image/white-choc-cran.jpg'
 ),
 (
-  'snickerdoodle',
+  'Snickerdoodle',
   '400',
   '3.5',
   'I love snickerdoodle cookies. Who doesn''t love the flavor of sugar and cinnamon? I made them larger than typical so I could get the crispy outsides while retaining the famous soft fluffy center.',
@@ -40,7 +40,7 @@ values
   '/image/snickerdoodle-1.jpg'
 ),
 (
-  'jasmine almond blueberry',
+  'Jasmine Almond Blueberry',
   '400',
   '3.5',
   'These are probably my all-time favorite creation. The light fragrance of jasmine tea leaves are enhanced with the white chocolate, dried blueberries and almond slivers acting in perfect harmony.',
@@ -50,7 +50,7 @@ values
   '/image/jasmine.jpg'
 ),
 (
-  'earl grey blueberry white chocolate',
+  'Earl Grey Blueberry White Chocolate',
   '400',
   '3.5',
   'The ever-popular earl grey tea is complemented with the natural sweetness from the blueberries and white chocolate while the orange zest reinforces the bergamot nuances from the tea.',
@@ -60,7 +60,7 @@ values
   '/image/logo.png'
 ),
 (
-  'chocolate peanut butter',
+  'Chocolate Peanut Butter',
   '400',
   '3.5',
   'These were inspired by dark chocolate peanut butter cups. The onyx cocoa powder not only provides the beautiful hue but also a more clean chocolate flavor to complement the peanut butter flavor.',

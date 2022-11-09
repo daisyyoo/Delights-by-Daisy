@@ -8,13 +8,13 @@ const styles = {
     cursor: 'pointer'
   },
   image: {
-    height: '250px',
-    objectFit: 'contain'
+    height: '150px',
+    objectFit: 'cover'
   },
-  drkbrown: {
+  title: {
     color: '#422300'
   },
-  lgtbrown: {
+  description: {
     color: '#693802'
   }
 };
@@ -39,22 +39,25 @@ export default class Catalog extends React.Component {
 
   render() {
     return (
-      <div className="container">
-        <h1 style={styles.drkbrown}>Shop All</h1>
-        <div className="row">
-          <a style={styles.lgtbrown} href='#'>Home</a>
-          <p style={styles.lgtbrown}>{`${this.state.cookies.length} items`}</p>
+      <>
+        <h1 style={styles.title}>Shop All</h1>
+        <div className="d-flex justify-content-between">
+          <a style={styles.description} className="text-decoration-none" href='#'>
+            <i className="fa-solid fa-chevron-left" />
+            {' Home'}
+          </a>
+          <p style={styles.description}>{`${this.state.cookies.length} items`}</p>
         </div>
         <div className="row">
           {
             this.state.cookies.map(product => (
-              <div key={product.cookieId} className="col-12 col-md-6 col-lg-4">
+              <div key={product.cookieId} className="col-6 col-lg-4">
                 <Product product={product} />
               </div>
             ))
           }
         </div>
-      </div>
+      </>
     );
   }
 }
@@ -67,12 +70,12 @@ function Product(props) {
     <a
       href={`#cookies?cookieId=${cookieId}`}
       style={styles.product}
-      className="mb-4 shadow-sm text-decoration-none">
+      className="mb-4 text-decoration-none">
       <Card>
-        <Card.Img variant="top" src={imageUrl} alt={flavor} style={styles.image}/>
+        <Card.Img variant="top" src={imageUrl} alt={flavor} style={styles.image} className=""/>
         <Card.Body>
-          <Card.Title style={styles.drkbrown}>{flavor}</Card.Title>
-          <Card.Text style={styles.drkbrown}>
+          <Card.Title className="" style={styles.title}>{flavor}</Card.Title>
+          <Card.Text style={styles.title}>
             { toDollars(price) }
           </Card.Text>
         </Card.Body>
