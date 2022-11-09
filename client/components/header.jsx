@@ -25,8 +25,8 @@ export default class Header extends React.Component {
             </Offcanvas.Header>
             <Offcanvas.Body>
               <Nav className="justify-content-end flex-grow-1 pe-3">
-                <Nav.Link style={styles.link} href="#home">HOME</Nav.Link>
-                <Nav.Link style={styles.link} href="#shopAll">SHOP</Nav.Link>
+                <Nav.Link style={styles.link} href="#">HOME</Nav.Link>
+                <Nav.Link style={styles.link} href="#cookies">SHOP</Nav.Link>
                 <Nav.Link style={styles.link} href="#myBasket">MY BASKET</Nav.Link>
                 <Nav.Link style={styles.link} href="#aboutMe">ABOUT ME</Nav.Link>
               </Nav>

@@ -40,10 +40,10 @@ export default class Catalog extends React.Component {
   }
 
   componentDidMount() {
-    fetch('/cookies/shopAll')
+    fetch('/cookies')
       .then(res => res.json())
       .then(cookies => {
-        window.location.hash = 'catalog';
+        // window.location.hash = 'cookies';
         this.setState({ cookies });
       }
       );
@@ -82,7 +82,7 @@ function Product(props) {
       style={styles.product}
       className="mb-4 text-decoration-none">
       <Card className="border-0">
-        <Card.Img variant="top" src={imageUrl} alt={flavor} style={styles.image} className=""/>
+        <Card.Img variant="top" src={imageUrl} alt={flavor} style={styles.image} />
         <Card.Body className="p-0">
           <Card.Title className="pt-2" style={styles.title}>{flavor}</Card.Title>
           <Card.Text style={styles.text}>
