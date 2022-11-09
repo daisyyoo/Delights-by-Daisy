@@ -1,7 +1,7 @@
 require('dotenv/config');
 const pg = require('pg');
 const express = require('express');
-// const ClientError = require('./client-error');
+const ClientError = require('./client-error');
 const staticMiddleware = require('./static-middleware');
 const errorMiddleware = require('./error-middleware');
 
@@ -18,7 +18,10 @@ app.use(staticMiddleware);
 
 app.get('/cookies/shopAll', (req, res, next) => {
   const sql = `
-  select *
+  select "cookieId",
+        "flavor",
+        "price",
+        "imageUrl"
     from "cookies"
   `;
 
@@ -27,6 +30,14 @@ app.get('/cookies/shopAll', (req, res, next) => {
       res.json(result.rows);
     })
     .catch(err => next(err));
+
+});
+
+app.get('/cookies/:cookieId', (req, res, next) => {
+  const cookieId = Number(req.params.productId);
+  if (!cookieId) {
+    throw new ClientError(400, 'cookieId must be a positive integer');
+  }
 
 });
 

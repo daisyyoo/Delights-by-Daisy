@@ -6,6 +6,7 @@ import PageContainer from './components/page-container';
 import NotFound from './pages/not-found';
 import Home from './pages/home';
 import Catalog from './pages/catalog';
+import ProductDetails from './pages/products';
 
 export default class App extends React.Component {
   constructor(props) {
@@ -31,10 +32,10 @@ export default class App extends React.Component {
     if (route.path === 'catalog') {
       return <Catalog />;
     }
-    // if (route.path === 'products') {
-    //   const productId = route.params.get('productId');
-    //   return <ProductDetails productId={productId} />;
-    // }
+    if (route.path === 'products') {
+      const productId = route.params.get('productId');
+      return <ProductDetails productId={productId} />;
+    }
     return <NotFound />;
   }
 
