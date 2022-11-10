@@ -57,7 +57,7 @@ values
   'flour, granulated sugar, brown sugar, eggs, butter, vanilla, salt, baking soda, baking powder, earl grey tea, dried blueberries, white chocolate, orange zest',
   'gluten, egg, dairy',
   'This is the result of a pleasant mistake. I had a batch of orange zest cookie dough that was too wet and a batch of earl grey dough that was too dry. I ended up test baking them together and to my pleasant surprise, they balanced each other out perfectly. Thus this cookie was born.',
-  '/image/logo.png'
+  '/image/earl-grey-blue.jpg'
 ),
 (
   'Chocolate Peanut Butter',
@@ -67,5 +67,5 @@ values
   'flour, granulated sugar, brown sugar, eggs, butter, vanilla, salt, baking soda, baking powder, onyx cocoa powder, dark chocolate, peanut butter, Reese''s peanut butter chips',
   'gluten, egg, dairy, peanuts',
   'My guilty pleasure is dark chocolate peanut butter cups. I also love brownies. So I decided to marry them together and make a cookie that not only showcased the nice fudgy flavor of brownies, but also the flavors of a chocolate covered peanut butter cup.',
-  'image/peanut-butter.jpg'
+  'image/pb-choc.jpg'
 );
