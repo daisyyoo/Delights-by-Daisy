@@ -44,6 +44,8 @@ h1,
   font-weight: 600;
   border: solid 2px #693802;
   border-radius: 5px;
+  height: 3rem;
+  width: 12rem;
 }
 
 .button-all:hover {
@@ -60,4 +62,17 @@ h1,
   font-weight: 600;
   border: solid 2px #ffd8a9;
   border-radius: 5px;
+}
+
+/* Figure out how to make the active color of this button to not change blue */
+
+.form-select {
+  border: solid 2px #693802;
+  color: #693802;
+  cursor: pointer;
+}
+
+.form-select:focus {
+  box-shadow: 0 0 5px 5px #ffd8a9;
+  border: solid 2px #693802;
 }

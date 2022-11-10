@@ -3,6 +3,7 @@ import { toDollars } from '../lib/';
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
 import Accordion from 'react-bootstrap/Accordion';
+import Form from 'react-bootstrap/Form';
 
 const styles = {
   title: {
@@ -10,8 +11,8 @@ const styles = {
     fontWeight: '600'
   },
   image: {
-    height: '300px',
-    objectFit: 'cover'
+    height: '400px',
+    objectFit: 'contain'
   },
   description: {
     color: '#693802',
@@ -26,7 +27,7 @@ const styles = {
     color: '#693802',
     fontWeight: '600'
   },
-  accordionText: {
+  text: {
     color: '#422300'
   }
 };
@@ -51,37 +52,50 @@ export default class ProductDetails extends React.Component {
     } = this.state.cookie;
     return (
       <>
-        <div>
-          <h1 style={styles.title}>{flavor}</h1>
-          <p style={styles.weight}>{`${weight} oz`}</p>
+        <div className="d-flex row">
+          <div className="col">
+            <img src={imageUrl} alt={flavor} style={styles.image} />
+          </div>
+          <Card className="col border-0 d-flex flex-direction-column justify-content-center">
+            <Card.Body className="pb-0">
+              <h1 className="mb-1 pt-lg-4" style={styles.title}>{flavor}</h1>
+              <p className="mb-0 pt-lg-2" style={styles.weight}>{`${weight} oz`}</p>
+            </Card.Body>
+            <Card.Body className="pt-lg-0">
+              <Card.Text style={styles.description}>
+                {description}
+              </Card.Text>
+            </Card.Body>
+            <Card.Body className="py-0" style={styles.price}>
+              {toDollars(price)}
+            </Card.Body>
+            <Card.Body className="d-flex justify-content-between align-items-center">
+              <Form.Group>
+                <Form.Select defaultValue="1">
+                  <option>1</option>
+                  <option>2</option>
+                  <option>3</option>
+                  <option>4</option>
+                  <option>5</option>
+                  <option>6</option>
+                </Form.Select>
+              </Form.Group>
+              <Button className="button-all ">ADD TO BASKET</Button>
+            </Card.Body>
+          </Card>
         </div>
-        <Card>
-          <Card.Img variant="top" src={imageUrl} alt={flavor} style={styles.image} />
-          <Card.Body>
-            <Card.Text style={styles.description}>
-              {description}
-            </Card.Text>
-          </Card.Body>
-          <Card.Body className="py-0" style={styles.price}>
-            {toDollars(price)}
-          </Card.Body>
-          <Card.Body className="d-flex justify-content-between">
-            <input type="number" />
-            <Button className="button-all">ADD TO BASKET</Button>
-          </Card.Body>
-        </Card>
         <Accordion className="my-4">
           <Accordion.Item eventKey="0">
             <Accordion.Header>Ingredients</Accordion.Header>
-            <Accordion.Body style={styles.accordionText}>{ingredients}</Accordion.Body>
+            <Accordion.Body style={styles.text}>{ingredients}</Accordion.Body>
           </Accordion.Item>
           <Accordion.Item eventKey="1">
             <Accordion.Header>Allergens</Accordion.Header>
-            <Accordion.Body style={styles.accordionText}>{allergens}</Accordion.Body>
+            <Accordion.Body style={styles.text}>{allergens}</Accordion.Body>
           </Accordion.Item>
           <Accordion.Item eventKey="2">
             <Accordion.Header>Backstory</Accordion.Header>
-            <Accordion.Body style={styles.accordionText}>{backstory}</Accordion.Body>
+            <Accordion.Body style={styles.text}>{backstory}</Accordion.Body>
           </Accordion.Item>
         </Accordion>
       </>
