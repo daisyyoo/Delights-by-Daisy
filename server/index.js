@@ -1,6 +1,7 @@
 require('dotenv/config');
 const pg = require('pg');
 const express = require('express');
+const jwt = require('jsonwebtoken');
 const ClientError = require('./client-error');
 const staticMiddleware = require('./static-middleware');
 const errorMiddleware = require('./error-middleware');
@@ -50,6 +51,44 @@ app.get('/cookies/:cookieId', (req, res, next) => {
         throw new ClientError(404, `cannot find cookie with cookieId ${cookieId}`);
       }
       res.json(result.rows[0]);
+    })
+    .catch(err => next(err));
+});
+
+app.post('/myBasket', (req, res, next) => {
+  const token = req.get('x-access-token');
+  if (!token) {
+    const sql = `
+      insert into "carts"
+      default values
+      returning *
+    `;
+    db.query(sql)
+      .then(result => {
+        const { cartId } = result.rows[0];
+        const token = jwt.sign(cartId, process.env.TOKEN_SECRET);
+        req.cartId = res.json({ token, cartId });
+      })
+      .catch(err => next(err));
+  } else {
+    const cartId = jwt.verify(token, process.env.TOKEN_SECRET);
+    req.cartId = cartId; // this is the cardId number, not object
+    next();
+  }
+  // the above is to get the cartId to be able to add it to cartItems table
+  // the below is adding the items to the cartItems table
+  const cartId = req.cartId;
+  const { cookieId, quantity } = req.body;
+  const sql = `
+    insert into "cartItems" ("cartId", "cookieId", "quantity")
+    values ($1, $2, $3)
+    returning *
+  `;
+  const params = [cartId, cookieId, quantity];
+  db.query(sql, params)
+    .then(result => {
+      const [cartItem] = result.rows;
+      res.status(201).json(cartItem);
     })
     .catch(err => next(err));
 });
