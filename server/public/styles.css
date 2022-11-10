@@ -15,3 +15,62 @@ h1,
 .navbar-toggler {
   border: solid 1px #fdeedc;
 }
+
+.accordion-button {
+  background-color: #fff8f1;
+  font-family: Merriweather, serif;
+  font-weight: 600;
+  color: #422300;
+  border: solid 1px #422300;
+}
+
+.accordion-button:focus {
+  box-shadow: none;
+  border: solid 1px #422300;
+}
+
+.accordion-button:not(.collapsed) {
+  background-color: #fdeedc;
+  color: #422300;
+}
+
+.accordion-body {
+  border: solid 1px #422300;
+}
+
+.button-all {
+  background-color: #ffd8a9;
+  color: #693802;
+  font-weight: 600;
+  border: solid 2px #693802;
+  border-radius: 5px;
+  height: 2.75rem;
+  width: 11rem;
+}
+
+.button-all:hover {
+  background-color: #94540f;
+  color: #ffd8a9;
+  font-weight: 600;
+  border: solid 2px #ffd8a9;
+  border-radius: 5px;
+}
+
+.button-all:active {
+  background-color: #693802 !important;
+  color: #ffd8a9 !important;
+  font-weight: 600;
+  border: solid 2px #ffd8a9;
+  border-radius: 5px;
+}
+
+.form-select {
+  border: solid 2px #693802;
+  color: #693802;
+  cursor: pointer;
+}
+
+.form-select:focus {
+  box-shadow: 0 0 5px 5px #ffd8a9;
+  border: solid 2px #693802;
+}

@@ -6,6 +6,7 @@ import PageContainer from './components/page-container';
 import NotFound from './pages/not-found';
 import Home from './pages/home';
 import Catalog from './pages/catalog';
+import ProductDetails from './pages/products';
 
 export default class App extends React.Component {
   constructor(props) {
@@ -24,17 +25,16 @@ export default class App extends React.Component {
 
   renderPage() {
     const { route } = this.state;
-
     if (route.path === '') {
       return <Home />;
     }
-    if (route.path === 'catalog') {
+    if (route.path === 'cookies') {
       return <Catalog />;
     }
-    // if (route.path === 'products') {
-    //   const productId = route.params.get('productId');
-    //   return <ProductDetails productId={productId} />;
-    // }
+    if (route.path === 'cookie') {
+      const cookieId = route.params.get('cookieId');
+      return <ProductDetails cookieId={cookieId} />;
+    }
     return <NotFound />;
   }
 
