@@ -43,7 +43,6 @@ export default class Catalog extends React.Component {
     fetch('/cookies')
       .then(res => res.json())
       .then(cookies => {
-        // window.location.hash = 'cookies';
         this.setState({ cookies });
       }
       );
