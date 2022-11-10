@@ -44,12 +44,12 @@ h1,
   font-weight: 600;
   border: solid 2px #693802;
   border-radius: 5px;
-  height: 3rem;
-  width: 12rem;
+  height: 2.75rem;
+  width: 11rem;
 }
 
 .button-all:hover {
-  background-color: #693802;
+  background-color: #94540f;
   color: #ffd8a9;
   font-weight: 600;
   border: solid 2px #ffd8a9;
@@ -57,14 +57,12 @@ h1,
 }
 
 .button-all:active {
-  background-color: #693802;
-  color: #ffd8a9;
+  background-color: #693802 !important;
+  color: #ffd8a9 !important;
   font-weight: 600;
   border: solid 2px #ffd8a9;
   border-radius: 5px;
 }
-
-/* Figure out how to make the active color of this button to not change blue */
 
 .form-select {
   border: solid 2px #693802;

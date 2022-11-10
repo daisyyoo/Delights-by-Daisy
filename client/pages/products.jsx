@@ -8,7 +8,8 @@ import Form from 'react-bootstrap/Form';
 const styles = {
   title: {
     color: '#422300',
-    fontWeight: '600'
+    fontWeight: '600',
+    fontFamily: 'Merriweather'
   },
   image: {
     height: '400px',
@@ -58,15 +59,15 @@ export default class ProductDetails extends React.Component {
           </div>
           <Card className="col border-0 d-flex flex-direction-column justify-content-center">
             <Card.Body className="pb-0">
-              <h1 className="mb-1 pt-lg-4" style={styles.title}>{flavor}</h1>
-              <p className="mb-0 pt-lg-2" style={styles.weight}>{`${weight} oz`}</p>
+              <Card.Text className="h1 py-lg-3 d-flex align-items-center" style={styles.title}>{flavor}</Card.Text>
+              <Card.Text className="h6 d-flex align-items-center" style={styles.weight}>{`${weight} oz`}</Card.Text>
             </Card.Body>
-            <Card.Body className="pt-lg-0">
+            <Card.Body className="pt-lg-0 d-flex align-items-center">
               <Card.Text style={styles.description}>
                 {description}
               </Card.Text>
             </Card.Body>
-            <Card.Body className="py-0" style={styles.price}>
+            <Card.Body className="py-0 d-flex align-items-center" style={styles.price}>
               {toDollars(price)}
             </Card.Body>
             <Card.Body className="d-flex justify-content-between align-items-center">
@@ -80,7 +81,7 @@ export default class ProductDetails extends React.Component {
                   <option>6</option>
                 </Form.Select>
               </Form.Group>
-              <Button className="button-all ">ADD TO BASKET</Button>
+              <Button href="#"className="button-all ">ADD TO BASKET</Button>
             </Card.Body>
           </Card>
         </div>
