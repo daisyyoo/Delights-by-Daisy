@@ -4,6 +4,7 @@ import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
 import Accordion from 'react-bootstrap/Accordion';
 import Form from 'react-bootstrap/Form';
+import AppContext from '../lib/app-context';
 
 const styles = {
   title: {
@@ -36,7 +37,8 @@ export default class ProductDetails extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      cookie: null
+      cookie: null,
+      selectValue: 1
     };
   }
 
@@ -46,8 +48,22 @@ export default class ProductDetails extends React.Component {
       .then(cookie => this.setState({ cookie }));
   }
 
+  handleChange(event) {
+    this.setState({ selectValue: event.target.value });
+  }
+  // try and figure out how to set the actual value of the selected value from drop down
+
+  sendTheInfo() {
+    // const quantity = this.state.selectValue;
+    // console.log(quantity);
+    // const { addToBasket } = this.context;
+    // addToBasket(result);
+  }
+
   render() {
     if (!this.state.cookie) return null;
+    // const { addToBasket } = this.context;
+    const { sendTheInfo } = this;
     const {
       flavor, price, weight, description, ingredients, allergens, backstory, imageUrl
     } = this.state.cookie;
@@ -72,7 +88,7 @@ export default class ProductDetails extends React.Component {
             </Card.Body>
             <Card.Body className="d-flex justify-content-between align-items-center">
               <Form.Group>
-                <Form.Select defaultValue="1">
+                <Form.Select value={this.state.selectValue} onChange={this.handleChange}>
                   <option>1</option>
                   <option>2</option>
                   <option>3</option>
@@ -81,7 +97,7 @@ export default class ProductDetails extends React.Component {
                   <option>6</option>
                 </Form.Select>
               </Form.Group>
-              <Button href="#"className="button-all ">ADD TO BASKET</Button>
+              <Button onClick={sendTheInfo} className="button-all ">ADD TO BASKET</Button>
             </Card.Body>
           </Card>
         </div>
@@ -103,3 +119,5 @@ export default class ProductDetails extends React.Component {
     );
   }
 }
+
+ProductDetails.contextType = AppContext;

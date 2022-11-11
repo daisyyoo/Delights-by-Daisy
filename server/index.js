@@ -14,7 +14,7 @@ const db = new pg.Pool({
 });
 
 const app = express();
-
+app.use(express.json());
 app.use(staticMiddleware);
 
 app.get('/cookies', (req, res, next) => {
@@ -57,6 +57,7 @@ app.get('/cookies/:cookieId', (req, res, next) => {
 
 app.post('/myBasket', (req, res, next) => {
   const token = req.get('x-access-token');
+  const { cookieId, quantity } = req.body;
   if (!token) {
     const sql = `
       insert into "carts"
@@ -65,32 +66,47 @@ app.post('/myBasket', (req, res, next) => {
     `;
     db.query(sql)
       .then(result => {
-        const { cartId } = result.rows[0];
+        const { cartId } = result.rows[0]; // cartId is just a number
         const token = jwt.sign(cartId, process.env.TOKEN_SECRET);
-        req.cartId = res.json({ token, cartId });
+
+        if (!cookieId || !quantity) {
+          throw new ClientError(400, 'cookieId and quantity are required fields');
+        }
+        const sql = `
+          insert into "cartItems" ("cartId", "cookieId", "quantity")
+          values ($1, $2, $3)
+          returning *
+        `;
+        const params = [cartId, cookieId, quantity];
+        db.query(sql, params)
+          .then(result => {
+            const [cartItem] = result.rows;
+            const user = { cartId, token, cartItem };
+            res.status(201).json(user);
+          })
+          .catch(err => next(err));
       })
       .catch(err => next(err));
   } else {
     const cartId = jwt.verify(token, process.env.TOKEN_SECRET);
-    req.cartId = cartId; // this is the cardId number, not object
-    next();
+    const { cookieId, quantity } = req.body;
+    if (!cookieId || !quantity) {
+      throw new ClientError(400, 'cookieId and quantity are required fields');
+    }
+    const sql = `
+      insert into "cartItems" ("cartId", "cookieId", "quantity")
+      values ($1, $2, $3)
+      returning *
+      `;
+    const params = [cartId, cookieId, quantity];
+    db.query(sql, params)
+      .then(result => {
+        const [cartItem] = result.rows;
+        const user = { cartId, token, cartItem };
+        res.status(201).json(user);
+      })
+      .catch(err => next(err));
   }
-  // the above is to get the cartId to be able to add it to cartItems table
-  // the below is adding the items to the cartItems table
-  const cartId = req.cartId;
-  const { cookieId, quantity } = req.body;
-  const sql = `
-    insert into "cartItems" ("cartId", "cookieId", "quantity")
-    values ($1, $2, $3)
-    returning *
-  `;
-  const params = [cartId, cookieId, quantity];
-  db.query(sql, params)
-    .then(result => {
-      const [cartItem] = result.rows;
-      res.status(201).json(cartItem);
-    })
-    .catch(err => next(err));
 });
 
 app.use(errorMiddleware);
