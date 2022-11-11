@@ -57,7 +57,8 @@ app.get('/cookies/:cookieId', (req, res, next) => {
 
 app.post('/myBasket', (req, res, next) => {
   const token = req.get('x-access-token');
-  const { cookieId, quantity } = req.body;
+  const { quantity } = req.body;
+  const { cookieId } = req.body.cookie;
   if (!token) {
     const sql = `
       insert into "carts"

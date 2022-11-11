@@ -5,6 +5,7 @@ import Card from 'react-bootstrap/Card';
 import Accordion from 'react-bootstrap/Accordion';
 import Form from 'react-bootstrap/Form';
 import AppContext from '../lib/app-context';
+import Modal from 'react-bootstrap/Modal';
 
 const styles = {
   title: {
@@ -38,8 +39,12 @@ export default class ProductDetails extends React.Component {
     super(props);
     this.state = {
       cookie: null,
-      selectValue: 1
+      quantity: 1,
+      setShow: false,
+      basketData: {}
     };
+    this.handleChange = this.handleChange.bind(this);
+    this.sendTheInfo = this.sendTheInfo.bind(this);
   }
 
   componentDidMount() {
@@ -49,15 +54,25 @@ export default class ProductDetails extends React.Component {
   }
 
   handleChange(event) {
-    this.setState({ selectValue: event.target.value });
+    this.setState({ quantity: event.target.value });
   }
-  // try and figure out how to set the actual value of the selected value from drop down
 
-  sendTheInfo() {
-    // const quantity = this.state.selectValue;
-    // console.log(quantity);
-    // const { addToBasket } = this.context;
-    // addToBasket(result);
+  sendTheInfo(event) {
+    const req = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(this.state)
+    };
+    fetch('/myBasket', req)
+      .then(res => res.json())
+      .then(result => {
+        // console.log(result);
+        this.setState({ basketData: result });
+        this.setState({ setShow: true });
+      });
+    // add token to window location HERE from the result of the fetch
   }
 
   render() {
@@ -67,6 +82,10 @@ export default class ProductDetails extends React.Component {
     const {
       flavor, price, weight, description, ingredients, allergens, backstory, imageUrl
     } = this.state.cookie;
+    const modalShow = this.state.setShow ? 'show' : 'd-none';
+    const { cookie, quantity } = this.state;
+    const { setShow } = this.state;
+    const moreProps = { cookie, quantity };
     return (
       <>
         <div className="d-flex row">
@@ -88,13 +107,13 @@ export default class ProductDetails extends React.Component {
             </Card.Body>
             <Card.Body className="d-flex justify-content-between align-items-center">
               <Form.Group>
-                <Form.Select value={this.state.selectValue} onChange={this.handleChange}>
-                  <option>1</option>
-                  <option>2</option>
-                  <option>3</option>
-                  <option>4</option>
-                  <option>5</option>
-                  <option>6</option>
+                <Form.Select value={this.state.quantity} onChange={this.handleChange}>
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                  <option value="5">5</option>
+                  <option value="6">6</option>
                 </Form.Select>
               </Form.Group>
               <Button onClick={sendTheInfo} className="button-all ">ADD TO BASKET</Button>
@@ -115,9 +134,56 @@ export default class ProductDetails extends React.Component {
             <Accordion.Body style={styles.text}>{backstory}</Accordion.Body>
           </Accordion.Item>
         </Accordion>
+        <BasketModal className={modalShow} data={moreProps} show={setShow} />
       </>
     );
   }
 }
 
 ProductDetails.contextType = AppContext;
+
+function BasketModal(props) {
+  const { cookie, quantity } = props.data;
+  const { show } = props;
+  const { flavor, imageUrl, price, weight } = cookie;
+
+  return (
+    <Modal
+      show={show}
+      // onHide= {!show}
+      dialogClassName="modal-lg-50w"
+      aria-labelledby="basket-modal"
+    >
+      <Modal.Header>
+        <Modal.Title id="basket-modal">
+          Added to Basket!
+        </Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <Card>
+          <Card.Img src={imageUrl} alt={flavor}/>
+          <Card.Body>
+            <Card.Text>
+              {flavor}
+            </Card.Text>
+            <Card.Text>
+              {`${weight} oz`}
+            </Card.Text>
+            <Card.Text>
+              {`${toDollars(price * quantity)}`}
+            </Card.Text>
+            <Card.Text>
+              {`Qty :  ${quantity}`}
+            </Card.Text>
+          </Card.Body>
+          <Card.Body>
+            <Button className="button-return">KEEP SHOPPING</Button>
+            {/* need to figure out how to close the modal with ^ button onClick event */}
+            <Button href="#myBasket" className="button-all">GO TO BASKET</Button>
+          </Card.Body>
+        </Card>
+      </Modal.Body>
+    </Modal>
+
+  );
+}
