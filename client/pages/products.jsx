@@ -13,8 +13,10 @@ const styles = {
     fontWeight: '600',
     fontFamily: 'Merriweather'
   },
+  imageContainer: {
+    height: '325px'
+  },
   image: {
-    height: '400px',
     objectFit: 'contain'
   },
   description: {
@@ -45,6 +47,7 @@ export default class ProductDetails extends React.Component {
     };
     this.handleChange = this.handleChange.bind(this);
     this.sendTheInfo = this.sendTheInfo.bind(this);
+    this.closeModal = this.closeModal.bind(this);
   }
 
   componentDidMount() {
@@ -75,6 +78,10 @@ export default class ProductDetails extends React.Component {
     // add token to window location HERE from the result of the fetch
   }
 
+  closeModal() {
+    this.setState({ setShow: false });
+  }
+
   render() {
     if (!this.state.cookie) return null;
     // const { addToBasket } = this.context;
@@ -84,15 +91,16 @@ export default class ProductDetails extends React.Component {
     } = this.state.cookie;
     const modalShow = this.state.setShow ? 'show' : 'd-none';
     const { cookie, quantity } = this.state;
+    const { closeModal } = this;
     const { setShow } = this.state;
-    const moreProps = { cookie, quantity };
+    const moreProps = { cookie, quantity, closeModal };
     return (
       <>
-        <div className="d-flex row">
-          <div className="col">
-            <img src={imageUrl} alt={flavor} style={styles.image} />
+        <div className="d-flex row align-items-center">
+          <div className="col-lg-6 d-flex justify-content-center" style={styles.imageContainer}>
+            <img src={imageUrl} alt={flavor} style={styles.image} className="mh-100" />
           </div>
-          <Card className="col border-0 d-flex flex-direction-column justify-content-center">
+          <Card className="col-lg-6 border-0 d-flex flex-direction-column justify-content-center">
             <Card.Body className="pb-0">
               <Card.Text className="h1 py-lg-3 d-flex align-items-center" style={styles.title}>{flavor}</Card.Text>
               <Card.Text className="h6 d-flex align-items-center" style={styles.weight}>{`${weight} oz`}</Card.Text>
@@ -143,15 +151,15 @@ export default class ProductDetails extends React.Component {
 ProductDetails.contextType = AppContext;
 
 function BasketModal(props) {
-  const { cookie, quantity } = props.data;
+  const { cookie, quantity, closeModal } = props.data;
   const { show } = props;
   const { flavor, imageUrl, price, weight } = cookie;
 
   return (
     <Modal
       show={show}
-      // onHide= {!show}
-      dialogClassName="modal-lg-50w"
+      fullscreen='md-down'
+      // className="w-100 w-lg-50"
       aria-labelledby="basket-modal"
     >
       <Modal.Header>
@@ -177,8 +185,7 @@ function BasketModal(props) {
             </Card.Text>
           </Card.Body>
           <Card.Body>
-            <Button className="button-return">KEEP SHOPPING</Button>
-            {/* need to figure out how to close the modal with ^ button onClick event */}
+            <Button onClick={closeModal} className="button-return">KEEP SHOPPING</Button>
             <Button href="#myBasket" className="button-all">GO TO BASKET</Button>
           </Card.Body>
         </Card>
