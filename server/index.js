@@ -56,9 +56,10 @@ app.get('/cookies/:cookieId', (req, res, next) => {
 });
 
 app.post('/myBasket', (req, res, next) => {
-  const token = req.get('x-access-token');
+  let token = req.get('x-access-token');
   const { quantity } = req.body;
   const { cookieId } = req.body.cookie;
+  let cartId;
   if (!token) {
     const sql = `
       insert into "carts"
@@ -67,48 +68,51 @@ app.post('/myBasket', (req, res, next) => {
     `;
     db.query(sql)
       .then(result => {
-        const { cartId } = result.rows[0];
-        const token = jwt.sign(cartId, process.env.TOKEN_SECRET);
-
-        if (!cookieId || !quantity) {
-          throw new ClientError(400, 'cookieId and quantity are required fields');
-        }
-        const sql = `
-          insert into "cartItems" ("cartId", "cookieId", "quantity")
-          values ($1, $2, $3)
-          returning *
-        `;
-        const params = [cartId, cookieId, quantity];
-        db.query(sql, params)
-          .then(result => {
-            const [cartItem] = result.rows;
-            const user = { cartId, token, cartItem };
-            res.status(201).json(user);
-          })
-          .catch(err => next(err));
+        cartId = result.rows[0].cartId;
+        token = jwt.sign(cartId, process.env.TOKEN_SECRET);
       })
       .catch(err => next(err));
   } else {
-    const cartId = jwt.verify(token, process.env.TOKEN_SECRET);
-    const { cookieId, quantity } = req.body;
-    if (!cookieId || !quantity) {
-      throw new ClientError(400, 'cookieId and quantity are required fields');
-    }
-    const sql = `
-      insert into "cartItems" ("cartId", "cookieId", "quantity")
-      values ($1, $2, $3)
-      returning *
-      `;
-    const params = [cartId, cookieId, quantity];
-    db.query(sql, params)
-      .then(result => {
-        const [cartItem] = result.rows;
-        const user = { cartId, token, cartItem };
-        res.status(201).json(user);
-      })
-      .catch(err => next(err));
+    cartId = jwt.verify(token, process.env.TOKEN_SECRET);
   }
+  if (!cookieId || !quantity) {
+    throw new ClientError(400, 'cookieId and quantity are required fields');
+  }
+  const sql = `
+    insert into "cartItems" ("cartId", "cookieId", "quantity")
+    values ($1, $2, $3)
+    returning *
+  `;
+  const params = [cartId, cookieId, quantity];
+  db.query(sql, params)
+    .then(result => {
+      const [cartItem] = result.rows;
+      const user = { cartId, token, cartItem };
+      res.status(201).json(user);
+    })
+    .catch(err => next(err));
 });
+// else {
+//   const cartId = jwt.verify(token, process.env.TOKEN_SECRET);
+//   if (!cookieId || !quantity) {
+//     throw new ClientError(400, 'cookieId and quantity are required fields');
+//   }
+
+//   const sql = `
+//     insert into "cartItems" ("cartId", "cookieId", "quantity")
+//     values ($1, $2, $3)
+//     returning *
+//     `;
+//   const params = [cartId, cookieId, quantity];
+//   db.query(sql, params)
+//     .then(result => {
+//       const [cartItem] = result.rows;
+//       const user = { cartId, token, cartItem };
+//       res.status(201).json(user);
+//     })
+//     .catch(err => next(err));
+// }
+// });
 
 app.use(errorMiddleware);
 

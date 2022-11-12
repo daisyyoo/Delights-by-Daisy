@@ -115,7 +115,6 @@ export default class ProductDetails extends React.Component {
           addToBasket(result);
         }
       });
-    // add token to window location HERE from the result of the fetch
   }
 
   closeModal() {
@@ -236,6 +235,5 @@ function BasketModal(props) {
         </div>
       </Modal.Body>
     </Modal>
-
   );
 }
