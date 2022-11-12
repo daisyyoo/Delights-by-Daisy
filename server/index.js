@@ -67,7 +67,7 @@ app.post('/myBasket', (req, res, next) => {
     `;
     db.query(sql)
       .then(result => {
-        const { cartId } = result.rows[0]; // cartId is just a number
+        const { cartId } = result.rows[0];
         const token = jwt.sign(cartId, process.env.TOKEN_SECRET);
 
         if (!cookieId || !quantity) {

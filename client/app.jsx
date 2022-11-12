@@ -26,19 +26,19 @@ export default class App extends React.Component {
       const route = parseRoute(window.location.hash);
       this.setState({ route });
     });
-    const token = window.localStorage.getItem('react-context-jwt');
+    const token = window.localStorage.getItem('basketToken');
     const cartId = token ? jwtDecode(token) : null;
     this.setState({ cartId });
   }
 
   addToBasket(result) {
     const { cartId, token } = result;
-    window.localStorage.setItem('react-context-jwt', token);
+    window.localStorage.setItem('basketToken', token);
     this.setState({ cartId });
   }
 
   checkOut() {
-    window.localStorage.removeItem('react-context-jwt');
+    window.localStorage.removeItem('basketToken');
     this.setState({ cartId: null });
   }
 

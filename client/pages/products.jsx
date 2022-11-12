@@ -14,7 +14,7 @@ const styles = {
     fontFamily: 'Merriweather'
   },
   imageContainer: {
-    height: '325px'
+    height: '350px'
   },
   image: {
     objectFit: 'contain'
@@ -34,6 +34,30 @@ const styles = {
   },
   text: {
     color: '#422300'
+  },
+  modalCard: {
+    height: '150px'
+  },
+  modalHeader: {
+    color: '#fdeedc',
+    fontWeight: '600',
+    fontFamily: 'Merriweather',
+    fontSize: '2rem'
+  },
+  modalTitle: {
+    color: '#422300',
+    fontWeight: '600',
+    fontFamily: 'Merriweather',
+    fontSize: '1.2rem'
+  },
+  modalText: {
+    color: '#422300',
+    fontSize: '1rem'
+  },
+  modalPrice: {
+    color: '#693802',
+    fontWeight: '600',
+    fontSize: '1rem'
   }
 };
 export default class ProductDetails extends React.Component {
@@ -61,19 +85,35 @@ export default class ProductDetails extends React.Component {
   }
 
   sendTheInfo(event) {
-    const req = {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(this.state)
-    };
+    const { cartId, addToBasket } = this.context;
+    let req;
+    const token = localStorage.getItem('basketToken');
+    if (token === null) {
+      req = {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(this.state)
+      };
+    } else {
+      req = {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-access-token': token
+        },
+        body: JSON.stringify(this.state)
+      };
+    }
     fetch('/myBasket', req)
       .then(res => res.json())
       .then(result => {
-        // console.log(result);
         this.setState({ basketData: result });
         this.setState({ setShow: true });
+        if (!cartId) {
+          addToBasket(result);
+        }
       });
     // add token to window location HERE from the result of the fetch
   }
@@ -84,7 +124,6 @@ export default class ProductDetails extends React.Component {
 
   render() {
     if (!this.state.cookie) return null;
-    // const { addToBasket } = this.context;
     const { sendTheInfo } = this;
     const {
       flavor, price, weight, description, ingredients, allergens, backstory, imageUrl
@@ -98,14 +137,14 @@ export default class ProductDetails extends React.Component {
       <>
         <div className="d-flex row align-items-center">
           <div className="col-lg-6 d-flex justify-content-center" style={styles.imageContainer}>
-            <img src={imageUrl} alt={flavor} style={styles.image} className="mh-100" />
+            <img src={imageUrl} alt={flavor} style={styles.image} className="mw-100" />
           </div>
           <Card className="col-lg-6 border-0 d-flex flex-direction-column justify-content-center">
             <Card.Body className="pb-0">
               <Card.Text className="h1 py-lg-3 d-flex align-items-center" style={styles.title}>{flavor}</Card.Text>
               <Card.Text className="h6 d-flex align-items-center" style={styles.weight}>{`${weight} oz`}</Card.Text>
             </Card.Body>
-            <Card.Body className="pt-lg-0 d-flex align-items-center">
+            <Card.Body className="d-flex align-items-center">
               <Card.Text style={styles.description}>
                 {description}
               </Card.Text>
@@ -159,36 +198,42 @@ function BasketModal(props) {
     <Modal
       show={show}
       fullscreen='md-down'
-      // className="w-100 w-lg-50"
       aria-labelledby="basket-modal"
+      className="border-0"
     >
       <Modal.Header>
-        <Modal.Title id="basket-modal">
+        <h1 style={styles.modalHeader} id="basket-modal" className="m-0">
           Added to Basket!
-        </Modal.Title>
+        </h1>
       </Modal.Header>
       <Modal.Body>
-        <Card>
-          <Card.Img src={imageUrl} alt={flavor}/>
-          <Card.Body>
-            <Card.Text>
-              {flavor}
-            </Card.Text>
-            <Card.Text>
-              {`${weight} oz`}
-            </Card.Text>
-            <Card.Text>
-              {`${toDollars(price * quantity)}`}
-            </Card.Text>
-            <Card.Text>
-              {`Qty :  ${quantity}`}
-            </Card.Text>
-          </Card.Body>
-          <Card.Body>
+        <div className="mt-2">
+          <div className="d-flex modal-card-container">
+            <div className="col-4 d-flex align-items-center ">
+              <img className="w-100" style={styles.image} src={imageUrl} alt={flavor}/>
+            </div>
+            <Card className="col-8 border-0">
+              <Card.Body className="py-2 px-3">
+                <Card.Text style={styles.modalTitle} className="h3">
+                  {flavor}
+                </Card.Text>
+                <Card.Text style={styles.modalText} className="h4">
+                  {`${weight} oz`}
+                </Card.Text>
+                <Card.Text style={styles.modalPrice} className="h4">
+                  {`${toDollars(price * quantity)}`}
+                </Card.Text>
+                <Card.Text style={styles.modalText} className="h4">
+                  {`Qty :  ${quantity}`}
+                </Card.Text>
+              </Card.Body>
+            </Card>
+          </div>
+          <div className="d-flex justify-content-between mt-5">
             <Button onClick={closeModal} className="button-return">KEEP SHOPPING</Button>
             <Button href="#myBasket" className="button-all">GO TO BASKET</Button>
-          </Card.Body>
-        </Card>
+          </div>
+        </div>
       </Modal.Body>
     </Modal>
 
