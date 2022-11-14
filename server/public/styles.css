@@ -111,3 +111,9 @@ h1,
 .basket-border {
   border-bottom: solid 1px #422300;
 }
+
+.card-border {
+  border: none;
+  border-bottom: solid 1px #422300;
+  border-radius: 0;
+}
