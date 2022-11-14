@@ -11,10 +11,6 @@ const styles = {
     height: '150px',
     objectFit: 'cover'
   },
-  header: {
-    color: '#422300',
-    fontWeight: '600'
-  },
   title: {
     color: '#422300',
     fontSize: '1rem',
@@ -51,7 +47,7 @@ export default class Catalog extends React.Component {
   render() {
     return (
       <>
-        <h1 className="py-1" style={styles.header}>Shop All</h1>
+        <h1 className="py-1">Shop All</h1>
         <div className="d-flex justify-content-between">
           <a style={styles.description} className="text-decoration-none" href='#'>
             <i className="fa-solid fa-chevron-left" style={styles.icon}/>

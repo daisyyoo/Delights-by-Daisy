@@ -207,7 +207,7 @@ function BasketModal(props) {
       </Modal.Header>
       <Modal.Body>
         <div className="mt-2">
-          <div className="d-flex modal-card-container">
+          <div className="d-flex">
             <div className="col-4 d-flex align-items-center ">
               <img className="w-100" style={styles.image} src={imageUrl} alt={flavor}/>
             </div>

@@ -107,3 +107,7 @@ h1,
   background-color: #dc924e;
   color: #fdeedc;
 }
+
+.basket-border {
+  border-bottom: solid 1px #422300;
+}

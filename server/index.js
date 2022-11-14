@@ -122,13 +122,10 @@ app.get('/myBasket', (req, res, next) => {
           "cookies"."flavor",
           "cookies"."weight",
           "cookies"."price",
-          "cookies"."imageUrl",
-          sum("price") as "totalPrice"
+          "cookies"."imageUrl"
     from "cartItems"
     join "cookies" using ("cookieId")
     where "cartId" = $1
-    group by "cartItems"."cookieId",
-            "cartItems"."cartId"
   `;
   const params = [cartId];
   db.query(sql, params)
