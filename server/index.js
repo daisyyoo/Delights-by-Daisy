@@ -55,7 +55,7 @@ app.get('/cookies/:cookieId', (req, res, next) => {
     .catch(err => next(err));
 });
 
-app.post('/myBasket', (req, res, next) => {
+app.post('/addToBasket', (req, res, next) => {
   const token = req.get('x-access-token');
   const { quantity } = req.body;
   const { cookieId } = req.body.cookie;
@@ -107,6 +107,35 @@ app.post('/myBasket', (req, res, next) => {
       })
       .catch(err => next(err));
   }
+});
+
+app.get('/myBasket', (req, res, next) => {
+  const token = req.get('x-access-token');
+  if (!token) {
+    next();
+  }
+  const cartId = jwt.verify(token, process.env.TOKEN_SECRET);
+  const sql = `
+    select "cartItems"."cartId",
+          "cartItems"."cookieId",
+          "cartItems"."quantity",
+          "cookies"."flavor",
+          "cookies"."weight",
+          "cookies"."price",
+          "cookies"."imageUrl"
+    from "cartItems"
+    join "cookies" using ("cookieId")
+    where "cartId" = $1
+  `;
+  const params = [cartId];
+  db.query(sql, params)
+    .then(result => {
+      if (!result.rows[0]) {
+        throw new ClientError(404, `cannot find basket with cartId ${cartId}`);
+      }
+      res.json(result.rows);
+    })
+    .catch(err => next(err));
 });
 
 app.use(errorMiddleware);

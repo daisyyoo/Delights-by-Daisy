@@ -106,7 +106,7 @@ export default class ProductDetails extends React.Component {
         body: JSON.stringify(this.state)
       };
     }
-    fetch('/myBasket', req)
+    fetch('/addToBasket', req)
       .then(res => res.json())
       .then(result => {
         this.setState({ basketData: result });
