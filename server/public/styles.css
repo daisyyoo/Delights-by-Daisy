@@ -3,7 +3,9 @@
 }
 
 h1,
-.navbar-brand {
+.navbar-brand,
+.modal-title {
+  color: #422300;
   font-family: Merriweather, serif;
   font-weight: 600;
 }
@@ -64,6 +66,32 @@ h1,
   border-radius: 5px;
 }
 
+.button-return {
+  background-color: #fdeedc;
+  color: #693802;
+  font-weight: 600;
+  border: solid 2px #693802;
+  border-radius: 5px;
+  height: 2.75rem;
+  width: 11rem;
+}
+
+.button-return:hover {
+  background-color: #94540f;
+  color: #ffd8a9;
+  font-weight: 600;
+  border: solid 2px #ffd8a9;
+  border-radius: 5px;
+}
+
+.button-return:active {
+  background-color: #693802 !important;
+  color: #ffd8a9 !important;
+  font-weight: 600;
+  border: solid 2px #ffd8a9;
+  border-radius: 5px;
+}
+
 .form-select {
   border: solid 2px #693802;
   color: #693802;
@@ -73,4 +101,9 @@ h1,
 .form-select:focus {
   box-shadow: 0 0 5px 5px #ffd8a9;
   border: solid 2px #693802;
+}
+
+.modal-header {
+  background-color: #dc924e;
+  color: #fdeedc;
 }
