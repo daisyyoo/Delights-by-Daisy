@@ -5,6 +5,8 @@ const jwt = require('jsonwebtoken');
 const ClientError = require('./client-error');
 const staticMiddleware = require('./static-middleware');
 const errorMiddleware = require('./error-middleware');
+const app = express();
+const stripe = require('stripe')('sk_test_51Ly5zQD9hcLXyrLfIIebHLiTNOKeO1CELshkDj0vjizFzkrgZ2cnZa8lF2Vf3AmZJQYHJfi454bf68ehAzJExyHe00gMcrQPGO');
 
 const db = new pg.Pool({
   connectionString: process.env.DATABASE_URL,
@@ -13,7 +15,6 @@ const db = new pg.Pool({
   }
 });
 
-const app = express();
 app.use(express.json());
 app.use(staticMiddleware);
 
@@ -140,6 +141,30 @@ app.get('/myBasket', (req, res, next) => {
       })
       .catch(err => next(err));
   }
+});
+
+const calculateOrderAmount = items => {
+  // Replace this constant with a calculation of the order's amount
+  // Calculate the order total on the server to prevent
+  // people from directly manipulating the amount on the client
+  return 1400;
+};
+
+app.post('/create-payment-intent', async (req, res) => {
+  const { items } = req.body;
+
+  // Create a PaymentIntent with the order amount and currency
+  const paymentIntent = await stripe.paymentIntents.create({
+    amount: calculateOrderAmount(items),
+    currency: 'usd',
+    automatic_payment_methods: {
+      enabled: true
+    }
+  });
+
+  res.send({
+    clientSecret: paymentIntent.client_secret
+  });
 });
 
 app.use(errorMiddleware);

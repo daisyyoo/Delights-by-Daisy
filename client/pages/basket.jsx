@@ -120,7 +120,7 @@ export default class Basket extends React.Component {
               </div>
               <div style={styles.borderBottom} className="w-100 pb-4 d-flex flex-column align-items-center">
                 <p style={styles.weight} className="w-100 text-left py-lg-2">Taxes and shipping calculated at checkout</p>
-                <Button style={styles.button} className="button-all w-100" >PROCEED TO CHECKOUT</Button>
+                <Button href="#checkout" style={styles.button} className="button-all w-100" >PROCEED TO CHECKOUT</Button>
               </div>
             </div>
             }
