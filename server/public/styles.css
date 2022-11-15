@@ -107,3 +107,18 @@ h1,
   background-color: #dc924e;
   color: #fdeedc;
 }
+
+.basket-border {
+  border-bottom: solid 1px #422300;
+}
+
+.card-border {
+  border: none;
+  border-bottom: solid 1px #422300;
+  border-radius: 0;
+}
+
+i {
+  color: #693802;
+  font-size: 1.2rem;
+}

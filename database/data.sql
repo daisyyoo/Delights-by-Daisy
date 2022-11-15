@@ -50,7 +50,7 @@ values
   '/image/jasmine.jpg'
 ),
 (
-  'Earl Grey Blueberry White Chocolate',
+  'Earl Grey Blueberry',
   '400',
   '3.5',
   'The ever-popular earl grey tea is complemented with the natural sweetness from the blueberries and white chocolate while the orange zest reinforces the bergamot nuances from the tea.',

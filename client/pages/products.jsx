@@ -106,7 +106,7 @@ export default class ProductDetails extends React.Component {
         body: JSON.stringify(this.state)
       };
     }
-    fetch('/myBasket', req)
+    fetch('/addToBasket', req)
       .then(res => res.json())
       .then(result => {
         this.setState({ basketData: result });
@@ -207,7 +207,7 @@ function BasketModal(props) {
       </Modal.Header>
       <Modal.Body>
         <div className="mt-2">
-          <div className="d-flex modal-card-container">
+          <div className="d-flex">
             <div className="col-4 d-flex align-items-center ">
               <img className="w-100" style={styles.image} src={imageUrl} alt={flavor}/>
             </div>

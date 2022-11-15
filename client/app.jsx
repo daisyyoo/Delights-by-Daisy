@@ -9,6 +9,7 @@ import NotFound from './pages/not-found';
 import Home from './pages/home';
 import Catalog from './pages/catalog';
 import ProductDetails from './pages/products';
+import Basket from './pages/basket';
 
 export default class App extends React.Component {
   constructor(props) {
@@ -53,6 +54,9 @@ export default class App extends React.Component {
     if (route.path === 'cookie') {
       const cookieId = route.params.get('cookieId');
       return <ProductDetails cookieId={cookieId} />;
+    }
+    if (route.path === 'myBasket') {
+      return <Basket />;
     }
     return <NotFound />;
   }
