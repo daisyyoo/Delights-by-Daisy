@@ -143,29 +143,108 @@ app.get('/myBasket', (req, res, next) => {
   }
 });
 
-const calculateOrderAmount = items => {
-  // Replace this constant with a calculation of the order's amount
-  // Calculate the order total on the server to prevent
-  // people from directly manipulating the amount on the client
-  return 1400;
-};
+// app.get('/checkout', (req, res, next) => {
+//   // const calculateOrderAmount = items => {
+//   // Replace this constant with a calculation of the order's amount
+//   // Calculate the order total on the server to prevent
+//   // people from directly manipulating the amount on the client
+//   const token = req.get('x-access-token');
+//   if (!token) {
+//     next();
+//   } else {
+//     const cartId = jwt.verify(token, process.env.TOKEN_SECRET);
+//     const sql = `
+//         select "cartItems"."cartId",
+//               "cartItems"."cookieId",
+//               "cartItems"."quantity",
+//               "cookies"."flavor",
+//               "cookies"."price"
+//         from "cartItems"
+//         join "cookies" using ("cookieId")
+//         where "cartId" = $1
+//       `;
+//     const params = [cartId];
+//     db.query(sql, params)
+//       .then(result => {
+//         if (!result.rows) {
+//           throw new ClientError(404, `cannot find basket with cartId ${cartId}`);
+//         }
+//         const cookiesArray = result.rows;
+
+//         const calculateOrderAmount = ((
+//           cookiesArray.reduce((previousCookie, currentCookie) => {
+//             return previousCookie + (currentCookie.quantity * currentCookie.price);
+//           }, 0)) / 100).toFixed(2);
+//         const checkoutInfo = {
+//           cookies: cookiesArray,
+//           totalAmount: calculateOrderAmount
+//         };
+//         res.json(checkoutInfo);
+//       })
+//       .catch(err => next(err));
+//   }
+// });
 
 app.post('/create-payment-intent', async (req, res) => {
-  const { items } = req.body;
+  const token = req.get('x-access-token');
+  const cartId = jwt.verify(token, process.env.TOKEN_SECRET);
+  const sql = `
+        select "cartItems"."cartId",
+              "cartItems"."cookieId",
+              "cartItems"."quantity",
+              "cookies"."flavor",
+              "cookies"."price"
+        from "cartItems"
+        join "cookies" using ("cookieId")
+        where "cartId" = $1
+      `;
+  const params = [cartId];
+  db.query(sql, params)
+    .then(result => {
+      if (!result.rows) {
+        throw new ClientError(404, `cannot find basket with cartId ${cartId}`);
+      }
+      const cookiesArray = result.rows;
 
-  // Create a PaymentIntent with the order amount and currency
-  const paymentIntent = await stripe.paymentIntents.create({
-    amount: calculateOrderAmount(items),
-    currency: 'usd',
-    automatic_payment_methods: {
-      enabled: true
-    }
-  });
-
-  res.send({
-    clientSecret: paymentIntent.client_secret
-  });
+      const calculateOrderAmount = ((
+        cookiesArray.reduce((previousCookie, currentCookie) => {
+          return previousCookie + (currentCookie.quantity * currentCookie.price);
+        }, 0)) / 100);
+      // const checkoutInfo = {
+      //   cookies: cookiesArray,
+      //   totalAmount: calculateOrderAmount
+      // };
+      const paymentIntent = stripe.paymentIntents.create({
+        amount: calculateOrderAmount,
+        currency: 'usd',
+        automatic_payment_methods: {
+          enabled: true
+        }
+      });
+      res.send({
+        clientSecret: paymentIntent.client_secret
+      });
+    });
 });
+// res.json(checkoutInfo);
+// })
+// .catch(err => next(err));
+
+// const { items } = req.body;
+
+// // Create a PaymentIntent with the order amount and currency
+// const paymentIntent = await stripe.paymentIntents.create({
+//   amount: calculateOrderAmount(items),
+//   currency: 'usd',
+//   automatic_payment_methods: {
+//     enabled: true
+//   }
+// });
+
+// res.send({
+//   clientSecret: paymentIntent.client_secret
+// });
+// });
 
 app.use(errorMiddleware);
 

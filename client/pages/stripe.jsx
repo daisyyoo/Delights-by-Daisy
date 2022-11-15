@@ -3,7 +3,7 @@ import { loadStripe } from '@stripe/stripe-js';
 import { Elements } from '@stripe/react-stripe-js';
 
 import CheckoutForm from './checkout-form';
-// import '../../server/public/stripe.css';
+import '../../server/public/stripe.css';
 
 // Make sure to call loadStripe outside of a component’s render to avoid
 // recreating the Stripe object on every render.
@@ -15,9 +15,13 @@ export default function StripeCheckout() {
 
   useEffect(() => {
     // Create PaymentIntent as soon as the page loads
+    const token = localStorage.getItem('basketToken');
     fetch('/create-payment-intent', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'x-access-token': token
+      },
       body: JSON.stringify({ items: [{ id: 'xl-tshirt' }] })
     })
       .then(res => res.json())

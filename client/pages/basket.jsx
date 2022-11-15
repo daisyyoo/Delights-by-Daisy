@@ -58,7 +58,8 @@ export default class Basket extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      cookies: []
+      cookies: [],
+      totalAmount: null
     };
   }
 

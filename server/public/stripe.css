@@ -4,14 +4,10 @@
   -webkit-font-smoothing: antialiased;
   display: flex;
   justify-content: center;
-  align-content: center;
-  height: 100vh;
-  width: 100vw;
 }
 
 form {
   min-width: 500px;
-  align-self: center;
   box-shadow:
     0 0 0 0.5px rgba(70, 53, 23, 0.1),
     0 2px 5px 0 rgba(70, 53, 23, 0.1),
@@ -29,7 +25,7 @@ form {
 }
 
 #payment-element {
-  margin-bottom: 24px;
+  margin-bottom: 2rem;
 }
 
 /* spinner/processing state, errors */
