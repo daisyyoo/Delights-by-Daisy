@@ -40,7 +40,8 @@ CREATE TABLE "public"."cartItems" (
 	"cartId" int NOT NULL,
 	"cookieId" int NOT NULL,
 	"quantity" int NOT NULL,
-	"message" TEXT
+	"message" TEXT,
+  UNIQUE ("cartId", "cookieId")
 ) WITH (
   OIDS=FALSE
 );
