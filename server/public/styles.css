@@ -117,3 +117,8 @@ h1,
   border-bottom: solid 1px #422300;
   border-radius: 0;
 }
+
+i {
+  color: #693802;
+  font-size: 1.2rem;
+}
