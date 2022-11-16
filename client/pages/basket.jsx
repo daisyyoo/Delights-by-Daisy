@@ -109,7 +109,7 @@ export default class Basket extends React.Component {
             </div>
             }
           {this.state.cookies.length > 0 &&
-            <div className="py-3 col-lg-3" >
+            <div className="col-lg-3" >
               <div className="d-flex w-100 justify-content-between pt-3 mt-5" style={styles.borderTop}>
                 <h5 style={styles.subtotalHeader}>{`Subtotal (${this.state.cookies.length} items)`}</h5>
                 <h5 style={styles.subtotalHeader}>

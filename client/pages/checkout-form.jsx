@@ -5,6 +5,7 @@ import {
   useElements
 } from '@stripe/react-stripe-js';
 import { toDollars } from '../lib/';
+import AppContext from '../lib/app-context';
 
 export default function CheckoutForm(props) {
   const stripe = useStripe();
@@ -17,15 +18,12 @@ export default function CheckoutForm(props) {
     if (!stripe) {
       return;
     }
-
     const clientSecret = new URLSearchParams(window.location.search).get(
       'payment_intent_client_secret'
     );
-
     if (!clientSecret) {
       return;
     }
-
     stripe.retrievePaymentIntent(clientSecret).then(({ paymentIntent }) => {
       switch (paymentIntent.status) {
         case 'succeeded':
@@ -51,6 +49,7 @@ export default function CheckoutForm(props) {
       // Make sure to disable form submission until Stripe.js has loaded.
       return;
     }
+
     setIsLoading(true);
     const { error } = await stripe.confirmPayment({
       elements,
@@ -59,9 +58,6 @@ export default function CheckoutForm(props) {
         return_url: 'http://localhost:3000/#confirmationPage'
       }
     });
-
-    // fetch() here to create the new data table for orderId
-    // then dispose of token in window
 
     // This point will only be reached if there is an immediate error when
     // confirming the payment. Otherwise, your customer will be redirected to
@@ -80,9 +76,9 @@ export default function CheckoutForm(props) {
   const { totalAmount } = props;
   return (
     <>
-      <div className="col-lg-6 px-4 mx-2 my-2 border-bot">
+      <div className="col-lg-6 px-4 mx-2 my-2 border-bot d-flex justify-content-between align-items-center">
         <h1>Checkout</h1>
-        <h3>{`Total: ${toDollars(totalAmount)}`}</h3>
+        <h4>{`Total: ${toDollars(totalAmount)}`}</h4>
       </div>
       <form id="payment-form" onSubmit={handleSubmit} className="col-lg-6 mx-auto mt-4 mb-5">
         <PaymentElement id="payment-element" />
@@ -97,3 +93,5 @@ export default function CheckoutForm(props) {
     </>
   );
 }
+
+CheckoutForm.contextType = AppContext;

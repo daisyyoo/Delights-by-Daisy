@@ -1,5 +1,4 @@
 import React from 'react';
-import AppContext from '../lib/app-context';
 
 const styles = {
   bgcolor: {
@@ -24,7 +23,7 @@ export default class Footer extends React.Component {
     return (
       <>
         {!cartId &&
-        <footer style={styles.bgcolor} className="w-100 fixed-bottom">
+        <footer style={styles.bgcolor} className="w-100">
           <div className="container d-flex">
             <div className="d-flex align-items-left justify-content-center flex-column w-75">
               <h4 style={styles.title}>Delights by Daisy</h4>
@@ -57,5 +56,3 @@ export default class Footer extends React.Component {
     );
   }
 }
-
-Footer.contextType = AppContext;

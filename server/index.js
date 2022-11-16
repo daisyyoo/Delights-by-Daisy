@@ -182,23 +182,6 @@ app.post('/create-payment-intent', async (req, res) => {
     });
 });
 
-app.post('/checkout', (req, res, next) => {
-  const token = req.get('x-access-token');
-  const cartId = jwt.verify(token, process.env.TOKEN_SECRET);
-  const sql = `
-      insert into "orders" ("cartId")
-      values ($1)
-      returning *
-    `;
-  const params = [cartId];
-  db.query(sql, params)
-    .then(result =>
-      // console.log(result.rows);
-      res.json(result.rows[0])
-    )
-    .catch(err => next(err));
-});
-
 app.use(errorMiddleware);
 
 app.listen(process.env.PORT, () => {
