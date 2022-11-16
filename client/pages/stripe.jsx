@@ -21,8 +21,7 @@ export default function StripeCheckout() {
       headers: {
         'Content-Type': 'application/json',
         'x-access-token': token
-      },
-      body: JSON.stringify({ items: [{ id: 'xl-tshirt' }] })
+      }
     })
       .then(res => res.json())
       .then(data => setClientSecret(data.clientSecret));
@@ -37,9 +36,9 @@ export default function StripeCheckout() {
   };
 
   return (
-    <div className="stripe-body">
+    <div className=" d-flex flex-column justify-content-between flex-lg-row">
       {clientSecret && (
-        <Elements options={options} stripe={stripePromise}>
+        <Elements options={options} stripe={stripePromise} >
           <CheckoutForm />
         </Elements>
       )}

@@ -206,45 +206,23 @@ app.post('/create-payment-intent', async (req, res) => {
       }
       const cookiesArray = result.rows;
 
-      const calculateOrderAmount = ((
+      const calculateOrderAmount = (
         cookiesArray.reduce((previousCookie, currentCookie) => {
           return previousCookie + (currentCookie.quantity * currentCookie.price);
-        }, 0)) / 100);
-      // const checkoutInfo = {
-      //   cookies: cookiesArray,
-      //   totalAmount: calculateOrderAmount
-      // };
-      const paymentIntent = stripe.paymentIntents.create({
+        }, 0));
+
+      stripe.paymentIntents.create({
         amount: calculateOrderAmount,
         currency: 'usd',
-        automatic_payment_methods: {
-          enabled: true
-        }
-      });
-      res.send({
-        clientSecret: paymentIntent.client_secret
-      });
+        payment_method_types: ['card']
+      })
+        .then(paymentIntent => {
+          res.send({
+            clientSecret: paymentIntent.client_secret
+          });
+        });
     });
 });
-// res.json(checkoutInfo);
-// })
-// .catch(err => next(err));
-
-// const { items } = req.body;
-
-// // Create a PaymentIntent with the order amount and currency
-// const paymentIntent = await stripe.paymentIntents.create({
-//   amount: calculateOrderAmount(items),
-//   currency: 'usd',
-//   automatic_payment_methods: {
-//     enabled: true
-//   }
-// });
-
-// res.send({
-//   clientSecret: paymentIntent.client_secret
-// });
-// });
 
 app.use(errorMiddleware);
 
