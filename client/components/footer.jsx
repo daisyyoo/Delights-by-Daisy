@@ -1,4 +1,5 @@
 import React from 'react';
+import AppContext from '../lib/app-context';
 
 const styles = {
   bgcolor: {
@@ -19,21 +20,42 @@ const styles = {
 };
 export default class Footer extends React.Component {
   render() {
+    const { cartId } = this.context;
     return (
-      <footer style={styles.bgcolor} className="w-100">
-        <div className="container d-flex">
-          <div className="d-flex align-items-left justify-content-center flex-column w-75">
-            <h4 style={styles.title}>Delights by Daisy</h4>
-            <p style={styles.text} className="mb-1">Contact us!</p>
-            <p style={styles.text} className="mb-1">Email: daisyhyoo@gmail.com</p>
-            <p style={styles.text} className="mb-1">Instagram: delights.by.daisy</p>
+      <>
+        {!cartId &&
+        <footer style={styles.bgcolor} className="w-100 fixed-bottom">
+          <div className="container d-flex">
+            <div className="d-flex align-items-left justify-content-center flex-column w-75">
+              <h4 style={styles.title}>Delights by Daisy</h4>
+              <p style={styles.text} className="mb-1">Contact us!</p>
+              <p style={styles.text} className="mb-1">Email: daisyhyoo@gmail.com</p>
+              <p style={styles.text} className="mb-1">Instagram: delights.by.daisy</p>
+            </div>
+            <div className="d-flex justify-content-end w-25">
+              <img style={styles.image} src='/image/logo.png' />
+            </div>
           </div>
-          <div className="d-flex justify-content-end w-25">
-            <img style={styles.image} src='/image/logo.png' />
+          </footer>
+        }
+        {cartId &&
+        <footer style={styles.bgcolor} className="w-100">
+          <div className="container d-flex">
+            <div className="d-flex align-items-left justify-content-center flex-column w-75">
+              <h4 style={styles.title}>Delights by Daisy</h4>
+              <p style={styles.text} className="mb-1">Contact us!</p>
+              <p style={styles.text} className="mb-1">Email: daisyhyoo@gmail.com</p>
+              <p style={styles.text} className="mb-1">Instagram: delights.by.daisy</p>
+            </div>
+            <div className="d-flex justify-content-end w-25">
+              <img style={styles.image} src='/image/logo.png' />
+            </div>
           </div>
-        </div>
-      </footer>
-
+        </footer>
+      }
+      </>
     );
   }
 }
+
+Footer.contextType = AppContext;

@@ -143,48 +143,6 @@ app.get('/myBasket', (req, res, next) => {
   }
 });
 
-// app.get('/checkout', (req, res, next) => {
-//   // const calculateOrderAmount = items => {
-//   // Replace this constant with a calculation of the order's amount
-//   // Calculate the order total on the server to prevent
-//   // people from directly manipulating the amount on the client
-//   const token = req.get('x-access-token');
-//   if (!token) {
-//     next();
-//   } else {
-//     const cartId = jwt.verify(token, process.env.TOKEN_SECRET);
-//     const sql = `
-//         select "cartItems"."cartId",
-//               "cartItems"."cookieId",
-//               "cartItems"."quantity",
-//               "cookies"."flavor",
-//               "cookies"."price"
-//         from "cartItems"
-//         join "cookies" using ("cookieId")
-//         where "cartId" = $1
-//       `;
-//     const params = [cartId];
-//     db.query(sql, params)
-//       .then(result => {
-//         if (!result.rows) {
-//           throw new ClientError(404, `cannot find basket with cartId ${cartId}`);
-//         }
-//         const cookiesArray = result.rows;
-
-//         const calculateOrderAmount = ((
-//           cookiesArray.reduce((previousCookie, currentCookie) => {
-//             return previousCookie + (currentCookie.quantity * currentCookie.price);
-//           }, 0)) / 100).toFixed(2);
-//         const checkoutInfo = {
-//           cookies: cookiesArray,
-//           totalAmount: calculateOrderAmount
-//         };
-//         res.json(checkoutInfo);
-//       })
-//       .catch(err => next(err));
-//   }
-// });
-
 app.post('/create-payment-intent', async (req, res) => {
   const token = req.get('x-access-token');
   const cartId = jwt.verify(token, process.env.TOKEN_SECRET);
@@ -192,7 +150,6 @@ app.post('/create-payment-intent', async (req, res) => {
         select "cartItems"."cartId",
               "cartItems"."cookieId",
               "cartItems"."quantity",
-              "cookies"."flavor",
               "cookies"."price"
         from "cartItems"
         join "cookies" using ("cookieId")
@@ -218,10 +175,28 @@ app.post('/create-payment-intent', async (req, res) => {
       })
         .then(paymentIntent => {
           res.send({
-            clientSecret: paymentIntent.client_secret
+            clientSecret: paymentIntent.client_secret,
+            totalAmount: paymentIntent.amount
           });
         });
     });
+});
+
+app.post('/checkout', (req, res, next) => {
+  const token = req.get('x-access-token');
+  const cartId = jwt.verify(token, process.env.TOKEN_SECRET);
+  const sql = `
+      insert into "orders" ("cartId")
+      values ($1)
+      returning *
+    `;
+  const params = [cartId];
+  db.query(sql, params)
+    .then(result =>
+      // console.log(result.rows);
+      res.json(result.rows[0])
+    )
+    .catch(err => next(err));
 });
 
 app.use(errorMiddleware);

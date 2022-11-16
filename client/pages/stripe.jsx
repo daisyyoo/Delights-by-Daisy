@@ -12,6 +12,7 @@ const stripePromise = loadStripe('pk_test_51Ly5zQD9hcLXyrLfzzKGfW7VlFhNh5usEvLD2
 
 export default function StripeCheckout() {
   const [clientSecret, setClientSecret] = useState('');
+  const [totalAmount, setTotalAmount] = useState(0);
 
   useEffect(() => {
     // Create PaymentIntent as soon as the page loads
@@ -24,7 +25,10 @@ export default function StripeCheckout() {
       }
     })
       .then(res => res.json())
-      .then(data => setClientSecret(data.clientSecret));
+      .then(data => {
+        setClientSecret(data.clientSecret);
+        setTotalAmount(data.totalAmount);
+      });
   }, []);
 
   const appearance = {
@@ -39,7 +43,7 @@ export default function StripeCheckout() {
     <div className=" d-flex flex-column justify-content-between flex-lg-row">
       {clientSecret && (
         <Elements options={options} stripe={stripePromise} >
-          <CheckoutForm />
+          <CheckoutForm totalAmount={totalAmount} />
         </Elements>
       )}
     </div>

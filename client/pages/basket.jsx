@@ -135,7 +135,7 @@ function BasketItems(props) {
   const { quantity, flavor, weight, price, imageUrl } = props.product;
   return (
     <>
-      <div style={styles.imageContainer} className="col-5 col-md-3 d-flex align-items-center basket-border">
+      <div style={styles.imageContainer} className="col-5 col-md-3 d-flex align-items-center border-bot">
         <img className="h-100 img-fluid" style={styles.image} src={imageUrl} alt={flavor}/>
       </div>
       <Card className="col-7 col-md-9 card-border" style={styles.card}>

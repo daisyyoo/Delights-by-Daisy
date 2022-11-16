@@ -4,8 +4,9 @@ import {
   useStripe,
   useElements
 } from '@stripe/react-stripe-js';
+import { toDollars } from '../lib/';
 
-export default function CheckoutForm() {
+export default function CheckoutForm(props) {
   const stripe = useStripe();
   const elements = useElements();
 
@@ -41,19 +42,16 @@ export default function CheckoutForm() {
           break;
       }
     });
-  }, [stripe]);
+  }, [stripe, props]);
 
   const handleSubmit = async e => {
     e.preventDefault();
-
     if (!stripe || !elements) {
       // Stripe.js has not yet loaded.
       // Make sure to disable form submission until Stripe.js has loaded.
       return;
     }
-
     setIsLoading(true);
-
     const { error } = await stripe.confirmPayment({
       elements,
       confirmParams: {
@@ -61,6 +59,9 @@ export default function CheckoutForm() {
         return_url: 'http://localhost:3000/#confirmationPage'
       }
     });
+
+    // fetch() here to create the new data table for orderId
+    // then dispose of token in window
 
     // This point will only be reached if there is an immediate error when
     // confirming the payment. Otherwise, your customer will be redirected to
@@ -76,13 +77,14 @@ export default function CheckoutForm() {
     setIsLoading(false);
   };
 
+  const { totalAmount } = props;
   return (
     <>
-      <div className="col-lg-6 ">
+      <div className="col-lg-6 px-4 mx-2 my-2 border-bot">
         <h1>Checkout</h1>
-        <h3>Total: </h3>
+        <h3>{`Total: ${toDollars(totalAmount)}`}</h3>
       </div>
-      <form id="payment-form" onSubmit={handleSubmit} className="col-lg-6 mx-auto">
+      <form id="payment-form" onSubmit={handleSubmit} className="col-lg-6 mx-auto mt-4 mb-5">
         <PaymentElement id="payment-element" />
         <button className="button-all w-100" disabled={isLoading || !stripe || !elements} id="submit">
           <span id="button-text">
