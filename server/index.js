@@ -184,39 +184,40 @@ app.post('/create-payment-intent', async (req, res, next) => {
     .catch(err => next(err));
 });
 
-app.get('/process-order', (req, res, next) => {
-  // const headers = req.query;
-  // store the first query payment_intent in database to be able to track order via Stripe
-  res.redirect(302, '/#confirmationPage');
+app.get('/process-order/:token', (req, res, next) => {
+  const token = req.params.token;
+  const cartId = jwt.verify(token, process.env.TOKEN_SECRET);
+  const paymentIntent = req.query.payment_intent;
+  const sql = `
+    insert into "orders" ("cartId", "orderedAt", "paymentIntent")
+    values ($1, now(), $2)
+    returning *
+  `;
+  const params = [cartId, paymentIntent];
+  db.query(sql, params)
+    .then(result => {
+      res.redirect(302, '/#confirmationPage');
+    })
+    .catch(err => next(err));
 });
 
 app.post('/confirmationPage', (req, res, next) => {
   const token = req.get('x-access-token');
   const cartId = jwt.verify(token, process.env.TOKEN_SECRET);
   const sql = `
-      insert into "orders" ("cartId", "orderedAt")
-      values ($1, now())
-      returning *
-    `;
+    select "orders"."orderId",
+          "orders"."orderedAt",
+          "cartItems"."quantity",
+          "cookies"."flavor",
+          "cookies"."price",
+          "cookies"."imageUrl"
+    from "orders"
+    join "cartItems" using ("cartId")
+    join "cookies" using ("cookieId")
+    where "cartId" = $1
+  `;
   const params = [cartId];
   db.query(sql, params)
-    .then(result => {
-      const orderId = result.rows[0].orderId;
-      const sql = `
-        select "orders"."orderId",
-              "orders"."orderedAt",
-              "cartItems"."quantity",
-              "cookies"."flavor",
-              "cookies"."price",
-              "cookies"."imageUrl"
-        from "orders"
-        join "cartItems" using ("cartId")
-        join "cookies" using ("cookieId")
-        where "orderId" = $1
-      `;
-      const params = [orderId];
-      return db.query(sql, params);
-    })
     .then(result => {
       res.json(result.rows);
     })

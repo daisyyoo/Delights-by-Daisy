@@ -2,6 +2,7 @@ import React from 'react';
 import AppContext from '../lib/app-context';
 import { toDollars } from '../lib/';
 import Card from 'react-bootstrap/Card';
+import Redirect from '../components/redirect';
 
 const styles = {
   image: {
@@ -65,7 +66,7 @@ export default class ConfirmationPage extends React.Component {
   componentDidMount() {
     const token = localStorage.getItem('basketToken');
     if (!token) {
-      return;
+      return <Redirect to=""/>;
     }
     const req = {
       method: 'POST',

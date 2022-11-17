@@ -87,7 +87,7 @@ export default class Basket extends React.Component {
         <h1 className="py-1" >My Basket</h1>
         <p className="m-0" style={styles.text}>{`${this.state.cookies.length} items`}</p>
         {this.state.cookies.length === 0 &&
-        <h4 style={styles.noBasket} className="mt-2 text-center">
+        <h4 style={styles.noBasket} className="my-5 text-center">
           You have no items in your basket!
           <br />Add cookies to your basket to get started!</h4>}
         <div className="d-lg-flex justify-content-lg-between container">
