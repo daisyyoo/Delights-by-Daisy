@@ -8,7 +8,7 @@ const styles = {
     cursor: 'pointer'
   },
   image: {
-    height: '150px',
+    height: '200px',
     objectFit: 'cover'
   },
   title: {

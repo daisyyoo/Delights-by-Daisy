@@ -184,6 +184,47 @@ app.post('/create-payment-intent', async (req, res, next) => {
     .catch(err => next(err));
 });
 
+app.get('/process-order', (req, res, next) => {
+  // const headers = req.query;
+  // store the first query payment_intent in database to be able to track order via Stripe
+  res.redirect(302, '/#confirmationPage');
+});
+
+app.post('/confirmationPage', (req, res, next) => {
+  const token = req.get('x-access-token');
+  const cartId = jwt.verify(token, process.env.TOKEN_SECRET);
+  const sql = `
+      insert into "orders" ("cartId", "orderedAt")
+      values ($1, now())
+      returning *
+    `;
+  const params = [cartId];
+  db.query(sql, params)
+    .then(result => {
+      const orderId = result.rows[0].orderId;
+      const sql = `
+        select "orders"."orderId",
+              "orders"."cartId",
+              "orders"."orderedAt",
+              "cartItems"."cookieId",
+              "cartItems"."quantity",
+              "cookies"."flavor",
+              "cookies"."price",
+              "cookies"."weight"
+        from "orders"
+        join "cartItems" using ("cartId")
+        join "cookies" using ("cookieId")
+        where "orderId" = $1
+      `;
+      const params = [orderId];
+      return db.query(sql, params);
+    })
+    .then(result => {
+      res.json(result.rows);
+    })
+    .catch(err => next(err));
+});
+
 app.use(errorMiddleware);
 
 app.listen(process.env.PORT, () => {

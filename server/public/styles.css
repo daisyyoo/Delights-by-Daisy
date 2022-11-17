@@ -160,4 +160,8 @@ i {
   .menu-link {
     color: #fdeedc;
   }
+
+  .menu-link:visited {
+    color: #ffd8a9;
+  }
 }
