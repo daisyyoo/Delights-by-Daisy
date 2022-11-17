@@ -5,6 +5,8 @@ const jwt = require('jsonwebtoken');
 const ClientError = require('./client-error');
 const staticMiddleware = require('./static-middleware');
 const errorMiddleware = require('./error-middleware');
+const app = express();
+const stripe = require('stripe')('sk_test_51Ly5zQD9hcLXyrLfIIebHLiTNOKeO1CELshkDj0vjizFzkrgZ2cnZa8lF2Vf3AmZJQYHJfi454bf68ehAzJExyHe00gMcrQPGO');
 
 const db = new pg.Pool({
   connectionString: process.env.DATABASE_URL,
@@ -13,7 +15,6 @@ const db = new pg.Pool({
   }
 });
 
-const app = express();
 app.use(express.json());
 app.use(staticMiddleware);
 
@@ -140,6 +141,47 @@ app.get('/myBasket', (req, res, next) => {
       })
       .catch(err => next(err));
   }
+});
+
+app.post('/create-payment-intent', async (req, res, next) => {
+  const token = req.get('x-access-token');
+  const cartId = jwt.verify(token, process.env.TOKEN_SECRET);
+  const sql = `
+        select "cartItems"."cartId",
+              "cartItems"."cookieId",
+              "cartItems"."quantity",
+              "cookies"."price"
+        from "cartItems"
+        join "cookies" using ("cookieId")
+        where "cartId" = $1
+      `;
+  const params = [cartId];
+  db.query(sql, params)
+    .then(result => {
+      if (!result.rows) {
+        throw new ClientError(404, `cannot find basket with cartId ${cartId}`);
+      }
+      const cookiesArray = result.rows;
+
+      const calculateOrderAmount = (
+        cookiesArray.reduce((previousCookie, currentCookie) => {
+          return previousCookie + (currentCookie.quantity * currentCookie.price);
+        }, 0));
+
+      stripe.paymentIntents.create({
+        amount: calculateOrderAmount,
+        currency: 'usd',
+        payment_method_types: ['card']
+      })
+        .then(paymentIntent => {
+          res.send({
+            clientSecret: paymentIntent.client_secret,
+            totalAmount: paymentIntent.amount
+          });
+        })
+        .catch(err => next(err));
+    })
+    .catch(err => next(err));
 });
 
 app.use(errorMiddleware);

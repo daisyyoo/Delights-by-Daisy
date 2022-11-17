@@ -1,6 +1,3 @@
-@media only screen and (max-width: 575px) {
-  footer {
-    position: fixed;
-    bottom: 0;
-  }
+.page-container {
+  padding-bottom: 90px;
 }

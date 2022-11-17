@@ -10,6 +10,7 @@ import Home from './pages/home';
 import Catalog from './pages/catalog';
 import ProductDetails from './pages/products';
 import Basket from './pages/basket';
+import StripeCheckout from './pages/stripe';
 
 export default class App extends React.Component {
   constructor(props) {
@@ -57,6 +58,9 @@ export default class App extends React.Component {
     }
     if (route.path === 'myBasket') {
       return <Basket />;
+    }
+    if (route.path === 'checkout') {
+      return <StripeCheckout />;
     }
     return <NotFound />;
   }

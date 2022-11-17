@@ -58,7 +58,8 @@ export default class Basket extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      cookies: []
+      cookies: [],
+      totalAmount: null
     };
   }
 
@@ -108,7 +109,7 @@ export default class Basket extends React.Component {
             </div>
             }
           {this.state.cookies.length > 0 &&
-            <div className="py-3 col-lg-3" >
+            <div className="col-lg-3" >
               <div className="d-flex w-100 justify-content-between pt-3 mt-5" style={styles.borderTop}>
                 <h5 style={styles.subtotalHeader}>{`Subtotal (${this.state.cookies.length} items)`}</h5>
                 <h5 style={styles.subtotalHeader}>
@@ -120,7 +121,7 @@ export default class Basket extends React.Component {
               </div>
               <div style={styles.borderBottom} className="w-100 pb-4 d-flex flex-column align-items-center">
                 <p style={styles.weight} className="w-100 text-left py-lg-2">Taxes and shipping calculated at checkout</p>
-                <Button style={styles.button} className="button-all w-100" >PROCEED TO CHECKOUT</Button>
+                <Button href="#checkout" style={styles.button} className="button-all w-100" >PROCEED TO CHECKOUT</Button>
               </div>
             </div>
             }
@@ -134,7 +135,7 @@ function BasketItems(props) {
   const { quantity, flavor, weight, price, imageUrl } = props.product;
   return (
     <>
-      <div style={styles.imageContainer} className="col-5 col-md-3 d-flex align-items-center basket-border">
+      <div style={styles.imageContainer} className="col-5 col-md-3 d-flex align-items-center border-bot">
         <img className="h-100 img-fluid" style={styles.image} src={imageUrl} alt={flavor}/>
       </div>
       <Card className="col-7 col-md-9 card-border" style={styles.card}>
