@@ -11,6 +11,7 @@ import Catalog from './pages/catalog';
 import ProductDetails from './pages/products';
 import Basket from './pages/basket';
 import StripeCheckout from './pages/stripe';
+import ConfirmationPage from './pages/confirmation-page';
 
 export default class App extends React.Component {
   constructor(props) {
@@ -61,6 +62,9 @@ export default class App extends React.Component {
     }
     if (route.path === 'checkout') {
       return <StripeCheckout />;
+    }
+    if (route.path === 'confirmationPage') {
+      return <ConfirmationPage />;
     }
     return <NotFound />;
   }

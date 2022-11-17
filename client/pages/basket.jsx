@@ -58,8 +58,7 @@ export default class Basket extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      cookies: [],
-      totalAmount: null
+      cookies: []
     };
   }
 
@@ -85,7 +84,7 @@ export default class Basket extends React.Component {
   render() {
     return (
       <>
-        <h1 className="py-1" style={styles.header}>My Basket</h1>
+        <h1 className="py-1" >My Basket</h1>
         <p className="m-0" style={styles.text}>{`${this.state.cookies.length} items`}</p>
         {this.state.cookies.length === 0 &&
         <h4 style={styles.noBasket} className="mt-2 text-center">
