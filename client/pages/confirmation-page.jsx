@@ -1,13 +1,64 @@
 import React from 'react';
 import AppContext from '../lib/app-context';
-// import { toDollars } from '../lib/';
+import { toDollars } from '../lib/';
 import Card from 'react-bootstrap/Card';
+
+const styles = {
+  image: {
+    objectFit: 'contain'
+  },
+  imageContainer: {
+    height: '200px'
+  },
+  card: {
+    height: '200px'
+  },
+  header: {
+    color: '#422300',
+    fontFamily: 'Merriweather'
+  },
+  title: {
+    color: '#422300',
+    fontWeight: '600',
+    fontFamily: 'Merriweather',
+    fontSize: '1.1rem'
+  },
+  text: {
+    color: '#422300',
+    fontSize: '1rem'
+  },
+  price: {
+    color: '#693802',
+    fontWeight: '600',
+    fontSize: '1rem'
+  },
+  orderInfo: {
+    color: '#693802',
+    fontSize: '0.8rem'
+  },
+  subtotalHeader: {
+    fontSize: '1rem',
+    color: '#693802'
+  },
+  total: {
+    fontWeight: '600',
+    fontSize: '1rem',
+    color: '#693802'
+  },
+  borderTop: {
+    borderTop: 'solid 2px #94540F'
+  },
+  borderBottom: {
+    borderBottom: 'solid 2px #94540F'
+  }
+};
 
 export default class ConfirmationPage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      order: []
+      order: [],
+      salesTax: 0
     };
   }
 
@@ -26,12 +77,12 @@ export default class ConfirmationPage extends React.Component {
     fetch('/confirmationPage', req)
       .then(res => res.json())
       .then(order => {
-        // const { checkOut } = this.context;
+        const { checkOut } = this.context;
         this.setState({ order });
-        // window.localStorage.removeItem('basketToken');
-        // checkOut();
+        checkOut();
       })
       .catch();
+    this.setState({ salesTax: 100 });
   }
 
   render() {
@@ -41,34 +92,43 @@ export default class ConfirmationPage extends React.Component {
     return (
       <>
         <h1 className="py-1">Thank you for your order!</h1>
-        <div>
-          <p>{`Order No. : 00${orderId}`}</p>
-          <p>{`Order Date : ${orderedAt}`}</p>
+        <div className="mb-3">
+          <p className="m-0" style={styles.orderInfo}>{`Order No. : 00${orderId}`}</p>
+          <p className="m-0" style={styles.orderInfo}>{`Order Date : ${orderedAt.slice(0, 10)}`}</p>
         </div>
-        <div>
-          <h3 className="border-bot">Items Ordered</h3>
-          <div className="row">
-            {
+        <div className="row">
+          <div className="col-lg-9">
+            <h3 style={styles.header} className="border-bot m-0 pb-2">Items Ordered</h3>
+            <div>
+              {
               this.state.order.map(cookie => (
-                <div key={cookie.cookieId} className="">
+                <div key={cookie.cookieId} className="d-flex justify-content-lg-start border-bot">
                   <OrderedCookie cookie={cookie} />
                 </div>
               ))
             }
+            </div>
           </div>
-        </div>
-        <div>
-          <div>
-            <p>Subtotal</p>
-            <p>$price</p>
-          </div>
-          <div>
-            <p>Sales Tax</p>
-            <p>$moremoney</p>
-          </div>
-          <div>
-            <p>Total </p>
-            <p>$lotsofmoney</p>
+          <div className="col-lg-3 mt-5">
+            <div style={styles.borderTop} className="d-flex justify-content-between pt-1">
+              <p className="m-1" style={styles.subtotalHeader}>{`Subtotal (${this.state.order.length} items) `}</p>
+              <p className="m-1" style={styles.subtotalHeader}>
+                {toDollars(
+                  this.state.order.reduce((previousCookie, currentCookie) => {
+                    return previousCookie + (currentCookie.quantity * currentCookie.price);
+                  }, 0))}</p>
+            </div>
+            <div className="d-flex justify-content-between pb-lg-4">
+              <p className="m-1">Sales Tax</p>
+              <p className="m-1">{toDollars(this.state.salesTax)}</p>
+            </div>
+            <div style={styles.borderBottom} className="d-flex justify-content-between pb-1">
+              <p className="m-1" style={styles.total}>Total Paid</p>
+              <p className="m-1" style={styles.total}>
+                {toDollars((this.state.order.reduce((previousCookie, currentCookie) => {
+                  return previousCookie + (currentCookie.quantity * currentCookie.price);
+                }, 0)) + this.state.salesTax)}</p>
+            </div>
           </div>
         </div>
       </>
@@ -77,15 +137,20 @@ export default class ConfirmationPage extends React.Component {
 }
 ConfirmationPage.contextType = AppContext;
 
-function OrderedCookie() {
+function OrderedCookie(props) {
+  const { flavor, quantity, price, imageUrl } = props.cookie;
   return (
-    <Card>
-      <Card.Img />
-      <Card.Body>
-        <Card.Text>Flavor</Card.Text>
-        <Card.Text>Price for this cookie order</Card.Text>
-        <Card.Text>Quantity</Card.Text>
-      </Card.Body>
-    </Card>
+    <>
+      <div className="col-5 col-md-3 d-flex align-items-center py-lg-2" style={styles.imageContainer}>
+        <img className="h-100 img-fluid" style={styles.image} src={imageUrl} alt={flavor} />
+      </div>
+      <Card className="col-7 col-md-9 border-0" style={styles.card}>
+        <Card.Body className="d-flex flex-column justify-content-center">
+          <Card.Text style={styles.title}>{flavor}</Card.Text>
+          <Card.Text style={styles.price}>{ toDollars(price * quantity) }</Card.Text>
+          <Card.Text style={styles.text}>{`Qty : ${quantity} `}</Card.Text>
+        </Card.Body>
+      </Card>
+    </>
   );
 }

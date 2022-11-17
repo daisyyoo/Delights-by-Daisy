@@ -204,13 +204,11 @@ app.post('/confirmationPage', (req, res, next) => {
       const orderId = result.rows[0].orderId;
       const sql = `
         select "orders"."orderId",
-              "orders"."cartId",
               "orders"."orderedAt",
-              "cartItems"."cookieId",
               "cartItems"."quantity",
               "cookies"."flavor",
               "cookies"."price",
-              "cookies"."weight"
+              "cookies"."imageUrl"
         from "orders"
         join "cartItems" using ("cartId")
         join "cookies" using ("cookieId")
