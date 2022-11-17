@@ -8,7 +8,7 @@ import '../../server/public/stripe.css';
 // Make sure to call loadStripe outside of a component’s render to avoid
 // recreating the Stripe object on every render.
 // This is your test publishable API key.
-const stripePromise = loadStripe('pk_test_51Ly5zQD9hcLXyrLfzzKGfW7VlFhNh5usEvLD2b4yOHnUnobBGxJCh7sJaftQoocfuVGUJOP1XQWhrhIFbA0X53KT00X0pmD4Bs');
+const stripePromise = loadStripe(process.env.STRIPE_API_KEY);
 
 export default function StripeCheckout() {
   const [clientSecret, setClientSecret] = useState('');

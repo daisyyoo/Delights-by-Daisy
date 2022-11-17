@@ -143,7 +143,7 @@ app.get('/myBasket', (req, res, next) => {
   }
 });
 
-app.post('/create-payment-intent', async (req, res) => {
+app.post('/create-payment-intent', async (req, res, next) => {
   const token = req.get('x-access-token');
   const cartId = jwt.verify(token, process.env.TOKEN_SECRET);
   const sql = `
@@ -178,8 +178,10 @@ app.post('/create-payment-intent', async (req, res) => {
             clientSecret: paymentIntent.client_secret,
             totalAmount: paymentIntent.amount
           });
-        });
-    });
+        })
+        .catch(err => next(err));
+    })
+    .catch(err => next(err));
 });
 
 app.use(errorMiddleware);
