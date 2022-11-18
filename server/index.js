@@ -255,23 +255,39 @@ app.post('/sendEmail', (req, res, next) => {
       const params = [cartId];
       db.query(sql, params)
         .then(result => {
-          // const orderDetails = result.rows;
-          // console.log('1', orderDetails);
-          // const msg = {
-          //   to: email,
-          //   from: 'Daisy@delightsbydaisy.de',
-          //   subject: 'Sending with SendGrid is Fun',
-          //   text: 'and easy to do anywhere, even with Node.js',
-          //   html: '<strong>and easy to do anywhere, even with Node.js</strong>'
-          // };
-          // sgMail
-          //   .send(msg)
-          //   .then(() => {
-          //     console.log('Email sent');
-          //   })
-          //   .catch(error => {
-          //     console.error(error);
-          //   });
+          const orderDetails = result.rows;
+          const { orderId, orderedAt } = orderDetails[0];
+          const msg = {
+            to: email,
+            from: 'Daisy@delightsbydaisy.de',
+            subject: 'Order Confirmation',
+            text: `
+              Order Details # 00${orderId}
+              Order Date: ${orderedAt}
+              ${orderDetails.map(cookie => (cookie.flavor + 'Qty: ' + cookie.quantity))}
+              Total:
+              ${orderDetails.reduce((previousCookie, currentCookie) => {
+                return previousCookie + (currentCookie.quantity * currentCookie.price);
+              }, 0)}
+              `,
+            html: `
+              <br><h2>Order Details # 00${orderId}</h2>
+              <br><strong>Order Date:</strong> ${orderedAt} <br>
+              ${orderDetails.map(cookie => ('<br><strong>Flavor: </strong>' + cookie.flavor + '<br><strong>Qty: </strong>' + cookie.quantity + '<br>'))}
+              <br><strong>Total:</strong> $
+              ${(orderDetails.reduce((previousCookie, currentCookie) => {
+              return previousCookie + (currentCookie.quantity * currentCookie.price);
+            }, 0) / 100).toFixed(2)}
+              <br><h3><em>Thank you for your purchase!</em></h3>`
+          };
+          sgMail
+            .send(msg)
+            .then(result => {
+              // console.log(result);
+            })
+            .catch(error => {
+              console.error(error);
+            });
         })
         .catch(err => next(err));
     })

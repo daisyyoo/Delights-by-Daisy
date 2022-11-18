@@ -96,20 +96,18 @@ export default class ConfirmationPage extends React.Component {
   }
 
   sendEmail(event) {
-    const token = localStorage.getItem('basketToken');
     const req = {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'x-access-token': token
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify(this.state)
     };
     fetch('./sendEmail', req)
       .then(res => res.json())
       .then(response => {
-
         this.setState({ emailSent: true });
+        this.setState({ email: null });
       })
       .catch();
   }
