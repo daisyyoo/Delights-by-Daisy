@@ -82,6 +82,10 @@ h1,
   border-radius: 5px;
 }
 
+.button-all:focus {
+  outline: solid 1px #693802;
+}
+
 .button-return {
   background-color: #fdeedc;
   color: #693802;
@@ -154,6 +158,20 @@ i {
 
 .menu-link:visited {
   color: #94540f;
+}
+
+.email-input {
+  border: solid 2px #94540f;
+  border-radius: 5px;
+  color: #422300;
+}
+
+.email-input:focus {
+  outline: solid 1px #94540f;
+}
+
+.submit-button {
+  width: 6rem;
 }
 
 @media only screen and (min-width: 768px) {

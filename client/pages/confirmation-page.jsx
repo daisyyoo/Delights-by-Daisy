@@ -123,8 +123,8 @@ export default class ConfirmationPage extends React.Component {
           <p className="m-0" style={styles.orderInfo}>{`Order Date : ${orderedAt.slice(0, 10)}`}</p>
         </div>
         <div className="row">
-          <div className="col-lg-9">
-            <h3 style={styles.header} className="border-bot m-0 pb-2">Items Ordered</h3>
+          <div className="col-lg-9 mb-2">
+            <h4 style={styles.header} className="border-bot m-0 pb-2">Items Ordered</h4>
             <div>
               {
               this.state.order.map(cookie => (
@@ -135,7 +135,7 @@ export default class ConfirmationPage extends React.Component {
             }
             </div>
           </div>
-          <div className="col-lg-3 mt-5">
+          <div className="col-lg-3 pt-lg-3 mt-4">
             <div style={styles.borderTop} className="d-flex justify-content-between pt-1">
               <p className="m-1" style={styles.subtotalHeader}>{`Subtotal (${this.state.order.length} items) `}</p>
               <p className="m-1" style={styles.subtotalHeader}>
@@ -157,16 +157,19 @@ export default class ConfirmationPage extends React.Component {
             </div>
           </div>
         </div>
-        <form onSubmit={this.sendEmail}>
-          <input
+        <div className="row">
+          <form className="mt-4 py-0 col-12 col-lg-9 w-lg-75 shadow-none d-flex flex-column" onSubmit={this.sendEmail}>
+            <label style={styles.header}>Would you like a confirmation email?</label>
+            <input
             autoFocus
             type="text"
             onChange={this.handleChange}
-            placeholder="Type email here for confirmation email"
-            className="w-100"
+            placeholder="type email here"
+            className="mb-2 mt-1 email-input p-2 px-3"
           />
-          <button type="submit" className="button-all">Send Email</button>
-        </form>
+            <button type="submit" className="button-all submit-button align-self-end">SEND</button>
+          </form>
+        </div>
       </>
     );
   }

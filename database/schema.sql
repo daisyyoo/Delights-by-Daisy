@@ -10,9 +10,9 @@ CREATE TABLE "public"."orders" (
 	"orderId" serial NOT NULL UNIQUE,
 	"orderedAt" timestamp with time zone NOT NULL,
 	"cartId" int NOT NULL,
-  "paymentIntent" TEXT UNIQUE,
 	"email" TEXT,
 	"confirmedAt" timestamp with time zone,
+  "paymentIntent" TEXT NOT NULL UNIQUE,
 	CONSTRAINT "orders_pk" PRIMARY KEY ("orderId")
 ) WITH (
   OIDS=FALSE
