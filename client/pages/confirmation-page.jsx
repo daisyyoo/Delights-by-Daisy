@@ -82,8 +82,8 @@ export default class ConfirmationPage extends React.Component {
     fetch('/confirmationPage', req)
       .then(res => res.json())
       .then(order => {
-        // const { checkOut } = this.context;
         this.setState({ order });
+        // const { checkOut } = this.context;
         // checkOut();
       })
       .catch();
@@ -96,17 +96,20 @@ export default class ConfirmationPage extends React.Component {
   }
 
   sendEmail(event) {
+    const token = localStorage.getItem('basketToken');
     const req = {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'x-access-token': token
       },
-      body: this.state.email
+      body: JSON.stringify(this.state)
     };
     fetch('./sendEmail', req)
       .then(res => res.json())
       .then(response => {
-        // setState for successful email sent, true or false, and have it affect the message shown if it's successful or not
+
+        this.setState({ emailSent: true });
       })
       .catch();
   }
@@ -167,7 +170,13 @@ export default class ConfirmationPage extends React.Component {
             placeholder="type email here"
             className="mb-2 mt-1 email-input p-2 px-3"
           />
-            <button type="submit" className="button-all submit-button align-self-end">SEND</button>
+            <div className="d-flex justify-content-between">
+              <div className="px-2">
+                <p style={styles.orderInfo} className={this.state.sendEmail ? 'show' : 'd-none'}>
+                  Your confirmation email has been sent!</p>
+              </div>
+              <button type="submit" className="button-all submit-button">SEND</button>
+            </div>
           </form>
         </div>
       </>

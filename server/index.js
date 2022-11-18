@@ -7,6 +7,8 @@ const staticMiddleware = require('./static-middleware');
 const errorMiddleware = require('./error-middleware');
 const app = express();
 const stripe = require('stripe')('sk_test_51Ly5zQD9hcLXyrLfIIebHLiTNOKeO1CELshkDj0vjizFzkrgZ2cnZa8lF2Vf3AmZJQYHJfi454bf68ehAzJExyHe00gMcrQPGO');
+const sgMail = require('@sendgrid/mail');
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 const db = new pg.Pool({
   connectionString: process.env.DATABASE_URL,
@@ -224,23 +226,58 @@ app.post('/confirmationPage', (req, res, next) => {
     .catch(err => next(err));
 });
 
-const sgMail = require('@sendgrid/mail');
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-const msg = {
-  to: 'daisyhyoo@gmail.com',
-  from: 'Daisy@delightsbydaisy.de',
-  subject: 'Sending with SendGrid is Fun',
-  text: 'and easy to do anywhere, even with Node.js',
-  html: '<strong>and easy to do anywhere, even with Node.js</strong>'
-};
-sgMail
-  .send(msg)
-  .then(() => {
-    // console.log('Email sent');
-  })
-  .catch(error => {
-    console.error(error);
-  });
+app.post('/sendEmail', (req, res, next) => {
+  const { email } = req.body;
+  const { orderId } = req.body.order[0];
+  const sql = `
+    update "orders"
+      set "email" = $1,
+          "confirmedAt" = now()
+      where "orderId" = $2
+      returning *
+  `;
+  const params = [email, orderId];
+  db.query(sql, params)
+    .then(result => {
+      const orderInfo = result.rows[0];
+      const { cartId } = orderInfo;
+      const sql = `
+        select "orders"."orderId",
+              "orders"."orderedAt",
+              "cartItems"."quantity",
+              "cookies"."flavor",
+              "cookies"."price"
+        from "orders"
+        join "cartItems" using ("cartId")
+        join "cookies" using ("cookieId")
+        where "cartId" = $1
+      `;
+      const params = [cartId];
+      db.query(sql, params)
+        .then(result => {
+          // const orderDetails = result.rows;
+          // console.log('1', orderDetails);
+          // const msg = {
+          //   to: email,
+          //   from: 'Daisy@delightsbydaisy.de',
+          //   subject: 'Sending with SendGrid is Fun',
+          //   text: 'and easy to do anywhere, even with Node.js',
+          //   html: '<strong>and easy to do anywhere, even with Node.js</strong>'
+          // };
+          // sgMail
+          //   .send(msg)
+          //   .then(() => {
+          //     console.log('Email sent');
+          //   })
+          //   .catch(error => {
+          //     console.error(error);
+          //   });
+        })
+        .catch(err => next(err));
+    })
+    .catch(err => next(err));
+
+});
 
 app.use(errorMiddleware);
 
