@@ -59,8 +59,12 @@ export default class ConfirmationPage extends React.Component {
     super(props);
     this.state = {
       order: [],
-      salesTax: 0
+      salesTax: 0,
+      email: null,
+      emailSent: false
     };
+    this.handleChange = this.handleChange.bind(this);
+    this.sendEmail = this.sendEmail.bind(this);
   }
 
   componentDidMount() {
@@ -78,12 +82,33 @@ export default class ConfirmationPage extends React.Component {
     fetch('/confirmationPage', req)
       .then(res => res.json())
       .then(order => {
-        const { checkOut } = this.context;
+        // const { checkOut } = this.context;
         this.setState({ order });
-        checkOut();
+        // checkOut();
       })
       .catch();
     this.setState({ salesTax: 100 });
+  }
+
+  handleChange(event) {
+    const { value } = event.target;
+    this.setState({ email: value });
+  }
+
+  sendEmail(event) {
+    const req = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: this.state.email
+    };
+    fetch('./sendEmail', req)
+      .then(res => res.json())
+      .then(response => {
+        // setState for successful email sent, true or false, and have it affect the message shown if it's successful or not
+      })
+      .catch();
   }
 
   render() {
@@ -132,6 +157,16 @@ export default class ConfirmationPage extends React.Component {
             </div>
           </div>
         </div>
+        <form onSubmit={this.sendEmail}>
+          <input
+            autoFocus
+            type="text"
+            onChange={this.handleChange}
+            placeholder="Type email here for confirmation email"
+            className="w-100"
+          />
+          <button type="submit" className="button-all">Send Email</button>
+        </form>
       </>
     );
   }
