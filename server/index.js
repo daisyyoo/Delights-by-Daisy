@@ -244,6 +244,7 @@ app.post('/sendEmail', (req, res, next) => {
       const sql = `
         select "orders"."orderId",
               "orders"."orderedAt",
+              "orders"."email",
               "cartItems"."quantity",
               "cookies"."flavor",
               "cookies"."price"
@@ -253,46 +254,40 @@ app.post('/sendEmail', (req, res, next) => {
         where "cartId" = $1
       `;
       const params = [cartId];
-      db.query(sql, params)
-        .then(result => {
-          const orderDetails = result.rows;
-          const { orderId, orderedAt } = orderDetails[0];
-          const msg = {
-            to: email,
-            from: 'Daisy@delightsbydaisy.de',
-            subject: 'Order Confirmation',
-            text: `
-              Order Details # 00${orderId}
-              Order Date: ${orderedAt}
-              ${orderDetails.map(cookie => (cookie.flavor + 'Qty: ' + cookie.quantity))}
-              Total:
-              ${orderDetails.reduce((previousCookie, currentCookie) => {
-                return previousCookie + (currentCookie.quantity * currentCookie.price);
-              }, 0)}
-              `,
-            html: `
-              <br><h2>Order Details # 00${orderId}</h2>
-              <br><strong>Order Date:</strong> ${orderedAt} <br>
-              ${orderDetails.map(cookie => ('<br><strong>Flavor: </strong>' + cookie.flavor + '<br><strong>Qty: </strong>' + cookie.quantity + '<br>'))}
-              <br><strong>Total:</strong> $
-              ${(orderDetails.reduce((previousCookie, currentCookie) => {
+      return db.query(sql, params);
+    })
+    .then(result => {
+      const orderDetails = result.rows;
+      const { orderId, email, orderedAt } = orderDetails[0];
+      const msg = {
+        to: email,
+        from: 'Daisy@delightsbydaisy.de',
+        subject: 'Order Confirmation',
+        text: `
+            Order Details # 00${orderId}
+            Order Date: ${orderedAt}
+            ${(orderDetails.map(cookie => (cookie.flavor + 'Qty: ' + cookie.quantity)).join(''))}
+            Total:
+            ${orderDetails.reduce((previousCookie, currentCookie) => {
               return previousCookie + (currentCookie.quantity * currentCookie.price);
-            }, 0) / 100).toFixed(2)}
-              <br><h3><em>Thank you for your purchase!</em></h3>`
-          };
-          sgMail
-            .send(msg)
-            .then(result => {
-              // console.log(result);
-            })
-            .catch(error => {
-              console.error(error);
-            });
-        })
-        .catch(err => next(err));
+            }, 0)}
+            `,
+        html: `
+            <br><h2>Order Details # 00${orderId}</h2>
+            <br><strong>Order Date:</strong> ${orderedAt} <br>
+            ${orderDetails.map(cookie => ('<br><strong>Flavor: </strong>' + cookie.flavor + '<br><strong>Qty: </strong>' + cookie.quantity + '<br>'))}
+            <br><strong>Total:</strong> $
+            ${(orderDetails.reduce((previousCookie, currentCookie) => {
+            return previousCookie + (currentCookie.quantity * currentCookie.price);
+          }, 0) / 100).toFixed(2)}
+            <br><h3><em>Thank you for your purchase!</em></h3>`
+      };
+      return sgMail.send(msg);
+    })
+    .then(() => {
+      res.send();
     })
     .catch(err => next(err));
-
 });
 
 app.use(errorMiddleware);

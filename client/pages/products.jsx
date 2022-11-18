@@ -24,6 +24,12 @@ const styles = {
     fontSize: '1rem',
     lineHeight: '1.3rem'
   },
+  backButton: {
+    color: '#693802'
+  },
+  icon: {
+    fontSize: '0.8rem'
+  },
   weight: {
     color: '#693802',
     fontSize: '0.8rem'
@@ -134,6 +140,12 @@ export default class ProductDetails extends React.Component {
     const moreProps = { cookie, quantity, closeModal };
     return (
       <>
+        <div className="d-flex justify-content-start">
+          <a style={styles.backButton} className="text-decoration-none mb-3" href='#cookies'>
+            <i className="fa-solid fa-chevron-left" style={styles.icon} />
+            {' Back'}
+          </a>
+        </div>
         <div className="d-flex row align-items-center">
           <div className="col-lg-6 d-flex justify-content-center" style={styles.imageContainer}>
             <img src={imageUrl} alt={flavor} style={styles.image} className="mw-100" />

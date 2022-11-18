@@ -20,6 +20,7 @@ h1,
 
 .navbar-toggler:focus {
   outline: none;
+  box-shadow: none;
 }
 
 .navbar-toggler:hover {
@@ -157,7 +158,7 @@ i {
 }
 
 .menu-link:visited {
-  color: #94540f;
+  color: #e38b29;
 }
 
 .email-input {

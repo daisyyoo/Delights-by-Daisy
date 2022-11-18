@@ -2,7 +2,7 @@ import React from 'react';
 import AppContext from '../lib/app-context';
 import { toDollars } from '../lib/';
 import Card from 'react-bootstrap/Card';
-import Redirect from '../components/redirect';
+import Button from 'react-bootstrap/Button';
 
 const styles = {
   image: {
@@ -60,7 +60,7 @@ export default class ConfirmationPage extends React.Component {
     this.state = {
       order: [],
       salesTax: 0,
-      email: null,
+      email: '',
       emailSent: false
     };
     this.handleChange = this.handleChange.bind(this);
@@ -69,9 +69,6 @@ export default class ConfirmationPage extends React.Component {
 
   componentDidMount() {
     const token = localStorage.getItem('basketToken');
-    if (!token) {
-      return <Redirect to=""/>;
-    }
     const req = {
       method: 'POST',
       headers: {
@@ -83,11 +80,9 @@ export default class ConfirmationPage extends React.Component {
       .then(res => res.json())
       .then(order => {
         this.setState({ order });
-        // const { checkOut } = this.context;
-        // checkOut();
       })
       .catch();
-    this.setState({ salesTax: 100 });
+    this.setState({ salesTax: 0 });
   }
 
   handleChange(event) {
@@ -104,10 +99,11 @@ export default class ConfirmationPage extends React.Component {
       body: JSON.stringify(this.state)
     };
     fetch('./sendEmail', req)
-      .then(res => res.json())
       .then(response => {
         this.setState({ emailSent: true });
-        this.setState({ email: null });
+        this.setState({ email: '' });
+        const { checkOut } = this.context;
+        checkOut();
       })
       .catch();
   }
@@ -128,8 +124,8 @@ export default class ConfirmationPage extends React.Component {
             <h4 style={styles.header} className="border-bot m-0 pb-2">Items Ordered</h4>
             <div>
               {
-              this.state.order.map(cookie => (
-                <div key={cookie.cookieId} className="d-flex justify-content-lg-start border-bot">
+              this.state.order.map((cookie, index) => (
+                <div key={index} className="d-flex justify-content-lg-start border-bot">
                   <OrderedCookie cookie={cookie} />
                 </div>
               ))
@@ -165,17 +161,21 @@ export default class ConfirmationPage extends React.Component {
             autoFocus
             type="text"
             onChange={this.handleChange}
+            value={this.state.email}
             placeholder="type email here"
             className="mb-2 mt-1 email-input p-2 px-3"
-          />
+            />
             <div className="d-flex justify-content-between">
               <div className="px-2">
-                <p style={styles.orderInfo} className={this.state.sendEmail ? 'show' : 'd-none'}>
+                <p style={styles.orderInfo} className={this.state.emailSent ? 'show' : 'd-none'}>
                   Your confirmation email has been sent!</p>
               </div>
               <button type="submit" className="button-all submit-button">SEND</button>
             </div>
           </form>
+          <div className="d-flex justify-content-center mt-5 pt-3">
+            <Button href="#home" className={`button-all ${this.state.emailSent ? 'show' : 'd-none'}`}>RETURN TO HOME</Button>
+          </div>
         </div>
       </>
     );
