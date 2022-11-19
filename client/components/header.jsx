@@ -9,7 +9,7 @@ export default class Header extends React.Component {
     return (
       <Navbar collapseOnSelect className="color-nav mb-3" expand="md" sticky="top" >
         <Container fluid>
-          <Navbar.Brand href="#" className="header-logo px-sm-5">Delights by Daisy</Navbar.Brand>
+          <Navbar.Brand href="#home" className="px-sm-5">Delights by Daisy</Navbar.Brand>
           <Navbar.Toggle aria-controls="offcanvasNavbar-expand" />
           <Navbar.Offcanvas id="offcanvasNavbar-expand" aria-labelledby="offcanvasNavbar-expand" placement="end">
             <Offcanvas.Header className="mx-4 border-bot" closeButton>

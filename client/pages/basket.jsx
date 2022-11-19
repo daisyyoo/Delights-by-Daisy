@@ -60,6 +60,7 @@ export default class Basket extends React.Component {
     this.state = {
       cookies: []
     };
+    this.handleClick = this.handleClick.bind(this);
   }
 
   componentDidMount() {
@@ -82,6 +83,43 @@ export default class Basket extends React.Component {
     }
   }
 
+  handleClick(event) {
+    const token = localStorage.getItem('basketToken');
+    let quantity;
+    let cookieId;
+    if (event.target.matches('.fa-circle-minus')) {
+      const currentQuantity = Number(event.target.closest('p').textContent);
+      cookieId = Number(event.target.closest('p').id);
+      if (currentQuantity > 0) {
+        quantity = currentQuantity - 1;
+      } else {
+        return;
+      }
+    } else if (event.target.matches('.fa-circle-plus')) {
+      const currentQuantity = Number(event.target.closest('p').textContent);
+      cookieId = Number(event.target.closest('p').id);
+      quantity = currentQuantity + 1;
+    }
+    const newInfo = {
+      quantity,
+      cookieId
+    };
+    const req = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-access-token': token
+      },
+      body: JSON.stringify(newInfo)
+    };
+    fetch('/updateQuantity', req)
+      .then(res => res.json())
+      .then(cookies => {
+        this.setState({ cookies });
+      })
+      .catch(err => console.error(err));
+  }
+
   render() {
     return (
       <>
@@ -97,7 +135,7 @@ export default class Basket extends React.Component {
               {
               this.state.cookies.map((product, index) => (
                 <div key={index} className="d-flex justify-content-lg-start">
-                  <BasketItems product={product} />
+                  <BasketItems product={product} handleClick={this.handleClick}/>
                 </div>
               ))
             }
@@ -136,7 +174,8 @@ export default class Basket extends React.Component {
 }
 
 function BasketItems(props) {
-  const { quantity, flavor, weight, price, imageUrl } = props.product;
+  const { cookieId, quantity, flavor, weight, price, imageUrl } = props.product;
+  const { handleClick } = props;
   return (
     <>
       <div style={styles.imageContainer} className="col-5 col-md-3 d-flex align-items-center border-bot">
@@ -150,10 +189,14 @@ function BasketItems(props) {
           </div>
           <div className="d-flex flex-column flex-lg-row justify-content-lg-between align-items-lg-center">
             <Card.Text className="m-0 py-2" style={styles.price}>{`${toDollars(price * quantity)}`}</Card.Text>
-            <Card.Text className="mx-lg-3" style={styles.text}>
-              <i className="fa-solid fa-circle-plus"/>
+            <Card.Text id={cookieId} className="mx-lg-3" style={styles.text} value={quantity} onClick={handleClick}>
+              <Button className="quantity-button" name="minus">
+                <i className="fa-solid fa-circle-minus"/>
+              </Button>
               {` ${quantity} `}
-              <i className="fa-solid fa-circle-minus"/>
+              <Button className="quantity-button" name="plus">
+                <i className="fa-solid fa-circle-plus"/>
+              </Button>
             </Card.Text>
           </div>
         </Card.Body>
