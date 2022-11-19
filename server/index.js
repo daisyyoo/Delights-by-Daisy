@@ -290,6 +290,44 @@ app.post('/sendEmail', (req, res, next) => {
     .catch(err => next(err));
 });
 
+app.post('/updateQuantity', (req, res, next) => {
+  const token = req.get('x-access-token');
+  const { quantity, cookieId } = req.body;
+  const cartId = jwt.verify(token, process.env.TOKEN_SECRET);
+  const sql = `
+    update "cartItems"
+      set "quantity" = $1
+      where "cartId" = $2
+      and "cookieId" = $3
+      returning *
+  `;
+  const params = [quantity, cartId, cookieId];
+  return db.query(sql, params)
+    .then(result => {
+      const sql = `
+      select "cartItems"."cartId",
+            "cartItems"."cookieId",
+            "cartItems"."quantity",
+            "cookies"."flavor",
+            "cookies"."weight",
+            "cookies"."price",
+            "cookies"."imageUrl"
+      from "cartItems"
+      join "cookies" using ("cookieId")
+      where "cartId" = $1
+    `;
+      const params = [cartId];
+      return db.query(sql, params);
+    })
+    .then(result => {
+      if (!result.rows) {
+        throw new ClientError(404, `cannot find basket with cartId ${cartId}`);
+      }
+      res.json(result.rows);
+    })
+    .catch(err => next(err));
+});
+
 app.use(errorMiddleware);
 
 app.listen(process.env.PORT, () => {

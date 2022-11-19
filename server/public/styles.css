@@ -14,6 +14,18 @@ h1,
   background-color: #dc924e;
 }
 
+.navbar-brand {
+  color: #fdeedc;
+}
+
+.navbar-brand:hover {
+  color: #fdeedc;
+}
+
+.navbar-brand:visited {
+  color: #fdeedc;
+}
+
 .navbar-toggler {
   border: none;
 }
@@ -171,12 +183,12 @@ i {
   font-size: 1.2rem;
 }
 
-.header-logo {
-  color: #fdeedc;
-}
-
 .menu-link {
   color: #422300;
+}
+
+.menu-link.active {
+  color: #ffd8a9 !important;
 }
 
 .menu-link:hover {
@@ -200,6 +212,26 @@ i {
 
 .submit-button {
   width: 6rem;
+}
+
+.quantity-button {
+  background: none;
+  border: none;
+}
+
+.quantity-button:hover {
+  background: none;
+  border: none;
+}
+
+.quantity-button:active {
+  background: none !important;
+  border: none;
+}
+
+.quantity-button:disabled {
+  background: none;
+  border: none;
 }
 
 @media only screen and (min-width: 768px) {
