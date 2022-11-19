@@ -111,7 +111,7 @@ export default class Basket extends React.Component {
             <div className="col-lg-3" >
               <div className="py-3 d-flex flex-column align-items-center">
                 <h4 style={styles.subtotalHeader} className="py-2">Need to grab more cookies for a friend in need?</h4>
-                <Button href="#cookies" style={styles.button} className="button-all w-75" >GET COOKIES</Button>
+                <Button href="#cookies" style={styles.button} className="button-more-cookies" >GET COOKIES</Button>
               </div>
               <div className="d-flex w-100 justify-content-between pt-3 mt-5" style={styles.borderTop}>
                 <h5 style={styles.subtotalHeader}>{`Subtotal (${this.state.cookies.length} items)`}</h5>

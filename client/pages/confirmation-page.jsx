@@ -91,6 +91,7 @@ export default class ConfirmationPage extends React.Component {
   }
 
   sendEmail(event) {
+    event.preventDefault();
     const req = {
       method: 'POST',
       headers: {
@@ -102,8 +103,8 @@ export default class ConfirmationPage extends React.Component {
       .then(response => {
         this.setState({ emailSent: true });
         this.setState({ email: '' });
-        const { checkOut } = this.context;
-        checkOut();
+        // const { checkOut } = this.context;
+        // checkOut();
       })
       .catch();
   }
@@ -174,7 +175,7 @@ export default class ConfirmationPage extends React.Component {
             </div>
           </form>
           <div className="d-flex justify-content-center mt-5 pt-3">
-            <Button href="#home" className={`button-all ${this.state.emailSent ? 'show' : 'd-none'}`}>RETURN TO HOME</Button>
+            <Button href="#home" className={this.state.emailSent ? 'button-all' : 'd-none'}>RETURN TO HOME</Button>
           </div>
         </div>
       </>
