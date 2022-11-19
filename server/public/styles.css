@@ -20,6 +20,7 @@ h1,
 
 .navbar-toggler:focus {
   outline: none;
+  box-shadow: none;
 }
 
 .navbar-toggler:hover {
@@ -66,6 +67,33 @@ h1,
   width: 11rem;
 }
 
+.button-more-cookies {
+  background-color: #fdeedc;
+  color: #693802;
+  font-weight: 600;
+  border: solid 2px #693802;
+  box-shadow: 0 0 4px #422300;
+  border-radius: 5px;
+  height: 2.75rem;
+  width: 11rem;
+}
+
+.button-more-cookies:hover {
+  background-color: #94540f;
+  color: #ffd8a9;
+  font-weight: 600;
+  border: solid 2px #94540f;
+  border-radius: 5px;
+}
+
+.button-more-cookies:active {
+  background-color: #693802 !important;
+  color: #ffd8a9 !important;
+  font-weight: 600;
+  border: solid 2px #693802 !important;
+  border-radius: 5px;
+}
+
 .button-all:hover {
   background-color: #94540f;
   color: #ffd8a9;
@@ -80,6 +108,10 @@ h1,
   font-weight: 600;
   border: solid 2px #ffd8a9;
   border-radius: 5px;
+}
+
+.button-all:focus {
+  outline: solid 1px #693802;
 }
 
 .button-return {
@@ -104,7 +136,7 @@ h1,
   background-color: #693802 !important;
   color: #ffd8a9 !important;
   font-weight: 600;
-  border: solid 2px #ffd8a9;
+  border: solid 2px #ffd8a9 !important;
   border-radius: 5px;
 }
 
@@ -153,7 +185,21 @@ i {
 }
 
 .menu-link:visited {
-  color: #94540f;
+  color: #e38b29;
+}
+
+.email-input {
+  border: solid 2px #94540f;
+  border-radius: 5px;
+  color: #422300;
+}
+
+.email-input:focus {
+  outline: solid 1px #94540f;
+}
+
+.submit-button {
+  width: 6rem;
 }
 
 @media only screen and (min-width: 768px) {

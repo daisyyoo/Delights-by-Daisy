@@ -49,10 +49,11 @@ export default function CheckoutForm(props) {
     }
 
     setIsLoading(true);
+    const token = localStorage.getItem('basketToken');
     const { error } = await stripe.confirmPayment({
       elements,
       confirmParams: {
-        return_url: new URL('/process-order', window.location).href
+        return_url: new URL(`/process-order/${token}`, window.location).href
       }
     });
 

@@ -77,7 +77,8 @@ export default class Basket extends React.Component {
         .then(res => res.json())
         .then(cookies => {
           this.setState({ cookies });
-        });
+        })
+        .catch(err => console.error(err));
     }
   }
 
@@ -87,7 +88,7 @@ export default class Basket extends React.Component {
         <h1 className="py-1" >My Basket</h1>
         <p className="m-0" style={styles.text}>{`${this.state.cookies.length} items`}</p>
         {this.state.cookies.length === 0 &&
-        <h4 style={styles.noBasket} className="mt-2 text-center">
+        <h4 style={styles.noBasket} className="my-5 text-center">
           You have no items in your basket!
           <br />Add cookies to your basket to get started!</h4>}
         <div className="d-lg-flex justify-content-lg-between container">
@@ -109,6 +110,10 @@ export default class Basket extends React.Component {
             }
           {this.state.cookies.length > 0 &&
             <div className="col-lg-3" >
+              <div className="py-3 d-flex flex-column align-items-center">
+                <h4 style={styles.subtotalHeader} className="py-2">Need to grab more cookies for a friend in need?</h4>
+                <Button href="#cookies" style={styles.button} className="button-more-cookies" >GET COOKIES</Button>
+              </div>
               <div className="d-flex w-100 justify-content-between pt-3 mt-5" style={styles.borderTop}>
                 <h5 style={styles.subtotalHeader}>{`Subtotal (${this.state.cookies.length} items)`}</h5>
                 <h5 style={styles.subtotalHeader}>

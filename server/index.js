@@ -6,7 +6,9 @@ const ClientError = require('./client-error');
 const staticMiddleware = require('./static-middleware');
 const errorMiddleware = require('./error-middleware');
 const app = express();
-const stripe = require('stripe')('sk_test_51Ly5zQD9hcLXyrLfIIebHLiTNOKeO1CELshkDj0vjizFzkrgZ2cnZa8lF2Vf3AmZJQYHJfi454bf68ehAzJExyHe00gMcrQPGO');
+const stripe = require('stripe')(process.env.STRIPE_API_SERVER_KEY);
+const sgMail = require('@sendgrid/mail');
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 const db = new pg.Pool({
   connectionString: process.env.DATABASE_URL,
@@ -184,41 +186,106 @@ app.post('/create-payment-intent', async (req, res, next) => {
     .catch(err => next(err));
 });
 
-app.get('/process-order', (req, res, next) => {
-  // const headers = req.query;
-  // store the first query payment_intent in database to be able to track order via Stripe
-  res.redirect(302, '/#confirmationPage');
+app.get('/process-order/:token', (req, res, next) => {
+  const token = req.params.token;
+  const cartId = jwt.verify(token, process.env.TOKEN_SECRET);
+  const paymentIntent = req.query.payment_intent;
+  const sql = `
+    insert into "orders" ("cartId", "orderedAt", "paymentIntent")
+    values ($1, now(), $2)
+    returning *
+  `;
+  const params = [cartId, paymentIntent];
+  db.query(sql, params)
+    .then(result => {
+      res.redirect(302, '/#confirmationPage');
+    })
+    .catch(err => next(err));
 });
 
 app.post('/confirmationPage', (req, res, next) => {
   const token = req.get('x-access-token');
   const cartId = jwt.verify(token, process.env.TOKEN_SECRET);
   const sql = `
-      insert into "orders" ("cartId", "orderedAt")
-      values ($1, now())
-      returning *
-    `;
+    select "orders"."orderId",
+          "orders"."orderedAt",
+          "cartItems"."quantity",
+          "cookies"."flavor",
+          "cookies"."price",
+          "cookies"."imageUrl"
+    from "orders"
+    join "cartItems" using ("cartId")
+    join "cookies" using ("cookieId")
+    where "cartId" = $1
+  `;
   const params = [cartId];
   db.query(sql, params)
     .then(result => {
-      const orderId = result.rows[0].orderId;
+      res.json(result.rows);
+    })
+    .catch(err => next(err));
+});
+
+app.post('/sendEmail', (req, res, next) => {
+  const { email } = req.body;
+  const { orderId } = req.body.order[0];
+  const sql = `
+    update "orders"
+      set "email" = $1,
+          "confirmedAt" = now()
+      where "orderId" = $2
+      returning *
+  `;
+  const params = [email, orderId];
+  db.query(sql, params)
+    .then(result => {
+      const orderInfo = result.rows[0];
+      const { cartId } = orderInfo;
       const sql = `
         select "orders"."orderId",
               "orders"."orderedAt",
+              "orders"."email",
               "cartItems"."quantity",
               "cookies"."flavor",
-              "cookies"."price",
-              "cookies"."imageUrl"
+              "cookies"."price"
         from "orders"
         join "cartItems" using ("cartId")
         join "cookies" using ("cookieId")
-        where "orderId" = $1
+        where "cartId" = $1
       `;
-      const params = [orderId];
+      const params = [cartId];
       return db.query(sql, params);
     })
     .then(result => {
-      res.json(result.rows);
+      const orderDetails = result.rows;
+      const { orderId, email, orderedAt } = orderDetails[0];
+      const msg = {
+        to: email,
+        from: 'Daisy@delightsbydaisy.de',
+        subject: 'Order Confirmation',
+        text: `
+            Order Details # 00${orderId}
+            Order Date: ${orderedAt}
+            ${(orderDetails.map(cookie => (cookie.flavor + 'Qty: ' + cookie.quantity)).join(''))}
+            Total:
+            ${orderDetails.reduce((previousCookie, currentCookie) => {
+              return previousCookie + (currentCookie.quantity * currentCookie.price);
+            }, 0)}
+            `,
+        html: `
+            <br><h2>Order Details # 00${orderId}</h2>
+            <br><strong>Order Date:</strong> ${orderedAt} <br>
+            ${(orderDetails.map(cookie => ('<br><strong>Flavor: </strong>' + cookie.flavor + '<br><strong>Qty: </strong>' + cookie.quantity + '<br>')).join(''))}
+            <br><strong>Total:</strong> $
+            ${(orderDetails.reduce((previousCookie, currentCookie) => {
+            return previousCookie + (currentCookie.quantity * currentCookie.price);
+          }, 0) / 100).toFixed(2)}
+            <br><h3><em>Thank you for your purchase!</em></h3>`
+      };
+      return sgMail.send(msg);
+    })
+    .then(() => {
+      res.send();
     })
     .catch(err => next(err));
 });

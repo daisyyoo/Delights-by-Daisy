@@ -40,8 +40,8 @@ export default class Catalog extends React.Component {
       .then(res => res.json())
       .then(cookies => {
         this.setState({ cookies });
-      }
-      );
+      })
+      .catch(err => console.error(err));
   }
 
   render() {
@@ -49,7 +49,7 @@ export default class Catalog extends React.Component {
       <>
         <h1 className="py-1">Shop All</h1>
         <div className="d-flex justify-content-between">
-          <a style={styles.description} className="text-decoration-none" href='#'>
+          <a style={styles.description} className="text-decoration-none" href='#home'>
             <i className="fa-solid fa-chevron-left" style={styles.icon}/>
             {' Home'}
           </a>

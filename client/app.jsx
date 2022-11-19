@@ -47,7 +47,7 @@ export default class App extends React.Component {
 
   renderPage() {
     const { route } = this.state;
-    if (route.path === '') {
+    if (route.path === 'home') {
       return <Home />;
     }
     if (route.path === 'cookies') {

@@ -12,6 +12,7 @@ CREATE TABLE "public"."orders" (
 	"cartId" int NOT NULL,
 	"email" TEXT,
 	"confirmedAt" timestamp with time zone,
+  "paymentIntent" TEXT NOT NULL UNIQUE,
 	CONSTRAINT "orders_pk" PRIMARY KEY ("orderId")
 ) WITH (
   OIDS=FALSE
