@@ -275,7 +275,7 @@ app.post('/sendEmail', (req, res, next) => {
         html: `
             <br><h2>Order Details # 00${orderId}</h2>
             <br><strong>Order Date:</strong> ${orderedAt} <br>
-            ${orderDetails.map(cookie => ('<br><strong>Flavor: </strong>' + cookie.flavor + '<br><strong>Qty: </strong>' + cookie.quantity + '<br>'))}
+            ${(orderDetails.map(cookie => ('<br><strong>Flavor: </strong>' + cookie.flavor + '<br><strong>Qty: </strong>' + cookie.quantity + '<br>')).join(''))}
             <br><strong>Total:</strong> $
             ${(orderDetails.reduce((previousCookie, currentCookie) => {
             return previousCookie + (currentCookie.quantity * currentCookie.price);

@@ -103,8 +103,8 @@ export default class ConfirmationPage extends React.Component {
       .then(response => {
         this.setState({ emailSent: true });
         this.setState({ email: '' });
-        // const { checkOut } = this.context;
-        // checkOut();
+        const { checkOut } = this.context;
+        checkOut();
       })
       .catch();
   }
