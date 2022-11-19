@@ -77,7 +77,8 @@ export default class Basket extends React.Component {
         .then(res => res.json())
         .then(cookies => {
           this.setState({ cookies });
-        });
+        })
+        .catch(err => console.error(err));
     }
   }
 

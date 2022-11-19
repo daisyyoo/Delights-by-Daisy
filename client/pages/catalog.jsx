@@ -40,8 +40,8 @@ export default class Catalog extends React.Component {
       .then(res => res.json())
       .then(cookies => {
         this.setState({ cookies });
-      }
-      );
+      })
+      .catch(err => console.error(err));
   }
 
   render() {

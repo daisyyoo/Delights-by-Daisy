@@ -52,7 +52,6 @@ module.exports = {
   plugins: [
     new webpack.EnvironmentPlugin([]),
     new webpack.EnvironmentPlugin(['STRIPE_API_KEY']),
-    new webpack.EnvironmentPlugin(['SENDGRID_API_KEY']),
     isDevelopment && new ReactRefreshWebpackPlugin(),
     isDevelopment && new webpack.NoEmitOnErrorsPlugin(),
     isDevelopment && new webpack.HotModuleReplacementPlugin()

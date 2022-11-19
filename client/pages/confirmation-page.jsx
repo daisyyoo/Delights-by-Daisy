@@ -80,9 +80,9 @@ export default class ConfirmationPage extends React.Component {
       .then(res => res.json())
       .then(order => {
         this.setState({ order });
+        this.setState({ salesTax: 0 });
       })
-      .catch();
-    this.setState({ salesTax: 0 });
+      .catch(err => console.error(err));
   }
 
   handleChange(event) {
@@ -106,7 +106,7 @@ export default class ConfirmationPage extends React.Component {
         const { checkOut } = this.context;
         checkOut();
       })
-      .catch();
+      .catch(err => console.error(err));
   }
 
   render() {

@@ -83,7 +83,8 @@ export default class ProductDetails extends React.Component {
   componentDidMount() {
     fetch(`/cookies/${this.props.cookieId}`)
       .then(res => res.json())
-      .then(cookie => this.setState({ cookie }));
+      .then(cookie => this.setState({ cookie }))
+      .catch(err => console.error(err));
   }
 
   handleChange(event) {
@@ -120,7 +121,8 @@ export default class ProductDetails extends React.Component {
         if (!cartId) {
           addToBasket(result);
         }
-      });
+      })
+      .catch(err => console.error(err));
   }
 
   closeModal() {
