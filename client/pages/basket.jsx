@@ -85,37 +85,35 @@ export default class Basket extends React.Component {
 
   handleClick(event) {
     const token = localStorage.getItem('basketToken');
-    let quantity;
-    let cookieId;
+    const cookieId = Number(event.target.closest('p').id);
+    const cookieIndex = this.state.cookies.findIndex(cookie => cookie.cookieId === cookieId);
+    const { quantity } = this.state.cookies[cookieIndex];
+    let newQuantity;
+
     if (event.target.matches('.fa-circle-minus')) {
-      const currentQuantity = Number(event.target.closest('p').textContent);
-      cookieId = Number(event.target.closest('p').id);
-      if (currentQuantity > 0) {
-        quantity = currentQuantity - 1;
-      } else {
-        return;
+      if (quantity > 0) {
+        newQuantity = quantity - 1;
       }
     } else if (event.target.matches('.fa-circle-plus')) {
-      const currentQuantity = Number(event.target.closest('p').textContent);
-      cookieId = Number(event.target.closest('p').id);
-      quantity = currentQuantity + 1;
+      newQuantity = quantity + 1;
     }
-    const newInfo = {
-      quantity,
-      cookieId
-    };
+    const updatedInfo = { cookieId, quantity: newQuantity };
+
     const req = {
-      method: 'POST',
+      method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
         'x-access-token': token
       },
-      body: JSON.stringify(newInfo)
+      body: JSON.stringify(updatedInfo)
     };
     fetch('/updateQuantity', req)
       .then(res => res.json())
-      .then(cookies => {
-        this.setState({ cookies });
+      .then(updatedCookie => {
+        const newCookies = this.state.cookies.slice();
+        updatedCookie.quantity = newQuantity;
+        newCookies[cookieIndex] = updatedCookie;
+        this.setState({ cookies: newCookies });
       })
       .catch(err => console.error(err));
   }
