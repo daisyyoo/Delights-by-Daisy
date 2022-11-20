@@ -89,10 +89,12 @@ export default class Basket extends React.Component {
     const cookieIndex = this.state.cookies.findIndex(cookie => cookie.cookieId === cookieId);
     const { quantity } = this.state.cookies[cookieIndex];
     let newQuantity;
-
+    const currentQuantity = Number(event.target.closest('p').textContent);
     if (event.target.matches('.fa-circle-minus')) {
-      if (quantity > 0) {
+      if (currentQuantity > 1) {
         newQuantity = quantity - 1;
+      } else {
+        return;
       }
     } else if (event.target.matches('.fa-circle-plus')) {
       newQuantity = quantity + 1;
