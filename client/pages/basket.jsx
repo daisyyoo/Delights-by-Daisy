@@ -52,6 +52,12 @@ const styles = {
   },
   noBasketImg: {
     height: '300px'
+  },
+  remove: {
+    cursor: 'pointer',
+    color: '#693802',
+    fontSize: '0.8rem',
+    textDecoration: 'underline'
   }
 };
 export default class Basket extends React.Component {
@@ -61,6 +67,7 @@ export default class Basket extends React.Component {
       cookies: []
     };
     this.handleClick = this.handleClick.bind(this);
+    this.handleRemove = this.handleRemove.bind(this);
   }
 
   componentDidMount() {
@@ -85,11 +92,12 @@ export default class Basket extends React.Component {
 
   handleClick(event) {
     const token = localStorage.getItem('basketToken');
-    const cookieId = Number(event.target.closest('p').id);
+    const cookieId = Number(event.target.closest('div').id);
     const cookieIndex = this.state.cookies.findIndex(cookie => cookie.cookieId === cookieId);
     const { quantity } = this.state.cookies[cookieIndex];
     let newQuantity;
-    const currentQuantity = Number(event.target.closest('p').textContent);
+    const currentQuantity = Number(event.target.closest('div').textContent);
+
     if (event.target.matches('.fa-circle-minus')) {
       if (currentQuantity > 1) {
         newQuantity = quantity - 1;
@@ -98,6 +106,8 @@ export default class Basket extends React.Component {
       }
     } else if (event.target.matches('.fa-circle-plus')) {
       newQuantity = quantity + 1;
+    } else {
+      return;
     }
     const updatedInfo = { cookieId, quantity: newQuantity };
 
@@ -120,6 +130,26 @@ export default class Basket extends React.Component {
       .catch(err => console.error(err));
   }
 
+  handleRemove(event) {
+    const token = localStorage.getItem('basketToken');
+    const cookieId = Number(event.target.closest('a').id);
+
+    const req = {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-access-token': token
+      }
+    };
+    fetch(`/removeCookie/${cookieId}`, req)
+      .then(res => res.json())
+      .then(updatedBasket => {
+        const updatedCookies = updatedBasket;
+        this.setState({ cookies: updatedCookies });
+      })
+      .catch(err => console.error(err));
+  }
+
   render() {
     return (
       <>
@@ -135,7 +165,7 @@ export default class Basket extends React.Component {
               {
               this.state.cookies.map((product, index) => (
                 <div key={index} className="d-flex justify-content-lg-start">
-                  <BasketItems product={product} handleClick={this.handleClick}/>
+                  <BasketItems product={product} handleClick={this.handleClick} handleRemove={this.handleRemove} />
                 </div>
               ))
             }
@@ -176,27 +206,31 @@ export default class Basket extends React.Component {
 function BasketItems(props) {
   const { cookieId, quantity, flavor, weight, price, imageUrl } = props.product;
   const { handleClick } = props;
+  const { handleRemove } = props;
   return (
     <>
-      <div style={styles.imageContainer} className="col-5 col-md-3 d-flex align-items-center border-bot">
-        <img className="h-100 img-fluid" style={styles.image} src={imageUrl} alt={flavor}/>
+      <div style={styles.imageContainer} className="col-5 col-md-3 p-3 d-flex align-items-center border-bot">
+        <img className="w-100 img-fluid" style={styles.image} src={imageUrl} alt={flavor}/>
       </div>
       <Card className="col-7 col-md-9 card-border" style={styles.card}>
-        <Card.Body className="d-flex flex-column flex-lg-row justify-content-center justify-content-lg-between align-items-lg-center">
-          <div className="p-0">
+        <Card.Body className="d-flex flex-column flex-md-row justify-content-center justify-content-md-between align-items-md-center">
+          <div className="p-0 col-md-5">
             <Card.Text className="m-0" style={styles.title}>{flavor}</Card.Text>
             <Card.Text className="m-0 pt-2" style={styles.weight}>{`${weight} oz`}</Card.Text>
           </div>
-          <div className="d-flex flex-column flex-lg-row justify-content-lg-between align-items-lg-center">
+          <div className="d-flex flex-column w-50 flex-md-row justify-content-md-between align-items-md-center">
             <Card.Text className="m-0 py-2" style={styles.price}>{`${toDollars(price * quantity)}`}</Card.Text>
-            <Card.Text id={cookieId} className="mx-lg-3" style={styles.text} value={quantity} onClick={handleClick}>
-              <Button className="quantity-button" name="minus">
+            <div id={cookieId} className="m-0 py-1 d-flex align-items-center" style={styles.text} value={quantity} onClick={handleClick}>
+              <Button className="quantity-button p-0 mr-1">
                 <i className="fa-solid fa-circle-minus"/>
               </Button>
-              {` ${quantity} `}
-              <Button className="quantity-button" name="plus">
+              <p style={styles.text} className=" px-2 px-md-3 m-0">{` ${quantity} `}</p>
+              <Button className="quantity-button p-0">
                 <i className="fa-solid fa-circle-plus"/>
               </Button>
+            </div>
+            <Card.Text>
+              <a id={cookieId} onClick={handleRemove} style={styles.remove}>Remove</a>
             </Card.Text>
           </div>
         </Card.Body>
