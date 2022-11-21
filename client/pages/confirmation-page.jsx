@@ -6,13 +6,14 @@ import Button from 'react-bootstrap/Button';
 
 const styles = {
   image: {
-    objectFit: 'contain'
+    objectFit: 'cover',
+    borderRadius: '5px'
   },
   imageContainer: {
-    height: '200px'
+    height: '150px'
   },
   card: {
-    height: '200px'
+    height: '150px'
   },
   header: {
     color: '#422300',
@@ -143,8 +144,8 @@ export default class ConfirmationPage extends React.Component {
                   }, 0))}</p>
             </div>
             <div className="d-flex justify-content-between pb-lg-4">
-              <p className="m-1">Sales Tax</p>
-              <p className="m-1">{toDollars(this.state.salesTax)}</p>
+              <p className="m-1" style={styles.subtotalHeader}>Sales Tax</p>
+              <p className="m-1" style={styles.subtotalHeader}>{toDollars(this.state.salesTax)}</p>
             </div>
             <div style={styles.borderBottom} className="d-flex justify-content-between pb-1">
               <p className="m-1" style={styles.total}>Total Paid</p>
@@ -188,14 +189,14 @@ function OrderedCookie(props) {
   const { flavor, quantity, price, imageUrl } = props.cookie;
   return (
     <>
-      <div className="col-5 col-md-3 d-flex align-items-center py-lg-2" style={styles.imageContainer}>
-        <img className="h-100 img-fluid" style={styles.image} src={imageUrl} alt={flavor} />
+      <div className="col-5 col-md-3 d-flex align-items-center py-2" style={styles.imageContainer}>
+        <img className="h-100 w-100 img-fluid" style={styles.image} src={imageUrl} alt={flavor} />
       </div>
       <Card className="col-7 col-md-9 border-0" style={styles.card}>
-        <Card.Body className="d-flex flex-column justify-content-center">
-          <Card.Text style={styles.title}>{flavor}</Card.Text>
-          <Card.Text style={styles.price}>{ toDollars(price * quantity) }</Card.Text>
-          <Card.Text style={styles.text}>{`Qty : ${quantity} `}</Card.Text>
+        <Card.Body className="d-flex flex-column justify-content-around">
+          <Card.Text className="m-0" style={styles.title}>{flavor}</Card.Text>
+          <Card.Text className="m-0" style={styles.price}>{ toDollars(price * quantity) }</Card.Text>
+          <Card.Text className="m-0" style={styles.text}>{`Qty : ${quantity} `}</Card.Text>
         </Card.Body>
       </Card>
     </>

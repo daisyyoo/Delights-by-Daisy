@@ -17,7 +17,8 @@ const styles = {
     height: '350px'
   },
   image: {
-    objectFit: 'contain'
+    objectFit: 'cover',
+    borderRadius: '5px'
   },
   description: {
     color: '#693802',
@@ -149,10 +150,10 @@ export default class ProductDetails extends React.Component {
           </a>
         </div>
         <div className="d-flex row align-items-center">
-          <div className="col-lg-6 d-flex justify-content-center" style={styles.imageContainer}>
-            <img src={imageUrl} alt={flavor} style={styles.image} className="mw-100" />
+          <div className="col-md-6 d-flex justify-content-center" style={styles.imageContainer}>
+            <img src={imageUrl} alt={flavor} style={styles.image} className="w-100 h-100" />
           </div>
-          <Card className="col-lg-6 border-0 d-flex flex-direction-column justify-content-center">
+          <Card className="col-md-6 border-0 d-flex flex-direction-column justify-content-center">
             <Card.Body className="pb-0">
               <Card.Text className="h1 py-lg-3 d-flex align-items-center" style={styles.title}>{flavor}</Card.Text>
               <Card.Text className="h6 d-flex align-items-center" style={styles.weight}>{`${weight} oz`}</Card.Text>
@@ -212,7 +213,6 @@ function BasketModal(props) {
       show={show}
       fullscreen='md-down'
       aria-labelledby="basket-modal"
-      className="border-0"
     >
       <Modal.Header>
         <h1 style={styles.modalHeader} id="basket-modal" className="m-0">

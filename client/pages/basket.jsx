@@ -5,7 +5,8 @@ import { toDollars } from '../lib/';
 
 const styles = {
   image: {
-    objectFit: 'contain'
+    objectFit: 'cover',
+    borderRadius: '5px'
   },
   imageContainer: {
     height: '200px'
@@ -209,10 +210,10 @@ function BasketItems(props) {
   const { handleRemove } = props;
   return (
     <>
-      <div style={styles.imageContainer} className="col-5 col-md-3 p-3 d-flex align-items-center border-bot">
-        <img className="w-100 img-fluid" style={styles.image} src={imageUrl} alt={flavor}/>
+      <div style={styles.imageContainer} className="col-5 col-md-4 p-3 d-flex align-items-center border-bot">
+        <img className="w-100 h-100 img-fluid" style={styles.image} src={imageUrl} alt={flavor}/>
       </div>
-      <Card className="col-7 col-md-9 card-border" style={styles.card}>
+      <Card className="col-7 col-md-8 card-border" style={styles.card}>
         <Card.Body className="d-flex flex-column flex-md-row justify-content-center justify-content-md-between align-items-md-center">
           <div className="p-0 col-md-5">
             <Card.Text className="m-0" style={styles.title}>{flavor}</Card.Text>
