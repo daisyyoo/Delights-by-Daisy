@@ -163,6 +163,10 @@ h1,
   border: solid 2px #693802;
 }
 
+.modal-content {
+  border: none;
+}
+
 .modal-header {
   background-color: #dc924e;
   color: #fdeedc;

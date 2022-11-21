@@ -290,10 +290,17 @@ app.post('/sendEmail', (req, res, next) => {
     .catch(err => next(err));
 });
 
-app.post('/updateQuantity', (req, res, next) => {
+app.patch('/updateQuantity', (req, res, next) => {
   const token = req.get('x-access-token');
-  const { quantity, cookieId } = req.body;
   const cartId = jwt.verify(token, process.env.TOKEN_SECRET);
+  const { quantity, cookieId } = req.body;
+  if (!Number.isInteger(cookieId) || cookieId < 1) {
+    throw new ClientError(400, 'cookieId must be a positive integer');
+  }
+  if (!Number.isInteger(quantity) || quantity < 1) {
+    throw new ClientError(400, 'quantity must be a positive integer');
+  }
+
   const sql = `
     update "cartItems"
       set "quantity" = $1
@@ -302,8 +309,52 @@ app.post('/updateQuantity', (req, res, next) => {
       returning *
   `;
   const params = [quantity, cartId, cookieId];
-  return db.query(sql, params)
+  db.query(sql, params)
     .then(result => {
+      const sql = `
+      select "cartItems"."cartId",
+            "cartItems"."cookieId",
+            "cartItems"."quantity",
+            "cookies"."flavor",
+            "cookies"."weight",
+            "cookies"."price",
+            "cookies"."imageUrl"
+      from "cartItems"
+      join "cookies" using ("cookieId")
+      where "cookieId" = $1
+    `;
+      const params = [cookieId];
+      return db.query(sql, params);
+    })
+    .then(result => {
+      if (!result.rows) {
+        throw new ClientError(404, `cannot find basket with cartId ${cartId}`);
+      }
+      const [updatedCookie] = result.rows;
+      res.json(updatedCookie);
+    })
+    .catch(err => next(err));
+});
+
+app.delete('/removeCookie/:cookieId', (req, res, next) => {
+  const token = req.get('x-access-token');
+  const cartId = jwt.verify(token, process.env.TOKEN_SECRET);
+  const cookieId = req.params.cookieId;
+  if (!cookieId) {
+    throw new ClientError(400, 'cookieId must be a positive integer');
+  }
+  const sql = `
+    delete from "cartItems"
+    where "cartId" = $1
+      and "cookieId" = $2
+    returning *
+  `;
+  const params = [cartId, cookieId];
+  db.query(sql, params)
+    .then(result => {
+      if (!result.rows) {
+        throw new ClientError(404, `cannot find basket with cartId ${cartId}`);
+      }
       const sql = `
       select "cartItems"."cartId",
             "cartItems"."cookieId",
