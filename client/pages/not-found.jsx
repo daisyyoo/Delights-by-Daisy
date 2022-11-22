@@ -18,7 +18,7 @@ export default function NotFound(props) {
             Uh oh, we could not find the page you were looking for!
           </h3>
           <p className="text-muted">
-            <a href="#">Return to the catalog</a>
+            <a href="#">Return to the Homepage</a>
           </p>
         </div>
       </div>
