@@ -20,7 +20,7 @@ const styles = {
 export default class Footer extends React.Component {
   render() {
     return (
-      <footer style={styles.bgcolor} className="w-100">
+      <footer style={styles.bgcolor} className="w-100 footer-container">
         <div className="container d-flex">
           <div className="d-flex align-items-left justify-content-center flex-column w-75">
             <h4 style={styles.title}>Delights by Daisy</h4>

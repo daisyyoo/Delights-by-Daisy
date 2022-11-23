@@ -238,12 +238,12 @@ i {
   border: none;
 }
 
-.carousel-container {
-  position: absolute;
-  width: 100vw;
-  height: 100vh;
-  top: 0;
-  left: 0;
+.homepage-image {
+  height: 700px;
+}
+
+.homepage-container {
+  height: 575px;
 }
 
 @media only screen and (min-width: 768px) {
@@ -253,5 +253,13 @@ i {
 
   .menu-link:visited {
     color: #ffd8a9;
+  }
+
+  .homepage-image {
+    height: 610px;
+  }
+
+  .homepage-container {
+    height: 480px;
   }
 }
