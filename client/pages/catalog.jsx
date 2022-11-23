@@ -49,7 +49,7 @@ export default class Catalog extends React.Component {
       <>
         <h1 className="py-1">Shop All</h1>
         <div className="d-flex justify-content-between">
-          <a style={styles.description} className="text-decoration-none" href='#home'>
+          <a style={styles.description} className="text-decoration-none" href='#'>
             <i className="fa-solid fa-chevron-left" style={styles.icon}/>
             {' Home'}
           </a>

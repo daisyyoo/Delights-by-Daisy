@@ -238,6 +238,14 @@ i {
   border: none;
 }
 
+.homepage-image {
+  height: 700px;
+}
+
+.homepage-container {
+  height: 575px;
+}
+
 @media only screen and (min-width: 768px) {
   .menu-link {
     color: #fdeedc;
@@ -245,5 +253,13 @@ i {
 
   .menu-link:visited {
     color: #ffd8a9;
+  }
+
+  .homepage-image {
+    height: 610px;
+  }
+
+  .homepage-container {
+    height: 480px;
   }
 }
