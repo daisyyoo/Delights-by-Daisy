@@ -1,19 +1,25 @@
 import React from 'react';
 import Carousel from 'react-bootstrap/Carousel';
 
-export default function Home(props) {
+const styles = {
+  image: {
+    objectFit: 'contain'
+  }
+};
 
+export default function Home(props) {
   return (
     // <div className="row" style={styles.position}>
     //   <img className="img-fluid" src="/image/home-pic.jpg" alt="plate-of-cookies"/>
     //   <h1 style={styles.text}>Welcome to the homepage!</h1>
     // </div>
-    <Carousel fade>
+    <Carousel className="carousel-container" fade>
       <Carousel.Item>
         <img
-          className="d-block w-100"
-          src="/image/home-pic.jpg"
+          className="d-block w-100 img-fluid"
+          src="/image/home-pic-sm.jpg"
           alt="welcome-picture"
+          style={styles.image}
         />
         <Carousel.Caption>
           <h3>Welcome!</h3>
