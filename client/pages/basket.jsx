@@ -173,8 +173,8 @@ export default class Basket extends React.Component {
             </div>
             }
           {this.state.cookies.length === 0 &&
-            <div className="col-lg-12 d-flex justify-content-center">
-              <img style={styles.noBasketImg} className="img-fluid my-3" src="/image/lots-of-cookies.jpg" alt="cookies"/>
+            <div className=" d-flex justify-content-center w-100">
+              <img style={styles.noBasketImg} className="img-fluid my-3" src="/image/lots-of-cookies.webp" alt="cookies"/>
             </div>
             }
           {this.state.cookies.length > 0 &&

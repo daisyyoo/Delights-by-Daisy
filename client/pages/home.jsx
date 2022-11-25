@@ -3,7 +3,7 @@ import Button from 'react-bootstrap/Button';
 
 const styles = {
   image: {
-    backgroundImage: 'url("/image/home-pic.jpg")',
+    backgroundImage: 'url("/image/home-pic.webp")',
     backgroundSize: 'cover',
     backgroundPosition: '75%',
     width: '100%',
