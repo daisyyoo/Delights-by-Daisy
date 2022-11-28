@@ -198,6 +198,7 @@ i {
 .menu-link:hover {
   color: #fdeedc;
   background-color: #94540f;
+  border-radius: 5px;
 }
 
 .menu-link:visited {
@@ -252,7 +253,7 @@ i {
   }
 
   .menu-link:visited {
-    color: #ffd8a9;
+    color: #fdeedc;
   }
 
   .homepage-image {
