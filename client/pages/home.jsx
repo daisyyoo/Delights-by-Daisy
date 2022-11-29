@@ -25,7 +25,7 @@ const styles = {
 export default function Home(props) {
   return (
     <div className="image-container">
-      <img style={styles.image} className="homepage-image"/>
+      <div style={styles.image} className="homepage-image"/>
       <div style={styles.textbox} className="w-50">
         <h1 className="mt-3 mb-5">Welcome!</h1>
         <p style={styles.text}>

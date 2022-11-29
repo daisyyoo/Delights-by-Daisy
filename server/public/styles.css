@@ -238,6 +238,11 @@ i {
   height: 740px;
 }
 
+.no-basket-image {
+  height: 600px;
+  bottom: 13%;
+}
+
 .loader {
   position: absolute;
   top: calc(50% - 4em);
@@ -268,6 +273,11 @@ i {
 @media only screen and (min-width: 568px) {
   .homepage-image {
     height: 630px;
+  }
+
+  .no-basket-image {
+    height: 500px;
+    bottom: 15%;
   }
 }
 

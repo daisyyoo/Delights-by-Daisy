@@ -49,11 +49,19 @@ const styles = {
     fontSize: '1rem'
   },
   noBasket: {
+    position: 'absolute',
+    left: '0',
     fontWeight: '600',
-    color: '#693802'
+    color: '#693802',
+    opacity: '1'
   },
   noBasketImg: {
-    height: '300px'
+    backgroundImage: 'url("/image/lots-of-cookies-sm.webp")',
+    backgroundSize: 'cover',
+    backgroundPosition: '45%',
+    width: '100%',
+    position: 'absolute',
+    left: '0'
   },
   remove: {
     cursor: 'pointer',
@@ -164,9 +172,8 @@ export default class Basket extends React.Component {
         <h1 className="py-1" >My Basket</h1>
         <p className="m-0" style={styles.text}>{`${this.state.cookies.length} items`}</p>
         {this.state.cookies.length === 0 &&
-        <h4 style={styles.noBasket} className="my-5 text-center">
-          You have no items in your basket!
-          <br />Add cookies to your basket to get started!</h4>}
+          <div style={styles.noBasketImg} className="no-basket-image"/>
+          }
         <div className="d-lg-flex justify-content-lg-between container">
           {this.state.cookies.length > 0 &&
             <div className="row col-lg-9 mb-3">
@@ -180,9 +187,11 @@ export default class Basket extends React.Component {
             </div>
             }
           {this.state.cookies.length === 0 &&
-            <div className=" d-flex justify-content-center w-100">
-              <img style={styles.noBasketImg} className="img-fluid my-3" src="/image/lots-of-cookies.webp" alt="cookies"/>
-            </div>
+          <div>
+            <h4 style={styles.noBasket} className="my-5 text-center w-100">
+              You have no items in your basket!
+              <br />Add cookies to your basket to get started!</h4>
+          </div>
             }
           {this.state.cookies.length > 0 &&
             <div className="col-lg-3 mb-3" >
