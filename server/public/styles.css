@@ -191,18 +191,13 @@ i {
   color: #422300;
 }
 
-.menu-link.active {
-  color: #ffd8a9 !important;
-}
-
 .menu-link:hover {
-  color: #fdeedc;
-  background-color: #94540f;
+  border: solid 2px #94540f;
   border-radius: 5px;
 }
 
 .menu-link:visited {
-  color: #e38b29;
+  color: #94540f;
 }
 
 .email-input {
@@ -283,5 +278,11 @@ i {
 
   .menu-link:visited {
     color: #fdeedc;
+  }
+
+  .menu-link:hover {
+    color: #fdeedc;
+    border: solid 1px #fdeedc;
+    border-radius: 5px;
   }
 }

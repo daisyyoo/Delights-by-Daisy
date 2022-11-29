@@ -19,7 +19,7 @@ export default class Header extends React.Component {
             </Offcanvas.Header>
             <Offcanvas.Body className="px-4">
               <Nav className="justify-content-end flex-grow-1 pe-3" onSelect={(_, event) => { window.location.href = event.target.href; }} >
-                <Nav.Link className="px-3 px-lg-3 menu-link" href="#" role="fool">HOME</Nav.Link>
+                <Nav.Link className="px-3 px-lg-3 menu-link" href="#">HOME</Nav.Link>
                 <Nav.Link className="px-3 px-lg-3 menu-link" href="#cookies">SHOP</Nav.Link>
                 <Nav.Link className="px-3 px-lg-3 menu-link" href="#myBasket" >MY BASKET</Nav.Link>
                 <Nav.Link className="px-3 px-lg-3 menu-link" href="#aboutMe">ABOUT ME</Nav.Link>
