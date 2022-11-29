@@ -6,6 +6,7 @@ import Accordion from 'react-bootstrap/Accordion';
 import Form from 'react-bootstrap/Form';
 import AppContext from '../lib/app-context';
 import Modal from 'react-bootstrap/Modal';
+const loader = document.querySelector('.loader');
 
 const styles = {
   title: {
@@ -82,9 +83,13 @@ export default class ProductDetails extends React.Component {
   }
 
   componentDidMount() {
+    loader.classList.remove('loader-hide');
     fetch(`/cookies/${this.props.cookieId}`)
       .then(res => res.json())
-      .then(cookie => this.setState({ cookie }))
+      .then(cookie => {
+        loader.classList.add('loader-hide');
+        this.setState({ cookie });
+      })
       .catch(err => console.error(err));
   }
 
@@ -93,6 +98,7 @@ export default class ProductDetails extends React.Component {
   }
 
   sendTheInfo(event) {
+    loader.classList.remove('loader-hide');
     const { cartId, addToBasket } = this.context;
     let req;
     const token = localStorage.getItem('basketToken');
@@ -117,6 +123,7 @@ export default class ProductDetails extends React.Component {
     fetch('/addToBasket', req)
       .then(res => res.json())
       .then(result => {
+        loader.classList.add('loader-hide');
         this.setState({ basketData: result });
         this.setState({ setShow: true });
         if (!cartId) {

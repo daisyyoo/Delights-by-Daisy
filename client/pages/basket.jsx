@@ -2,6 +2,7 @@ import React from 'react';
 import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
 import { toDollars } from '../lib/';
+const loader = document.querySelector('.loader');
 
 const styles = {
   image: {
@@ -72,6 +73,7 @@ export default class Basket extends React.Component {
   }
 
   componentDidMount() {
+    loader.classList.remove('loader-hide');
     const token = localStorage.getItem('basketToken');
     if (token) {
       const req = {
@@ -85,6 +87,7 @@ export default class Basket extends React.Component {
       fetch('/myBasket', req)
         .then(res => res.json())
         .then(cookies => {
+          loader.classList.add('loader-hide');
           this.setState({ cookies });
         })
         .catch(err => console.error(err));
@@ -92,6 +95,7 @@ export default class Basket extends React.Component {
   }
 
   handleClick(event) {
+    loader.classList.remove('loader-hide');
     const token = localStorage.getItem('basketToken');
     const cookieId = Number(event.target.closest('div').id);
     const cookieIndex = this.state.cookies.findIndex(cookie => cookie.cookieId === cookieId);
@@ -123,6 +127,7 @@ export default class Basket extends React.Component {
     fetch('/updateQuantity', req)
       .then(res => res.json())
       .then(updatedCookie => {
+        loader.classList.add('loader-hide');
         const newCookies = this.state.cookies.slice();
         updatedCookie.quantity = newQuantity;
         newCookies[cookieIndex] = updatedCookie;
@@ -132,6 +137,7 @@ export default class Basket extends React.Component {
   }
 
   handleRemove(event) {
+    loader.classList.remove('loader-hide');
     const token = localStorage.getItem('basketToken');
     const cookieId = Number(event.target.closest('a').id);
 
@@ -145,6 +151,7 @@ export default class Basket extends React.Component {
     fetch(`/removeCookie/${cookieId}`, req)
       .then(res => res.json())
       .then(updatedBasket => {
+        loader.classList.add('loader-hide');
         const updatedCookies = updatedBasket;
         this.setState({ cookies: updatedCookies });
       })

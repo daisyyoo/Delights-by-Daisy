@@ -12,6 +12,7 @@ import ProductDetails from './pages/products';
 import Basket from './pages/basket';
 import StripeCheckout from './pages/stripe';
 import ConfirmationPage from './pages/confirmation-page';
+const loader = document.querySelector('.loader');
 
 export default class App extends React.Component {
   constructor(props) {
@@ -25,6 +26,7 @@ export default class App extends React.Component {
   }
 
   componentDidMount() {
+    loader.classList.remove('loader-hide');
     window.addEventListener('hashchange', event => {
       const route = parseRoute(window.location.hash);
       this.setState({ route });
@@ -32,6 +34,7 @@ export default class App extends React.Component {
     const token = window.localStorage.getItem('basketToken');
     const cartId = token ? jwtDecode(token) : null;
     this.setState({ cartId });
+    loader.classList.add('loader-hide');
   }
 
   addToBasket(result) {
