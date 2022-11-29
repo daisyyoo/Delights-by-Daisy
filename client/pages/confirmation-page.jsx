@@ -156,7 +156,7 @@ export default class ConfirmationPage extends React.Component {
             </div>
           </div>
         </div>
-        <div className="row">
+        <div className="row mb-3">
           <form className="mt-4 py-0 col-12 col-lg-9 w-lg-75 shadow-none d-flex flex-column" onSubmit={this.sendEmail}>
             <label style={styles.header}>Would you like a confirmation email?</label>
             <input

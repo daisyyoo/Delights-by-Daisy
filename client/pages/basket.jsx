@@ -178,7 +178,7 @@ export default class Basket extends React.Component {
             </div>
             }
           {this.state.cookies.length > 0 &&
-            <div className="col-lg-3" >
+            <div className="col-lg-3 mb-3" >
               <div className="py-3 d-flex flex-column align-items-center">
                 <h4 style={styles.subtotalHeader} className="py-2">Need to grab more cookies for a friend in need?</h4>
                 <Button href="#cookies" style={styles.button} className="button-more-cookies" >GET COOKIES</Button>

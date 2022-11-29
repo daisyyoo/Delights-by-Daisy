@@ -240,11 +240,13 @@ i {
 }
 
 .homepage-image {
-  height: 700px;
+  height: 740px;
 }
 
-.homepage-container {
-  height: 575px;
+@media only screen and (min-width: 568px) {
+  .homepage-image {
+    height: 630px;
+  }
 }
 
 @media only screen and (min-width: 768px) {
@@ -254,13 +256,5 @@ i {
 
   .menu-link:visited {
     color: #fdeedc;
-  }
-
-  .homepage-image {
-    height: 610px;
-  }
-
-  .homepage-container {
-    height: 480px;
   }
 }
