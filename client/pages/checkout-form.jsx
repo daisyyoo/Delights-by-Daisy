@@ -6,7 +6,6 @@ import {
 } from '@stripe/react-stripe-js';
 import { toDollars } from '../lib/';
 import AppContext from '../lib/app-context';
-const loader = document.querySelector('.loader');
 
 export default function CheckoutForm(props) {
   const stripe = useStripe();
@@ -16,14 +15,12 @@ export default function CheckoutForm(props) {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    loader.classList.remove('loader-hide');
     if (!stripe) {
       return;
     }
     const clientSecret = new URLSearchParams(window.location.search).get(
       'payment_intent_client_secret'
     );
-    loader.classList.add('loader-hide');
     if (!clientSecret) {
       return;
     }

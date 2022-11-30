@@ -6,7 +6,6 @@ import Accordion from 'react-bootstrap/Accordion';
 import Form from 'react-bootstrap/Form';
 import AppContext from '../lib/app-context';
 import Modal from 'react-bootstrap/Modal';
-const loader = document.querySelector('.loader');
 
 const styles = {
   title: {
@@ -83,12 +82,15 @@ export default class ProductDetails extends React.Component {
   }
 
   componentDidMount() {
-    loader.classList.remove('loader-hide');
+    const { handleLoader } = this.context;
+    // console.log('1');
+    handleLoader();
     fetch(`/cookies/${this.props.cookieId}`)
       .then(res => res.json())
       .then(cookie => {
-        loader.classList.add('loader-hide');
+        // console.log('3');
         this.setState({ cookie });
+        handleLoader();
       })
       .catch(err => console.error(err));
   }
@@ -98,7 +100,6 @@ export default class ProductDetails extends React.Component {
   }
 
   sendTheInfo(event) {
-    loader.classList.remove('loader-hide');
     const { cartId, addToBasket } = this.context;
     let req;
     const token = localStorage.getItem('basketToken');
@@ -123,7 +124,6 @@ export default class ProductDetails extends React.Component {
     fetch('/addToBasket', req)
       .then(res => res.json())
       .then(result => {
-        loader.classList.add('loader-hide');
         this.setState({ basketData: result });
         this.setState({ setShow: true });
         if (!cartId) {
@@ -139,6 +139,7 @@ export default class ProductDetails extends React.Component {
 
   render() {
     if (!this.state.cookie) return null;
+    const { loading } = this.context;
     const { sendTheInfo } = this;
     const {
       flavor, price, weight, description, ingredients, allergens, backstory, imageUrl
@@ -148,61 +149,70 @@ export default class ProductDetails extends React.Component {
     const { closeModal } = this;
     const { setShow } = this.state;
     const moreProps = { cookie, quantity, closeModal };
+    // console.log('2');
+    // console.log(loading);
     return (
       <>
-        <div className="d-flex justify-content-start">
-          <a style={styles.backButton} className="text-decoration-none mb-3" href='#cookies'>
-            <i className="fa-solid fa-chevron-left" style={styles.icon} />
-            {' Back'}
-          </a>
-        </div>
-        <div className="d-flex row align-items-center">
-          <div className="col-md-6 d-flex justify-content-center" style={styles.imageContainer}>
-            <img src={imageUrl} alt={flavor} style={styles.image} className="w-100 h-100" />
+        {loading === true &&
+          <div className="loader d-flex justify-content-center align-items-center" />
+        }
+        {loading === false &&
+        <>
+          <div className="d-flex justify-content-start">
+            <a style={styles.backButton} className="text-decoration-none mb-3" href='#cookies'>
+              <i className="fa-solid fa-chevron-left" style={styles.icon} />
+              {' Back'}
+            </a>
           </div>
-          <Card className="col-md-6 border-0 d-flex flex-direction-column justify-content-center">
-            <Card.Body className="pb-0">
-              <Card.Text className="h1 py-lg-3 d-flex align-items-center" style={styles.title}>{flavor}</Card.Text>
-              <Card.Text className="h6 d-flex align-items-center" style={styles.weight}>{`${weight} oz`}</Card.Text>
-            </Card.Body>
-            <Card.Body className="d-flex align-items-center">
-              <Card.Text style={styles.description}>
-                {description}
-              </Card.Text>
-            </Card.Body>
-            <Card.Body className="py-0 d-flex align-items-center" style={styles.price}>
-              {toDollars(price)}
-            </Card.Body>
-            <Card.Body className="d-flex justify-content-between align-items-center">
-              <Form.Group>
-                <Form.Select value={this.state.quantity} onChange={this.handleChange}>
-                  <option value="1">1</option>
-                  <option value="2">2</option>
-                  <option value="3">3</option>
-                  <option value="4">4</option>
-                  <option value="5">5</option>
-                  <option value="6">6</option>
-                </Form.Select>
-              </Form.Group>
-              <Button onClick={sendTheInfo} className="button-all ">ADD TO BASKET</Button>
-            </Card.Body>
-          </Card>
-        </div>
-        <Accordion className="my-4">
-          <Accordion.Item eventKey="0">
-            <Accordion.Header>Ingredients</Accordion.Header>
-            <Accordion.Body style={styles.text}>{ingredients}</Accordion.Body>
-          </Accordion.Item>
-          <Accordion.Item eventKey="1">
-            <Accordion.Header>Allergens</Accordion.Header>
-            <Accordion.Body style={styles.text}>{allergens}</Accordion.Body>
-          </Accordion.Item>
-          <Accordion.Item eventKey="2">
-            <Accordion.Header>Backstory</Accordion.Header>
-            <Accordion.Body style={styles.text}>{backstory}</Accordion.Body>
-          </Accordion.Item>
-        </Accordion>
-        <BasketModal className={modalShow} data={moreProps} show={setShow} />
+          <div className="d-flex row align-items-center">
+            <div className="col-md-6 d-flex justify-content-center" style={styles.imageContainer}>
+              <img src={imageUrl} alt={flavor} style={styles.image} className="w-100 h-100" />
+            </div>
+            <Card className="col-md-6 border-0 d-flex flex-direction-column justify-content-center">
+              <Card.Body className="pb-0">
+                <Card.Text className="h1 py-lg-3 d-flex align-items-center" style={styles.title}>{flavor}</Card.Text>
+                <Card.Text className="h6 d-flex align-items-center" style={styles.weight}>{`${weight} oz`}</Card.Text>
+              </Card.Body>
+              <Card.Body className="d-flex align-items-center">
+                <Card.Text style={styles.description}>
+                  {description}
+                </Card.Text>
+              </Card.Body>
+              <Card.Body className="py-0 d-flex align-items-center" style={styles.price}>
+                {toDollars(price)}
+              </Card.Body>
+              <Card.Body className="d-flex justify-content-between align-items-center">
+                <Form.Group>
+                  <Form.Select value={this.state.quantity} onChange={this.handleChange}>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                  </Form.Select>
+                </Form.Group>
+                <Button onClick={sendTheInfo} className="button-all ">ADD TO BASKET</Button>
+              </Card.Body>
+            </Card>
+          </div>
+          <Accordion className="my-4">
+            <Accordion.Item eventKey="0">
+              <Accordion.Header>Ingredients</Accordion.Header>
+              <Accordion.Body style={styles.text}>{ingredients}</Accordion.Body>
+            </Accordion.Item>
+            <Accordion.Item eventKey="1">
+              <Accordion.Header>Allergens</Accordion.Header>
+              <Accordion.Body style={styles.text}>{allergens}</Accordion.Body>
+            </Accordion.Item>
+            <Accordion.Item eventKey="2">
+              <Accordion.Header>Backstory</Accordion.Header>
+              <Accordion.Body style={styles.text}>{backstory}</Accordion.Body>
+            </Accordion.Item>
+          </Accordion>
+          <BasketModal className={modalShow} data={moreProps} show={setShow} />
+        </>
+        }
       </>
     );
   }

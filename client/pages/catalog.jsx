@@ -1,7 +1,6 @@
 import React from 'react';
 import { toDollars } from '../lib/';
 import Card from 'react-bootstrap/Card';
-const loader = document.querySelector('.loader');
 
 const styles = {
   product: {
@@ -37,11 +36,9 @@ export default class Catalog extends React.Component {
   }
 
   componentDidMount() {
-    loader.classList.remove('loader-hide');
     fetch('/cookies')
       .then(res => res.json())
       .then(cookies => {
-        loader.classList.add('loader-hide');
         this.setState({ cookies });
       })
       .catch(err => console.error(err));

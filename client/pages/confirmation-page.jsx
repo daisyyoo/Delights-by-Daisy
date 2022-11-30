@@ -3,7 +3,6 @@ import AppContext from '../lib/app-context';
 import { toDollars } from '../lib/';
 import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
-const loader = document.querySelector('.loader');
 
 const styles = {
   image: {
@@ -70,7 +69,6 @@ export default class ConfirmationPage extends React.Component {
   }
 
   componentDidMount() {
-    loader.classList.remove('loader-hide');
     const token = localStorage.getItem('basketToken');
     const req = {
       method: 'POST',
@@ -82,7 +80,6 @@ export default class ConfirmationPage extends React.Component {
     fetch('/confirmationPage', req)
       .then(res => res.json())
       .then(order => {
-        loader.classList.add('loader-hide');
         this.setState({ order });
         this.setState({ salesTax: 0 });
       })
@@ -95,7 +92,6 @@ export default class ConfirmationPage extends React.Component {
   }
 
   sendEmail(event) {
-    loader.classList.remove('loader-hide');
     event.preventDefault();
     const req = {
       method: 'POST',
@@ -106,7 +102,6 @@ export default class ConfirmationPage extends React.Component {
     };
     fetch('./sendEmail', req)
       .then(response => {
-        loader.classList.add('loader-hide');
         this.setState({ emailSent: true });
         this.setState({ email: '' });
         const { checkOut } = this.context;

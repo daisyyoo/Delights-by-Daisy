@@ -12,21 +12,21 @@ import ProductDetails from './pages/products';
 import Basket from './pages/basket';
 import StripeCheckout from './pages/stripe';
 import ConfirmationPage from './pages/confirmation-page';
-const loader = document.querySelector('.loader');
 
 export default class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       cartId: null,
-      route: parseRoute(window.location.hash)
+      route: parseRoute(window.location.hash),
+      loading: false
     };
     this.addToBasket = this.addToBasket.bind(this);
     this.checkOut = this.checkOut.bind(this);
+    this.handleLoader = this.handleLoader.bind(this);
   }
 
   componentDidMount() {
-    loader.classList.remove('loader-hide');
     window.addEventListener('hashchange', event => {
       const route = parseRoute(window.location.hash);
       this.setState({ route });
@@ -34,7 +34,14 @@ export default class App extends React.Component {
     const token = window.localStorage.getItem('basketToken');
     const cartId = token ? jwtDecode(token) : null;
     this.setState({ cartId });
-    loader.classList.add('loader-hide');
+  }
+
+  handleLoader() {
+    if (!this.state.loading) {
+      this.setState({ loading: true });
+    } else if (this.state.loading) {
+      this.setState({ loading: false });
+    }
   }
 
   addToBasket(result) {
@@ -73,12 +80,13 @@ export default class App extends React.Component {
   }
 
   render() {
-    const { cartId, route } = this.state;
-    const { addToBasket, checkOut } = this;
-    const contextValue = { cartId, route, addToBasket, checkOut };
+    const { cartId, route, loading } = this.state;
+    const { addToBasket, checkOut, handleLoader } = this;
+    const contextValue = { cartId, route, loading, addToBasket, checkOut, handleLoader };
     return (
       <AppContext.Provider value={contextValue}>
         <>
+
           <Header />
           <PageContainer>
             { this.renderPage() }
