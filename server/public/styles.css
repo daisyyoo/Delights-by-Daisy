@@ -234,8 +234,8 @@ i {
   border: none;
 }
 
-.homepage-image {
-  height: 740px;
+.image-container {
+  height: 82vh;
 }
 
 .no-basket-image {
@@ -271,8 +271,8 @@ i {
 }
 
 @media only screen and (min-width: 568px) {
-  .homepage-image {
-    height: 630px;
+  .image-container {
+    height: 80vh;
   }
 
   .no-basket-image {

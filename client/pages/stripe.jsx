@@ -40,7 +40,7 @@ export default function StripeCheckout() {
   };
 
   return (
-    <div className="d-flex flex-column justify-content-between">
+    <div className="container mt-3 d-flex flex-column justify-content-between">
       {clientSecret && (
         <Elements options={options} stripe={stripePromise} >
           <CheckoutForm totalAmount={totalAmount} />

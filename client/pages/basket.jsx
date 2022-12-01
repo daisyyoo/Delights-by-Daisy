@@ -168,7 +168,7 @@ export default class Basket extends React.Component {
 
   render() {
     return (
-      <>
+      <div className="container mt-3">
         <h1 className="py-1" >My Basket</h1>
         <p className="m-0" style={styles.text}>{`${this.state.cookies.length} items`}</p>
         {this.state.cookies.length === 0 &&
@@ -215,7 +215,7 @@ export default class Basket extends React.Component {
             </div>
             }
         </div>
-      </>
+      </div>
     );
   }
 }

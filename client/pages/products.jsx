@@ -157,7 +157,7 @@ export default class ProductDetails extends React.Component {
           <div className="loader d-flex justify-content-center align-items-center" />
         }
         {loading === false &&
-        <>
+        <div className="container mt-3">
           <div className="d-flex justify-content-start">
             <a style={styles.backButton} className="text-decoration-none mb-3" href='#cookies'>
               <i className="fa-solid fa-chevron-left" style={styles.icon} />
@@ -211,7 +211,7 @@ export default class ProductDetails extends React.Component {
             </Accordion.Item>
           </Accordion>
           <BasketModal className={modalShow} data={moreProps} show={setShow} />
-        </>
+        </div>
         }
       </>
     );

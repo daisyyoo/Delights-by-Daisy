@@ -46,7 +46,7 @@ export default class Catalog extends React.Component {
 
   render() {
     return (
-      <>
+      <div className="container mt-3">
         <h1 className="py-1">Shop All</h1>
         <div className="d-flex justify-content-between">
           <a style={styles.description} className="text-decoration-none" href='#'>
@@ -64,7 +64,7 @@ export default class Catalog extends React.Component {
             ))
           }
         </div>
-      </>
+      </div>
     );
   }
 }

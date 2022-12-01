@@ -115,7 +115,7 @@ export default class ConfirmationPage extends React.Component {
 
     const { orderId, orderedAt } = this.state.order[0];
     return (
-      <>
+      <div className="container mt-3">
         <h1 className="py-1">Thank you for your order!</h1>
         <div className="mb-3">
           <p className="m-0" style={styles.orderInfo}>{`Order No. : 00${orderId}`}</p>
@@ -179,7 +179,7 @@ export default class ConfirmationPage extends React.Component {
             <Button href=" " className={this.state.emailSent ? 'button-all' : 'd-none'}>RETURN TO HOME</Button>
           </div>
         </div>
-      </>
+      </div>
     );
   }
 }

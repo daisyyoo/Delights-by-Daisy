@@ -68,7 +68,7 @@ export default function CheckoutForm(props) {
 
   const { totalAmount } = props;
   return (
-    <>
+    <div className="container mt-3">
       <div className="px-4 mx-2 my-2 border-bot d-flex justify-content-between align-items-center">
         <h1>Checkout</h1>
         <h4>{`Total: ${toDollars(totalAmount)}`}</h4>
@@ -82,7 +82,7 @@ export default function CheckoutForm(props) {
         </button>
         {message && <div id="payment-message">{message}</div>}
       </form>
-    </>
+    </div>
   );
 }
 
