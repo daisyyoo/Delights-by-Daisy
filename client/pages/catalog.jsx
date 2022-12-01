@@ -31,7 +31,8 @@ export default class Catalog extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      cookies: []
+      cookies: [],
+      loading: true
     };
   }
 
@@ -39,32 +40,41 @@ export default class Catalog extends React.Component {
     fetch('/cookies')
       .then(res => res.json())
       .then(cookies => {
+        this.setState({ loading: false });
         this.setState({ cookies });
       })
       .catch(err => console.error(err));
   }
 
   render() {
+    const { loading } = this.state;
     return (
-      <div className="container mt-3">
-        <h1 className="py-1">Shop All</h1>
-        <div className="d-flex justify-content-between">
-          <a style={styles.description} className="text-decoration-none" href='#'>
-            <i className="fa-solid fa-chevron-left" style={styles.icon}/>
-            {' Home'}
-          </a>
-          <p style={styles.description}>{`${this.state.cookies.length} items`}</p>
-        </div>
-        <div className="row">
-          {
+      <>
+        { loading === true &&
+        <div className="loader d-flex justify-content-center align-items-center" />
+        }
+        {loading === false &&
+        <div className="container mt-3">
+          <h1 className="py-1">Shop All</h1>
+          <div className="d-flex justify-content-between">
+            <a style={styles.description} className="text-decoration-none" href='#'>
+              <i className="fa-solid fa-chevron-left" style={styles.icon}/>
+              {' Home'}
+            </a>
+            <p style={styles.description}>{`${this.state.cookies.length} items`}</p>
+          </div>
+          <div className="row">
+            {
             this.state.cookies.map(product => (
               <div key={product.cookieId} className="col-6 col-lg-4">
                 <Product product={product} />
               </div>
             ))
           }
+          </div>
         </div>
-      </div>
+        }
+      </>
     );
   }
 }

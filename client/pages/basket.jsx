@@ -2,7 +2,6 @@ import React from 'react';
 import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
 import { toDollars } from '../lib/';
-const loader = document.querySelector('.loader');
 
 const styles = {
   image: {
@@ -74,14 +73,14 @@ export default class Basket extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      cookies: []
+      cookies: [],
+      loading: true
     };
     this.handleClick = this.handleClick.bind(this);
     this.handleRemove = this.handleRemove.bind(this);
   }
 
   componentDidMount() {
-    loader.classList.remove('loader-hide');
     const token = localStorage.getItem('basketToken');
     if (token) {
       const req = {
@@ -95,7 +94,7 @@ export default class Basket extends React.Component {
       fetch('/myBasket', req)
         .then(res => res.json())
         .then(cookies => {
-          loader.classList.add('loader-hide');
+          this.setState({ loading: false });
           this.setState({ cookies });
         })
         .catch(err => console.error(err));
@@ -103,7 +102,6 @@ export default class Basket extends React.Component {
   }
 
   handleClick(event) {
-    loader.classList.remove('loader-hide');
     const token = localStorage.getItem('basketToken');
     const cookieId = Number(event.target.closest('div').id);
     const cookieIndex = this.state.cookies.findIndex(cookie => cookie.cookieId === cookieId);
@@ -135,7 +133,6 @@ export default class Basket extends React.Component {
     fetch('/updateQuantity', req)
       .then(res => res.json())
       .then(updatedCookie => {
-        loader.classList.add('loader-hide');
         const newCookies = this.state.cookies.slice();
         updatedCookie.quantity = newQuantity;
         newCookies[cookieIndex] = updatedCookie;
@@ -145,10 +142,8 @@ export default class Basket extends React.Component {
   }
 
   handleRemove(event) {
-    loader.classList.remove('loader-hide');
     const token = localStorage.getItem('basketToken');
     const cookieId = Number(event.target.closest('a').id);
-
     const req = {
       method: 'DELETE',
       headers: {
@@ -159,7 +154,6 @@ export default class Basket extends React.Component {
     fetch(`/removeCookie/${cookieId}`, req)
       .then(res => res.json())
       .then(updatedBasket => {
-        loader.classList.add('loader-hide');
         const updatedCookies = updatedBasket;
         this.setState({ cookies: updatedCookies });
       })
@@ -167,15 +161,21 @@ export default class Basket extends React.Component {
   }
 
   render() {
+    const { loading } = this.state;
     return (
-      <div className="container mt-3">
-        <h1 className="py-1" >My Basket</h1>
-        <p className="m-0" style={styles.text}>{`${this.state.cookies.length} items`}</p>
-        {this.state.cookies.length === 0 &&
+      <>
+        {loading === true &&
+          <div className="loader d-flex justify-content-center align-items-center" />
+        }
+        {loading === false &&
+        <div className="container mt-3">
+          <h1 className="py-1" >My Basket</h1>
+          <p className="m-0" style={styles.text}>{`${this.state.cookies.length} items`}</p>
+          {this.state.cookies.length === 0 &&
           <div style={styles.noBasketImg} className="no-basket-image"/>
           }
-        <div className="d-lg-flex justify-content-lg-between container">
-          {this.state.cookies.length > 0 &&
+          <div className="d-lg-flex justify-content-lg-between container">
+            {this.state.cookies.length > 0 &&
             <div className="row col-lg-9 mb-3">
               {
               this.state.cookies.map((product, index) => (
@@ -186,14 +186,14 @@ export default class Basket extends React.Component {
             }
             </div>
             }
-          {this.state.cookies.length === 0 &&
-          <div>
-            <h4 style={styles.noBasket} className="my-5 text-center w-100">
-              You have no items in your basket!
-              <br />Add cookies to your basket to get started!</h4>
-          </div>
+            {this.state.cookies.length === 0 &&
+            <div>
+              <h4 style={styles.noBasket} className="my-5 text-center w-100">
+                You have no items in your basket!
+                <br />Add cookies to your basket to get started!</h4>
+            </div>
             }
-          {this.state.cookies.length > 0 &&
+            {this.state.cookies.length > 0 &&
             <div className="col-lg-3 mb-3" >
               <div className="py-3 d-flex flex-column align-items-center">
                 <h4 style={styles.subtotalHeader} className="py-2">Need to grab more cookies for a friend in need?</h4>
@@ -214,8 +214,10 @@ export default class Basket extends React.Component {
               </div>
             </div>
             }
+          </div>
         </div>
-      </div>
+        }
+      </>
     );
   }
 }

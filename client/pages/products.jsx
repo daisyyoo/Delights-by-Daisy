@@ -74,7 +74,8 @@ export default class ProductDetails extends React.Component {
       cookie: null,
       quantity: 1,
       setShow: false,
-      basketData: {}
+      basketData: {},
+      loading: true
     };
     this.handleChange = this.handleChange.bind(this);
     this.sendTheInfo = this.sendTheInfo.bind(this);
@@ -82,15 +83,11 @@ export default class ProductDetails extends React.Component {
   }
 
   componentDidMount() {
-    const { handleLoader } = this.context;
-    // console.log('1');
-    handleLoader();
     fetch(`/cookies/${this.props.cookieId}`)
       .then(res => res.json())
       .then(cookie => {
-        // console.log('3');
+        this.setState({ loading: false });
         this.setState({ cookie });
-        handleLoader();
       })
       .catch(err => console.error(err));
   }
@@ -139,18 +136,14 @@ export default class ProductDetails extends React.Component {
 
   render() {
     if (!this.state.cookie) return null;
-    const { loading } = this.context;
     const { sendTheInfo } = this;
     const {
       flavor, price, weight, description, ingredients, allergens, backstory, imageUrl
     } = this.state.cookie;
     const modalShow = this.state.setShow ? 'show' : 'd-none';
-    const { cookie, quantity } = this.state;
+    const { cookie, quantity, setShow, loading } = this.state;
     const { closeModal } = this;
-    const { setShow } = this.state;
     const moreProps = { cookie, quantity, closeModal };
-    // console.log('2');
-    // console.log(loading);
     return (
       <>
         {loading === true &&

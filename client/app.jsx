@@ -18,12 +18,10 @@ export default class App extends React.Component {
     super(props);
     this.state = {
       cartId: null,
-      route: parseRoute(window.location.hash),
-      loading: false
+      route: parseRoute(window.location.hash)
     };
     this.addToBasket = this.addToBasket.bind(this);
     this.checkOut = this.checkOut.bind(this);
-    this.handleLoader = this.handleLoader.bind(this);
   }
 
   componentDidMount() {
@@ -34,14 +32,6 @@ export default class App extends React.Component {
     const token = window.localStorage.getItem('basketToken');
     const cartId = token ? jwtDecode(token) : null;
     this.setState({ cartId });
-  }
-
-  handleLoader() {
-    if (!this.state.loading) {
-      this.setState({ loading: true });
-    } else if (this.state.loading) {
-      this.setState({ loading: false });
-    }
   }
 
   addToBasket(result) {
@@ -80,9 +70,9 @@ export default class App extends React.Component {
   }
 
   render() {
-    const { cartId, route, loading } = this.state;
-    const { addToBasket, checkOut, handleLoader } = this;
-    const contextValue = { cartId, route, loading, addToBasket, checkOut, handleLoader };
+    const { cartId, route } = this.state;
+    const { addToBasket, checkOut } = this;
+    const contextValue = { cartId, route, addToBasket, checkOut };
     return (
       <AppContext.Provider value={contextValue}>
         <>
