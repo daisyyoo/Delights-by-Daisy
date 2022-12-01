@@ -116,7 +116,9 @@ export default class ConfirmationPage extends React.Component {
 
   render() {
     const { loading } = this.state;
-    if (this.state.order.length === 0) return;
+    if (this.state.order.length === 0) {
+      return <div className="loader d-flex justify-content-center align-items-center" />;
+    }
     const { orderId, orderedAt } = this.state.order[0];
     return (
       <>
@@ -124,6 +126,8 @@ export default class ConfirmationPage extends React.Component {
           <div className="loader d-flex justify-content-center align-items-center" />
         }
         {loading === false &&
+          <div className="loader-hide" />
+        }
         <div className="container mt-3">
           <h1 className="py-1">Thank you for your order!</h1>
           <div className="mb-3">
@@ -189,7 +193,6 @@ export default class ConfirmationPage extends React.Component {
             </div>
           </div>
         </div>
-        }
       </>
     );
   }
@@ -203,7 +206,7 @@ function OrderedCookie(props) {
       <div className="col-5 col-md-3 d-flex align-items-center py-2" style={styles.imageContainer}>
         <img className="h-100 w-100 img-fluid" style={styles.image} src={imageUrl} alt={flavor} />
       </div>
-      <Card className="col-7 col-md-9 border-0" style={styles.card}>
+      <Card className="col-7 col-md-9 border-0 bg-transparent" style={styles.card}>
         <Card.Body className="d-flex flex-column justify-content-around">
           <Card.Text className="m-0" style={styles.title}>{flavor}</Card.Text>
           <Card.Text className="m-0" style={styles.price}>{ toDollars(price * quantity) }</Card.Text>

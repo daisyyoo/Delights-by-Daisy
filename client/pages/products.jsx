@@ -75,7 +75,7 @@ export default class ProductDetails extends React.Component {
       quantity: 1,
       setShow: false,
       basketData: {},
-      loading: true
+      loading: false
     };
     this.handleChange = this.handleChange.bind(this);
     this.sendTheInfo = this.sendTheInfo.bind(this);
@@ -86,7 +86,6 @@ export default class ProductDetails extends React.Component {
     fetch(`/cookies/${this.props.cookieId}`)
       .then(res => res.json())
       .then(cookie => {
-        this.setState({ loading: false });
         this.setState({ cookie });
       })
       .catch(err => console.error(err));
@@ -97,6 +96,7 @@ export default class ProductDetails extends React.Component {
   }
 
   sendTheInfo(event) {
+    this.setState({ loading: true });
     const { cartId, addToBasket } = this.context;
     let req;
     const token = localStorage.getItem('basketToken');
@@ -121,6 +121,7 @@ export default class ProductDetails extends React.Component {
     fetch('/addToBasket', req)
       .then(res => res.json())
       .then(result => {
+        this.setState({ loading: false });
         this.setState({ basketData: result });
         this.setState({ setShow: true });
         if (!cartId) {
@@ -135,7 +136,9 @@ export default class ProductDetails extends React.Component {
   }
 
   render() {
-    if (!this.state.cookie) return null;
+    if (!this.state.cookie) {
+      return <div className="loader d-flex justify-content-center align-items-center" />;
+    }
     const { sendTheInfo } = this;
     const {
       flavor, price, weight, description, ingredients, allergens, backstory, imageUrl
@@ -150,6 +153,8 @@ export default class ProductDetails extends React.Component {
           <div className="loader d-flex justify-content-center align-items-center" />
         }
         {loading === false &&
+          <div className="loader-hide" />
+        }
         <div className="container mt-3">
           <div className="d-flex justify-content-start">
             <a style={styles.backButton} className="text-decoration-none mb-3" href='#cookies'>
@@ -161,7 +166,7 @@ export default class ProductDetails extends React.Component {
             <div className="col-md-6 d-flex justify-content-center" style={styles.imageContainer}>
               <img src={imageUrl} alt={flavor} style={styles.image} className="w-100 h-100" />
             </div>
-            <Card className="col-md-6 border-0 d-flex flex-direction-column justify-content-center">
+            <Card className="col-md-6 border-0 d-flex flex-direction-column justify-content-center bg-transparent">
               <Card.Body className="pb-0">
                 <Card.Text className="h1 py-lg-3 d-flex align-items-center" style={styles.title}>{flavor}</Card.Text>
                 <Card.Text className="h6 d-flex align-items-center" style={styles.weight}>{`${weight} oz`}</Card.Text>
@@ -205,7 +210,6 @@ export default class ProductDetails extends React.Component {
           </Accordion>
           <BasketModal className={modalShow} data={moreProps} show={setShow} />
         </div>
-        }
       </>
     );
   }

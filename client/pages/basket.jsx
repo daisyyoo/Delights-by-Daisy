@@ -102,6 +102,7 @@ export default class Basket extends React.Component {
   }
 
   handleClick(event) {
+    this.setState({ loading: true });
     const token = localStorage.getItem('basketToken');
     const cookieId = Number(event.target.closest('div').id);
     const cookieIndex = this.state.cookies.findIndex(cookie => cookie.cookieId === cookieId);
@@ -133,6 +134,7 @@ export default class Basket extends React.Component {
     fetch('/updateQuantity', req)
       .then(res => res.json())
       .then(updatedCookie => {
+        this.setState({ loading: false });
         const newCookies = this.state.cookies.slice();
         updatedCookie.quantity = newQuantity;
         newCookies[cookieIndex] = updatedCookie;
@@ -142,6 +144,7 @@ export default class Basket extends React.Component {
   }
 
   handleRemove(event) {
+    this.setState({ loading: true });
     const token = localStorage.getItem('basketToken');
     const cookieId = Number(event.target.closest('a').id);
     const req = {
@@ -154,6 +157,7 @@ export default class Basket extends React.Component {
     fetch(`/removeCookie/${cookieId}`, req)
       .then(res => res.json())
       .then(updatedBasket => {
+        this.setState({ loading: false });
         const updatedCookies = updatedBasket;
         this.setState({ cookies: updatedCookies });
       })
@@ -168,6 +172,8 @@ export default class Basket extends React.Component {
           <div className="loader d-flex justify-content-center align-items-center" />
         }
         {loading === false &&
+          <div className="loader-hide" />
+        }
         <div className="container mt-3">
           <h1 className="py-1" >My Basket</h1>
           <p className="m-0" style={styles.text}>{`${this.state.cookies.length} items`}</p>
@@ -216,7 +222,6 @@ export default class Basket extends React.Component {
             }
           </div>
         </div>
-        }
       </>
     );
   }
@@ -231,7 +236,7 @@ function BasketItems(props) {
       <div style={styles.imageContainer} className="col-5 col-md-4 p-3 d-flex align-items-center border-bot">
         <img className="w-100 h-100 img-fluid" style={styles.image} src={imageUrl} alt={flavor}/>
       </div>
-      <Card className="col-7 col-md-8 card-border" style={styles.card}>
+      <Card className="col-7 col-md-8 card-border bg-transparent" style={styles.card}>
         <Card.Body className="d-flex flex-column flex-md-row justify-content-center justify-content-md-between align-items-md-center">
           <div className="p-0 col-md-5">
             <Card.Text className="m-0" style={styles.title}>{flavor}</Card.Text>

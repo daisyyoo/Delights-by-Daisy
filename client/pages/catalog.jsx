@@ -50,10 +50,6 @@ export default class Catalog extends React.Component {
     const { loading } = this.state;
     return (
       <>
-        { loading === true &&
-        <div className="loader d-flex justify-content-center align-items-center" />
-        }
-        {loading === false &&
         <div className="container mt-3">
           <h1 className="py-1">Shop All</h1>
           <div className="d-flex justify-content-between">
@@ -73,6 +69,11 @@ export default class Catalog extends React.Component {
           }
           </div>
         </div>
+        {loading === true &&
+          <div className="loader d-flex justify-content-center align-items-center" />
+        }
+        {loading === false &&
+          <div className="loader-hide" />
         }
       </>
     );
