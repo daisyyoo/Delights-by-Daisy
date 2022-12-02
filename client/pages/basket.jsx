@@ -47,20 +47,29 @@ const styles = {
   button: {
     fontSize: '1rem'
   },
-  noBasket: {
-    position: 'absolute',
-    left: '0',
+  noBasketText: {
+    position: 'relative',
+    fontFamily: 'Merriweather',
+    top: '3rem',
+    lineHeight: '2.2rem',
+    fontSize: '1.7rem',
     fontWeight: '600',
-    color: '#693802',
-    opacity: '1'
+    color: '#693802'
+  },
+  noBasketSmText: {
+    position: 'relative',
+    top: '3rem',
+    lineHeight: '2.2rem',
+    fontSize: '1.2rem',
+    fontWeight: '600',
+    color: '#693802'
   },
   noBasketImg: {
     backgroundImage: 'url("/image/lots-of-cookies-sm.webp")',
     backgroundSize: 'cover',
     backgroundPosition: '45%',
     width: '100%',
-    position: 'absolute',
-    left: '0'
+    height: '100%'
   },
   remove: {
     cursor: 'pointer',
@@ -82,6 +91,9 @@ export default class Basket extends React.Component {
 
   componentDidMount() {
     const token = localStorage.getItem('basketToken');
+    if (!token) {
+      this.setState({ loading: false });
+    }
     if (token) {
       const req = {
         method: 'GET',
@@ -174,32 +186,32 @@ export default class Basket extends React.Component {
         {loading === false &&
           <div className="loader-hide" />
         }
+
+        {this.state.cookies.length === 0 &&
+          <div className="no-basket-image-container">
+            <div style={styles.noBasketImg} className="no-basket-image d-flex flex-column align-items-center">
+              <h2 style={styles.noBasketText} className="text-center w-75">
+                You have no cookies in your basket!</h2>
+              <h4 style={styles.noBasketSmText} className="text-center w-75 mt-3">
+                Add some cookies to your basket to get started!</h4>
+            </div>
+          </div>
+        }
+
+        {this.state.cookies.length > 0 &&
         <div className="container mt-3">
           <h1 className="py-1" >My Basket</h1>
           <p className="m-0" style={styles.text}>{`${this.state.cookies.length} items`}</p>
-          {this.state.cookies.length === 0 &&
-          <div style={styles.noBasketImg} className="no-basket-image"/>
-          }
           <div className="d-lg-flex justify-content-lg-between container">
-            {this.state.cookies.length > 0 &&
             <div className="row col-lg-9 mb-3">
               {
-              this.state.cookies.map((product, index) => (
-                <div key={index} className="d-flex justify-content-lg-start">
-                  <BasketItems product={product} handleClick={this.handleClick} handleRemove={this.handleRemove} />
-                </div>
-              ))
+            this.state.cookies.map((product, index) => (
+              <div key={index} className="d-flex justify-content-lg-start">
+                <BasketItems product={product} handleClick={this.handleClick} handleRemove={this.handleRemove} />
+              </div>
+            ))
             }
             </div>
-            }
-            {this.state.cookies.length === 0 &&
-            <div>
-              <h4 style={styles.noBasket} className="my-5 text-center w-100">
-                You have no items in your basket!
-                <br />Add cookies to your basket to get started!</h4>
-            </div>
-            }
-            {this.state.cookies.length > 0 &&
             <div className="col-lg-3 mb-3" >
               <div className="py-3 d-flex flex-column align-items-center">
                 <h4 style={styles.subtotalHeader} className="py-2">Need to grab more cookies for a friend in need?</h4>
@@ -219,9 +231,9 @@ export default class Basket extends React.Component {
                 <Button href="#checkout" style={styles.button} className="button-all w-100" >PROCEED TO CHECKOUT</Button>
               </div>
             </div>
-            }
           </div>
         </div>
+        }
       </>
     );
   }

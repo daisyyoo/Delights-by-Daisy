@@ -234,13 +234,9 @@ i {
   border: none;
 }
 
-.image-container {
+.image-container,
+.no-basket-image-container {
   height: 82vh;
-}
-
-.no-basket-image {
-  height: 600px;
-  bottom: 13%;
 }
 
 .loader {
@@ -271,7 +267,8 @@ i {
 }
 
 @media only screen and (min-width: 568px) {
-  .image-container {
+  .image-container,
+  .no-basket-image-container {
     height: 80vh;
   }
 
