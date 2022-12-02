@@ -161,6 +161,7 @@ export default class ProductDetails extends React.Component {
         </div>
       );
     }
+
     const { sendTheInfo } = this;
     const {
       flavor, price, weight, description, ingredients, allergens, backstory, imageUrl
