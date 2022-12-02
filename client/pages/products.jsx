@@ -65,6 +65,9 @@ const styles = {
     color: '#693802',
     fontWeight: '600',
     fontSize: '1rem'
+  },
+  errorContent: {
+    height: '500px'
   }
 };
 export default class ProductDetails extends React.Component {
@@ -75,7 +78,8 @@ export default class ProductDetails extends React.Component {
       quantity: 1,
       setShow: false,
       basketData: {},
-      loading: false
+      loading: false,
+      error: false
     };
     this.handleChange = this.handleChange.bind(this);
     this.sendTheInfo = this.sendTheInfo.bind(this);
@@ -84,7 +88,12 @@ export default class ProductDetails extends React.Component {
 
   componentDidMount() {
     fetch(`/cookies/${this.props.cookieId}`)
-      .then(res => res.json())
+      .then(res => {
+        if (res.status === 500) {
+          this.setState({ error: true });
+        }
+        return res.json();
+      })
       .then(cookie => {
         this.setState({ cookie });
       })
@@ -119,7 +128,12 @@ export default class ProductDetails extends React.Component {
       };
     }
     fetch('/addToBasket', req)
-      .then(res => res.json())
+      .then(res => {
+        if (res.status === 500) {
+          this.setState({ error: true });
+        }
+        return res.json();
+      })
       .then(result => {
         this.setState({ loading: false });
         this.setState({ basketData: result });
@@ -139,6 +153,14 @@ export default class ProductDetails extends React.Component {
     if (!this.state.cookie) {
       return <div className="loader d-flex justify-content-center align-items-center" />;
     }
+    if (this.state.error) {
+      return (
+        <div style={styles.errorContent} className="my-5 text-center d-flex flex-column justify-content-center align-items-center">
+          <h1 className="w-75">There was an error with the connection. Please try again.</h1>
+          <img src="/image/sad-cookie.png" alt="sad-cookie" />
+        </div>
+      );
+    }
     const { sendTheInfo } = this;
     const {
       flavor, price, weight, description, ingredients, allergens, backstory, imageUrl
@@ -147,6 +169,7 @@ export default class ProductDetails extends React.Component {
     const { cookie, quantity, setShow, loading } = this.state;
     const { closeModal } = this;
     const moreProps = { cookie, quantity, closeModal };
+
     return (
       <>
         {loading === true &&

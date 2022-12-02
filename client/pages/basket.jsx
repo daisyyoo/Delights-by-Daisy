@@ -76,6 +76,9 @@ const styles = {
     color: '#693802',
     fontSize: '0.8rem',
     textDecoration: 'underline'
+  },
+  errorContent: {
+    height: '500px'
   }
 };
 export default class Basket extends React.Component {
@@ -83,7 +86,8 @@ export default class Basket extends React.Component {
     super(props);
     this.state = {
       cookies: [],
-      loading: true
+      loading: true,
+      error: false
     };
     this.handleClick = this.handleClick.bind(this);
     this.handleRemove = this.handleRemove.bind(this);
@@ -104,7 +108,12 @@ export default class Basket extends React.Component {
       };
 
       fetch('/myBasket', req)
-        .then(res => res.json())
+        .then(res => {
+          if (res.status === 500) {
+            this.setState({ error: true });
+          }
+          return res.json();
+        })
         .then(cookies => {
           this.setState({ loading: false });
           this.setState({ cookies });
@@ -144,7 +153,12 @@ export default class Basket extends React.Component {
       body: JSON.stringify(updatedInfo)
     };
     fetch('/updateQuantity', req)
-      .then(res => res.json())
+      .then(res => {
+        if (res.status === 500) {
+          this.setState({ error: true });
+        }
+        return res.json();
+      })
       .then(updatedCookie => {
         this.setState({ loading: false });
         const newCookies = this.state.cookies.slice();
@@ -167,7 +181,12 @@ export default class Basket extends React.Component {
       }
     };
     fetch(`/removeCookie/${cookieId}`, req)
-      .then(res => res.json())
+      .then(res => {
+        if (res.status === 500) {
+          this.setState({ error: true });
+        }
+        return res.json();
+      })
       .then(updatedBasket => {
         this.setState({ loading: false });
         const updatedCookies = updatedBasket;
@@ -178,6 +197,14 @@ export default class Basket extends React.Component {
 
   render() {
     const { loading } = this.state;
+    if (this.state.error) {
+      return (
+        <div style={styles.errorContent} className="my-5 text-center d-flex flex-column justify-content-center align-items-center">
+          <h1 className="w-75">There was an error with the connection. Please try again.</h1>
+          <img src="/image/sad-cookie.png" alt="sad-cookie" />
+        </div>
+      );
+    }
     return (
       <>
         {loading === true &&

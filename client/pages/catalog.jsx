@@ -24,6 +24,9 @@ const styles = {
   },
   icon: {
     fontSize: '0.8rem'
+  },
+  errorContent: {
+    height: '500px'
   }
 };
 
@@ -32,13 +35,19 @@ export default class Catalog extends React.Component {
     super(props);
     this.state = {
       cookies: [],
-      loading: true
+      loading: true,
+      error: false
     };
   }
 
   componentDidMount() {
     fetch('/cookies')
-      .then(res => res.json())
+      .then(res => {
+        if (res.status === 500) {
+          this.setState({ error: true });
+        }
+        return res.json();
+      })
       .then(cookies => {
         this.setState({ loading: false });
         this.setState({ cookies });
@@ -47,7 +56,15 @@ export default class Catalog extends React.Component {
   }
 
   render() {
-    const { loading } = this.state;
+    const { loading, error } = this.state;
+    if (error) {
+      return (
+        <div style={styles.errorContent} className="my-5 text-center d-flex flex-column justify-content-center align-items-center">
+          <h1 className="w-75">There was an error with the connection. Please try again.</h1>
+          <img src="/image/sad-cookie.png" alt="sad-cookie"/>
+        </div>
+      );
+    }
     return (
       <>
         <div className="container mt-3">

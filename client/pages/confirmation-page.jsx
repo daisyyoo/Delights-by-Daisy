@@ -52,6 +52,9 @@ const styles = {
   },
   borderBottom: {
     borderBottom: 'solid 2px #94540F'
+  },
+  errorContent: {
+    height: '500px'
   }
 };
 
@@ -63,7 +66,8 @@ export default class ConfirmationPage extends React.Component {
       salesTax: 0,
       email: '',
       emailSent: false,
-      loading: true
+      loading: true,
+      error: false
     };
     this.handleChange = this.handleChange.bind(this);
     this.sendEmail = this.sendEmail.bind(this);
@@ -79,7 +83,12 @@ export default class ConfirmationPage extends React.Component {
       }
     };
     fetch('/confirmationPage', req)
-      .then(res => res.json())
+      .then(res => {
+        if (res.status === 500) {
+          this.setState({ error: true });
+        }
+        return res.json();
+      })
       .then(order => {
         this.setState({ loading: false });
         this.setState({ order });
@@ -104,6 +113,12 @@ export default class ConfirmationPage extends React.Component {
       body: JSON.stringify(this.state)
     };
     fetch('./sendEmail', req)
+      .then(res => {
+        if (res.status === 500) {
+          this.setState({ error: true });
+        }
+        return res.json();
+      })
       .then(response => {
         this.setState({ loading: false });
         this.setState({ emailSent: true });
@@ -115,6 +130,14 @@ export default class ConfirmationPage extends React.Component {
   }
 
   render() {
+    if (this.state.error) {
+      return (
+        <div style={styles.errorContent} className="my-5 text-center d-flex flex-column justify-content-center align-items-center">
+          <h1 className="w-75">There was an error with the connection. Please try again.</h1>
+          <img src="/image/sad-cookie.png" alt="sad-cookie" />
+        </div>
+      );
+    }
     const { loading } = this.state;
     if (this.state.order.length === 0) {
       return <div className="loader d-flex justify-content-center align-items-center" />;
