@@ -12,7 +12,7 @@ import ProductDetails from './pages/products';
 import Basket from './pages/basket';
 import StripeCheckout from './pages/stripe';
 import ConfirmationPage from './pages/confirmation-page';
-
+import AboutMe from './pages/about-me';
 export default class App extends React.Component {
   constructor(props) {
     super(props);
@@ -65,6 +65,9 @@ export default class App extends React.Component {
     }
     if (route.path === 'confirmationPage') {
       return <ConfirmationPage />;
+    }
+    if (route.path === 'aboutMe') {
+      return <AboutMe />;
     }
     return <NotFound />;
   }
