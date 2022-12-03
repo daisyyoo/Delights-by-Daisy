@@ -65,6 +65,9 @@ const styles = {
     color: '#693802',
     fontWeight: '600',
     fontSize: '1rem'
+  },
+  errorContent: {
+    height: '500px'
   }
 };
 export default class ProductDetails extends React.Component {
@@ -74,7 +77,9 @@ export default class ProductDetails extends React.Component {
       cookie: null,
       quantity: 1,
       setShow: false,
-      basketData: {}
+      basketData: {},
+      loading: false,
+      error: false
     };
     this.handleChange = this.handleChange.bind(this);
     this.sendTheInfo = this.sendTheInfo.bind(this);
@@ -83,8 +88,15 @@ export default class ProductDetails extends React.Component {
 
   componentDidMount() {
     fetch(`/cookies/${this.props.cookieId}`)
-      .then(res => res.json())
-      .then(cookie => this.setState({ cookie }))
+      .then(res => {
+        if (res.status === 500) {
+          this.setState({ error: true });
+        }
+        return res.json();
+      })
+      .then(cookie => {
+        this.setState({ cookie });
+      })
       .catch(err => console.error(err));
   }
 
@@ -93,6 +105,7 @@ export default class ProductDetails extends React.Component {
   }
 
   sendTheInfo(event) {
+    this.setState({ loading: true });
     const { cartId, addToBasket } = this.context;
     let req;
     const token = localStorage.getItem('basketToken');
@@ -115,8 +128,14 @@ export default class ProductDetails extends React.Component {
       };
     }
     fetch('/addToBasket', req)
-      .then(res => res.json())
+      .then(res => {
+        if (res.status === 500) {
+          this.setState({ error: true });
+        }
+        return res.json();
+      })
       .then(result => {
+        this.setState({ loading: false });
         this.setState({ basketData: result });
         this.setState({ setShow: true });
         if (!cartId) {
@@ -131,71 +150,90 @@ export default class ProductDetails extends React.Component {
   }
 
   render() {
-    if (!this.state.cookie) return null;
+    if (!this.state.cookie) {
+      return <div className="loader d-flex justify-content-center align-items-center" />;
+    }
+    if (this.state.error) {
+      return (
+        <div style={styles.errorContent} className="my-5 text-center d-flex flex-column justify-content-center align-items-center">
+          <h1 className="w-75">There was an error with the connection. Please try again.</h1>
+          <img src="/image/sad-cookie.png" alt="sad-cookie" />
+        </div>
+      );
+    }
+
     const { sendTheInfo } = this;
     const {
       flavor, price, weight, description, ingredients, allergens, backstory, imageUrl
     } = this.state.cookie;
     const modalShow = this.state.setShow ? 'show' : 'd-none';
-    const { cookie, quantity } = this.state;
+    const { cookie, quantity, setShow, loading } = this.state;
     const { closeModal } = this;
-    const { setShow } = this.state;
     const moreProps = { cookie, quantity, closeModal };
+
     return (
       <>
-        <div className="d-flex justify-content-start">
-          <a style={styles.backButton} className="text-decoration-none mb-3" href='#cookies'>
-            <i className="fa-solid fa-chevron-left" style={styles.icon} />
-            {' Back'}
-          </a>
-        </div>
-        <div className="d-flex row align-items-center">
-          <div className="col-md-6 d-flex justify-content-center" style={styles.imageContainer}>
-            <img src={imageUrl} alt={flavor} style={styles.image} className="w-100 h-100" />
+        {loading === true &&
+          <div className="loader d-flex justify-content-center align-items-center" />
+        }
+        {loading === false &&
+          <div className="loader-hide" />
+        }
+        <div className="container mt-3">
+          <div className="d-flex justify-content-start">
+            <a style={styles.backButton} className="text-decoration-none mb-3" href='#cookies'>
+              <i className="fa-solid fa-chevron-left" style={styles.icon} />
+              {' Back'}
+            </a>
           </div>
-          <Card className="col-md-6 border-0 d-flex flex-direction-column justify-content-center">
-            <Card.Body className="pb-0">
-              <Card.Text className="h1 py-lg-3 d-flex align-items-center" style={styles.title}>{flavor}</Card.Text>
-              <Card.Text className="h6 d-flex align-items-center" style={styles.weight}>{`${weight} oz`}</Card.Text>
-            </Card.Body>
-            <Card.Body className="d-flex align-items-center">
-              <Card.Text style={styles.description}>
-                {description}
-              </Card.Text>
-            </Card.Body>
-            <Card.Body className="py-0 d-flex align-items-center" style={styles.price}>
-              {toDollars(price)}
-            </Card.Body>
-            <Card.Body className="d-flex justify-content-between align-items-center">
-              <Form.Group>
-                <Form.Select value={this.state.quantity} onChange={this.handleChange}>
-                  <option value="1">1</option>
-                  <option value="2">2</option>
-                  <option value="3">3</option>
-                  <option value="4">4</option>
-                  <option value="5">5</option>
-                  <option value="6">6</option>
-                </Form.Select>
-              </Form.Group>
-              <Button onClick={sendTheInfo} className="button-all ">ADD TO BASKET</Button>
-            </Card.Body>
-          </Card>
+          <div className="d-flex row align-items-center">
+            <div className="col-md-6 d-flex justify-content-center" style={styles.imageContainer}>
+              <img src={imageUrl} alt={flavor} style={styles.image} className="w-100 h-100" />
+            </div>
+            <Card className="col-md-6 border-0 d-flex flex-direction-column justify-content-center bg-transparent">
+              <Card.Body className="pb-0">
+                <Card.Text className="h1 py-lg-3 d-flex align-items-center" style={styles.title}>{flavor}</Card.Text>
+                <Card.Text className="h6 d-flex align-items-center" style={styles.weight}>{`${weight} oz`}</Card.Text>
+              </Card.Body>
+              <Card.Body className="d-flex align-items-center">
+                <Card.Text style={styles.description}>
+                  {description}
+                </Card.Text>
+              </Card.Body>
+              <Card.Body className="py-0 d-flex align-items-center" style={styles.price}>
+                {toDollars(price)}
+              </Card.Body>
+              <Card.Body className="d-flex justify-content-between align-items-center">
+                <Form.Group>
+                  <Form.Select value={this.state.quantity} onChange={this.handleChange}>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                  </Form.Select>
+                </Form.Group>
+                <Button onClick={sendTheInfo} className="button-all ">ADD TO BASKET</Button>
+              </Card.Body>
+            </Card>
+          </div>
+          <Accordion className="my-4">
+            <Accordion.Item eventKey="0">
+              <Accordion.Header>Ingredients</Accordion.Header>
+              <Accordion.Body style={styles.text}>{ingredients}</Accordion.Body>
+            </Accordion.Item>
+            <Accordion.Item eventKey="1">
+              <Accordion.Header>Allergens</Accordion.Header>
+              <Accordion.Body style={styles.text}>{allergens}</Accordion.Body>
+            </Accordion.Item>
+            <Accordion.Item eventKey="2">
+              <Accordion.Header>Backstory</Accordion.Header>
+              <Accordion.Body style={styles.text}>{backstory}</Accordion.Body>
+            </Accordion.Item>
+          </Accordion>
+          <BasketModal className={modalShow} data={moreProps} show={setShow} />
         </div>
-        <Accordion className="my-4">
-          <Accordion.Item eventKey="0">
-            <Accordion.Header>Ingredients</Accordion.Header>
-            <Accordion.Body style={styles.text}>{ingredients}</Accordion.Body>
-          </Accordion.Item>
-          <Accordion.Item eventKey="1">
-            <Accordion.Header>Allergens</Accordion.Header>
-            <Accordion.Body style={styles.text}>{allergens}</Accordion.Body>
-          </Accordion.Item>
-          <Accordion.Item eventKey="2">
-            <Accordion.Header>Backstory</Accordion.Header>
-            <Accordion.Body style={styles.text}>{backstory}</Accordion.Body>
-          </Accordion.Item>
-        </Accordion>
-        <BasketModal className={modalShow} data={moreProps} show={setShow} />
       </>
     );
   }

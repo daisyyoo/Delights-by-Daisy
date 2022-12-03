@@ -47,25 +47,47 @@ const styles = {
   button: {
     fontSize: '1rem'
   },
-  noBasket: {
+  noBasketText: {
+    position: 'relative',
+    fontFamily: 'Merriweather',
+    top: '3rem',
+    lineHeight: '2.2rem',
+    fontSize: '1.7rem',
+    fontWeight: '600',
+    color: '#693802'
+  },
+  noBasketSmText: {
+    position: 'relative',
+    top: '3rem',
+    lineHeight: '2.2rem',
+    fontSize: '1.2rem',
     fontWeight: '600',
     color: '#693802'
   },
   noBasketImg: {
-    height: '300px'
+    backgroundImage: 'url("/image/lots-of-cookies-sm.webp")',
+    backgroundSize: 'cover',
+    backgroundPosition: '45%',
+    width: '100%',
+    height: '100%'
   },
   remove: {
     cursor: 'pointer',
     color: '#693802',
     fontSize: '0.8rem',
     textDecoration: 'underline'
+  },
+  errorContent: {
+    height: '500px'
   }
 };
 export default class Basket extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      cookies: []
+      cookies: [],
+      loading: true,
+      error: false
     };
     this.handleClick = this.handleClick.bind(this);
     this.handleRemove = this.handleRemove.bind(this);
@@ -73,6 +95,9 @@ export default class Basket extends React.Component {
 
   componentDidMount() {
     const token = localStorage.getItem('basketToken');
+    if (!token) {
+      this.setState({ loading: false });
+    }
     if (token) {
       const req = {
         method: 'GET',
@@ -83,8 +108,14 @@ export default class Basket extends React.Component {
       };
 
       fetch('/myBasket', req)
-        .then(res => res.json())
+        .then(res => {
+          if (res.status === 500) {
+            this.setState({ error: true });
+          }
+          return res.json();
+        })
         .then(cookies => {
+          this.setState({ loading: false });
           this.setState({ cookies });
         })
         .catch(err => console.error(err));
@@ -92,6 +123,7 @@ export default class Basket extends React.Component {
   }
 
   handleClick(event) {
+    this.setState({ loading: true });
     const token = localStorage.getItem('basketToken');
     const cookieId = Number(event.target.closest('div').id);
     const cookieIndex = this.state.cookies.findIndex(cookie => cookie.cookieId === cookieId);
@@ -121,8 +153,14 @@ export default class Basket extends React.Component {
       body: JSON.stringify(updatedInfo)
     };
     fetch('/updateQuantity', req)
-      .then(res => res.json())
+      .then(res => {
+        if (res.status === 500) {
+          this.setState({ error: true });
+        }
+        return res.json();
+      })
       .then(updatedCookie => {
+        this.setState({ loading: false });
         const newCookies = this.state.cookies.slice();
         updatedCookie.quantity = newQuantity;
         newCookies[cookieIndex] = updatedCookie;
@@ -132,9 +170,9 @@ export default class Basket extends React.Component {
   }
 
   handleRemove(event) {
+    this.setState({ loading: true });
     const token = localStorage.getItem('basketToken');
     const cookieId = Number(event.target.closest('a').id);
-
     const req = {
       method: 'DELETE',
       headers: {
@@ -143,8 +181,14 @@ export default class Basket extends React.Component {
       }
     };
     fetch(`/removeCookie/${cookieId}`, req)
-      .then(res => res.json())
+      .then(res => {
+        if (res.status === 500) {
+          this.setState({ error: true });
+        }
+        return res.json();
+      })
       .then(updatedBasket => {
+        this.setState({ loading: false });
         const updatedCookies = updatedBasket;
         this.setState({ cookies: updatedCookies });
       })
@@ -152,33 +196,50 @@ export default class Basket extends React.Component {
   }
 
   render() {
+    const { loading } = this.state;
+    if (this.state.error) {
+      return (
+        <div style={styles.errorContent} className="my-5 text-center d-flex flex-column justify-content-center align-items-center">
+          <h1 className="w-75">There was an error with the connection. Please try again.</h1>
+          <img src="/image/sad-cookie.png" alt="sad-cookie" />
+        </div>
+      );
+    }
     return (
       <>
-        <h1 className="py-1" >My Basket</h1>
-        <p className="m-0" style={styles.text}>{`${this.state.cookies.length} items`}</p>
+        {loading === true &&
+          <div className="loader d-flex justify-content-center align-items-center" />
+        }
+        {loading === false &&
+          <div className="loader-hide" />
+        }
+
         {this.state.cookies.length === 0 &&
-        <h4 style={styles.noBasket} className="my-5 text-center">
-          You have no items in your basket!
-          <br />Add cookies to your basket to get started!</h4>}
-        <div className="d-lg-flex justify-content-lg-between container">
-          {this.state.cookies.length > 0 &&
+          <div className="no-basket-image-container">
+            <div style={styles.noBasketImg} className="no-basket-image d-flex flex-column align-items-center">
+              <h2 style={styles.noBasketText} className="text-center w-75">
+                You have no cookies in your basket!</h2>
+              <h4 style={styles.noBasketSmText} className="text-center w-75 mt-3">
+                Add some cookies to your basket to get started!</h4>
+            </div>
+          </div>
+        }
+
+        {this.state.cookies.length > 0 &&
+        <div className="container mt-3">
+          <h1 className="py-1" >My Basket</h1>
+          <p className="m-0" style={styles.text}>{`${this.state.cookies.length} items`}</p>
+          <div className="d-lg-flex justify-content-lg-between container">
             <div className="row col-lg-9 mb-3">
               {
-              this.state.cookies.map((product, index) => (
-                <div key={index} className="d-flex justify-content-lg-start">
-                  <BasketItems product={product} handleClick={this.handleClick} handleRemove={this.handleRemove} />
-                </div>
-              ))
+            this.state.cookies.map((product, index) => (
+              <div key={index} className="d-flex justify-content-lg-start">
+                <BasketItems product={product} handleClick={this.handleClick} handleRemove={this.handleRemove} />
+              </div>
+            ))
             }
             </div>
-            }
-          {this.state.cookies.length === 0 &&
-            <div className="col-lg-12 d-flex justify-content-center">
-              <img style={styles.noBasketImg} className="img-fluid my-3" src="/image/lots-of-cookies.jpg" alt="cookies"/>
-            </div>
-            }
-          {this.state.cookies.length > 0 &&
-            <div className="col-lg-3" >
+            <div className="col-lg-3 mb-3" >
               <div className="py-3 d-flex flex-column align-items-center">
                 <h4 style={styles.subtotalHeader} className="py-2">Need to grab more cookies for a friend in need?</h4>
                 <Button href="#cookies" style={styles.button} className="button-more-cookies" >GET COOKIES</Button>
@@ -197,8 +258,9 @@ export default class Basket extends React.Component {
                 <Button href="#checkout" style={styles.button} className="button-all w-100" >PROCEED TO CHECKOUT</Button>
               </div>
             </div>
-            }
+          </div>
         </div>
+        }
       </>
     );
   }
@@ -213,7 +275,7 @@ function BasketItems(props) {
       <div style={styles.imageContainer} className="col-5 col-md-4 p-3 d-flex align-items-center border-bot">
         <img className="w-100 h-100 img-fluid" style={styles.image} src={imageUrl} alt={flavor}/>
       </div>
-      <Card className="col-7 col-md-8 card-border" style={styles.card}>
+      <Card className="col-7 col-md-8 card-border bg-transparent" style={styles.card}>
         <Card.Body className="d-flex flex-column flex-md-row justify-content-center justify-content-md-between align-items-md-center">
           <div className="p-0 col-md-5">
             <Card.Text className="m-0" style={styles.title}>{flavor}</Card.Text>

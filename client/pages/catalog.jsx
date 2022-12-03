@@ -24,6 +24,9 @@ const styles = {
   },
   icon: {
     fontSize: '0.8rem'
+  },
+  errorContent: {
+    height: '500px'
   }
 };
 
@@ -31,39 +34,64 @@ export default class Catalog extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      cookies: []
+      cookies: [],
+      loading: true,
+      error: false
     };
   }
 
   componentDidMount() {
     fetch('/cookies')
-      .then(res => res.json())
+      .then(res => {
+        if (res.status === 500) {
+          this.setState({ error: true });
+        }
+        return res.json();
+      })
       .then(cookies => {
+        this.setState({ loading: false });
         this.setState({ cookies });
       })
       .catch(err => console.error(err));
   }
 
   render() {
+    const { loading, error } = this.state;
+    if (error) {
+      return (
+        <div style={styles.errorContent} className="my-5 text-center d-flex flex-column justify-content-center align-items-center">
+          <h1 className="w-75">There was an error with the connection. Please try again.</h1>
+          <img src="/image/sad-cookie.png" alt="sad-cookie"/>
+        </div>
+      );
+    }
     return (
       <>
-        <h1 className="py-1">Shop All</h1>
-        <div className="d-flex justify-content-between">
-          <a style={styles.description} className="text-decoration-none" href='#'>
-            <i className="fa-solid fa-chevron-left" style={styles.icon}/>
-            {' Home'}
-          </a>
-          <p style={styles.description}>{`${this.state.cookies.length} items`}</p>
-        </div>
-        <div className="row">
-          {
+        <div className="container mt-3">
+          <h1 className="py-1">Shop All</h1>
+          <div className="d-flex justify-content-between">
+            <a style={styles.description} className="text-decoration-none" href='#'>
+              <i className="fa-solid fa-chevron-left" style={styles.icon}/>
+              {' Home'}
+            </a>
+            <p style={styles.description}>{`${this.state.cookies.length} items`}</p>
+          </div>
+          <div className="row">
+            {
             this.state.cookies.map(product => (
               <div key={product.cookieId} className="col-6 col-lg-4">
                 <Product product={product} />
               </div>
             ))
           }
+          </div>
         </div>
+        {loading === true &&
+          <div className="loader d-flex justify-content-center align-items-center" />
+        }
+        {loading === false &&
+          <div className="loader-hide" />
+        }
       </>
     );
   }

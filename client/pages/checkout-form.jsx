@@ -12,9 +12,11 @@ export default function CheckoutForm(props) {
   const elements = useElements();
 
   const [message, setMessage] = useState(null);
+  const [loading, handleLoading] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
+    handleLoading(false);
     if (!stripe) {
       return;
     }
@@ -69,19 +71,27 @@ export default function CheckoutForm(props) {
   const { totalAmount } = props;
   return (
     <>
-      <div className="px-4 mx-2 my-2 border-bot d-flex justify-content-between align-items-center">
-        <h1>Checkout</h1>
-        <h4>{`Total: ${toDollars(totalAmount)}`}</h4>
+      {loading === true &&
+      <div className="loader d-flex justify-content-center align-items-center" />
+      }
+      {loading === false &&
+        <div className="loader-hide" />
+      }
+      <div className="container mt-3">
+        <div className="px-4 mx-2 my-2 border-bot d-flex justify-content-between align-items-center">
+          <h1>Checkout</h1>
+          <h4>{`Total: ${toDollars(totalAmount)}`}</h4>
+        </div>
+        <form id="payment-form" onSubmit={handleSubmit} className="mx-auto mt-4 mb-5">
+          <PaymentElement id="payment-element" />
+          <button className="button-all w-100" disabled={isLoading || !stripe || !elements} id="submit">
+            <span id="button-text">
+              {isLoading ? <div className="spinner" id="spinner" /> : 'Pay now'}
+            </span>
+          </button>
+          {message && <div id="payment-message">{message}</div>}
+        </form>
       </div>
-      <form id="payment-form" onSubmit={handleSubmit} className="mx-auto mt-4 mb-5">
-        <PaymentElement id="payment-element" />
-        <button className="button-all w-100" disabled={isLoading || !stripe || !elements} id="submit">
-          <span id="button-text">
-            {isLoading ? <div className="spinner" id="spinner" /> : 'Pay now'}
-          </span>
-        </button>
-        {message && <div id="payment-message">{message}</div>}
-      </form>
     </>
   );
 }
