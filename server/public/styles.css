@@ -239,6 +239,15 @@ i {
   height: 82vh;
 }
 
+.about-me-image {
+  height: 400px;
+  width: 70vw;
+}
+
+.about-me-background {
+  height: 50vh;
+}
+
 .loader {
   position: absolute;
   top: calc(50% - 4em);
@@ -291,5 +300,21 @@ i {
     color: #fdeedc;
     border: solid 1px #fdeedc;
     border-radius: 5px;
+  }
+
+  .about-me-background {
+    height: 45vh;
+  }
+}
+
+@media only screen and (min-width: 992px) {
+  .about-me-background {
+    height: 40vh;
+  }
+}
+
+@media only screen and (min-width: 1200px) {
+  .about-me-background {
+    height: 35vh;
   }
 }
