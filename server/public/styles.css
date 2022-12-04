@@ -43,6 +43,12 @@ h1,
   background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(255,251,247, 1)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 8h24M4 16h24M4 24h24'/%3E%3C/svg%3E");
 }
 
+.offcanvas-title {
+  color: #422300;
+  font-family: Merriweather, serif;
+  letter-spacing: 0.2rem;
+}
+
 .btn-close:focus {
   box-shadow: none;
 }
@@ -189,9 +195,12 @@ i {
 
 .menu-link {
   color: #422300;
+  border: solid 2px #fff;
+  border-radius: 5px;
 }
 
-.menu-link:hover {
+.menu-link:hover,
+.menu-link:active {
   border: solid 2px #94540f;
   border-radius: 5px;
 }
@@ -290,6 +299,8 @@ i {
 @media only screen and (min-width: 768px) {
   .menu-link {
     color: #fdeedc;
+    border: solid 1px #dc924e;
+    border-radius: 5px;
   }
 
   .menu-link:visited {
