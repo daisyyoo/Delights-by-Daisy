@@ -217,7 +217,7 @@ export default class ConfirmationPage extends React.Component {
               </div>
             </form>
             <div className="d-flex justify-content-center mt-5 pt-3">
-              <Button href=" " style={styles.button} className={this.state.emailSent ? 'button-all' : 'd-none'}>RETURN TO HOME</Button>
+              <Button href=" " style={styles.button} className={this.state.emailSent ? 'button-all w-100 text-center' : 'd-none'}>RETURN TO HOME</Button>
             </div>
           </div>
         </div>

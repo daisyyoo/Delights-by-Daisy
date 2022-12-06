@@ -83,6 +83,7 @@ h1,
   border-radius: 5px;
   height: 2.75rem;
   width: 11rem;
+  font-size: 1rem;
 }
 
 .button-more-cookies {
@@ -216,8 +217,9 @@ i {
 }
 
 .email-input:focus {
-  outline: solid 1px #94540f;
+  border: solid 3px #94540f;
   border-radius: 5px;
+  color: #422300;
 }
 
 .submit-button {
