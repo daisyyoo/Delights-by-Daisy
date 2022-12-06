@@ -217,6 +217,7 @@ i {
 
 .email-input:focus {
   outline: solid 1px #94540f;
+  border-radius: 5px;
 }
 
 .submit-button {
