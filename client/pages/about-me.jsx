@@ -44,7 +44,7 @@ export default class AboutMe extends React.Component {
           </div>
         </div>
         <div className="row justify-content-end m-0" style={styles.imageContainer}>
-          <img style={styles.image} className="about-me-image" src="/image/about-me.webp" alt="lots-of-cookies"/>
+          <img style={styles.image} className="about-me-image" src="/image/about-me-sm.webp" alt="lots-of-cookies"/>
         </div>
         <div style={styles.background} className="about-me-background">
           <div className="container" style={styles.height}>
