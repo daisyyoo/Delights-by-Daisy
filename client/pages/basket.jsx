@@ -64,6 +64,11 @@ const styles = {
     fontWeight: '600',
     color: '#693802'
   },
+  noBasketButton: {
+    position: 'relative',
+    top: '3rem',
+    fontSize: '1rem'
+  },
   noBasketImg: {
     backgroundImage: 'url("/image/lots-of-cookies-sm.webp")',
     backgroundSize: 'cover',
@@ -219,8 +224,9 @@ export default class Basket extends React.Component {
             <div style={styles.noBasketImg} className="no-basket-image d-flex flex-column align-items-center">
               <h2 style={styles.noBasketText} className="text-center w-75">
                 You have no cookies in your basket!</h2>
-              <h4 style={styles.noBasketSmText} className="text-center w-75 mt-3">
+              <h4 style={styles.noBasketSmText} className="text-center w-75">
                 Add some cookies to your basket to get started!</h4>
+              <Button href="#cookies" style={styles.noBasketButton} className="button-more-cookies" >GET COOKIES</Button>
             </div>
           </div>
         }
