@@ -226,7 +226,7 @@ export default class Basket extends React.Component {
                 You have no cookies in your basket!</h2>
               <h4 style={styles.noBasketSmText} className="text-center w-75">
                 Add some cookies to your basket to get started!</h4>
-              <Button href="#cookies" style={styles.noBasketButton} className="button-more-cookies" >GET COOKIES</Button>
+              <Button href="#cookies" style={styles.noBasketButton} className="button-more-cookies mt-2" >GET COOKIES</Button>
             </div>
           </div>
         }
