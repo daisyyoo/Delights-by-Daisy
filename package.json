@@ -2,7 +2,7 @@
   "name": "final-project",
   "version": "1.0.0",
   "private": true,
-  "description": "A full stack JavaScript solo project.",
+  "description": "A full stack web application where you can order cookies baked by me.",
   "main": "server/index.js",
   "scripts": {
     "start": "NODE_ENV=production node .",
