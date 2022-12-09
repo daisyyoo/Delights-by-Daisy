@@ -37,7 +37,6 @@ Try the application live at [https://delights-by-daisy.delightsbydaisy.de/](http
 ## Preview
 
 [Delights Demo 1](image/delights-demo-1.gif)
-[Delights Demo 2](image/delights-demo-2.gif)
 [Delights Demo 3](image/delights-demo-3.gif)
 ## Stretch Features
 - User can add allergy notes to their order
