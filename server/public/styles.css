@@ -248,7 +248,7 @@ i {
 
 .image-container,
 .no-basket-image-container {
-  height: 82vh;
+  height: 95vh;
 }
 
 .loader {
@@ -289,7 +289,7 @@ i {
 @media only screen and (min-width: 568px) {
   .image-container,
   .no-basket-image-container {
-    height: 80vh;
+    height: 95vh;
   }
 
   .no-basket-image {
