@@ -52,7 +52,7 @@ export default function Catalog() {
 
   return (
     <>
-      {error === true && (
+      {error && (
         <div style={styles.errorContent} className="my-5 text-center d-flex flex-column justify-content-center align-items-center">
           <h1 className="w-75">There was an error with the connection. Please try again.</h1>
           <img src="/image/sad-cookie.png" alt="sad-cookie"/>
@@ -77,10 +77,10 @@ export default function Catalog() {
           }
         </div>
       </div>
-      {loading === true &&
+      {loading &&
       <div className="loader d-flex justify-content-center align-items-center" />
         }
-      {loading === false &&
+      {!loading &&
       <div className="loader-hide" />
         }
     </>
