@@ -14,6 +14,8 @@ import StripeCheckout from './pages/stripe';
 import ConfirmationPage from './pages/confirmation-page';
 import AboutMe from './pages/about-me';
 export default class App extends React.Component {
+  // const [cartId, setCartId] = useState();
+
   constructor(props) {
     super(props);
     this.state = {

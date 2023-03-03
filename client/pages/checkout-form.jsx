@@ -1,11 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import {
-  PaymentElement,
-  useStripe,
-  useElements
-} from '@stripe/react-stripe-js';
+import { PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { toDollars } from '../lib/';
-import AppContext from '../lib/app-context';
 
 export default function CheckoutForm(props) {
   const stripe = useStripe();
@@ -71,12 +66,8 @@ export default function CheckoutForm(props) {
   const { totalAmount } = props;
   return (
     <>
-      {loading === true &&
-      <div className="loader d-flex justify-content-center align-items-center" />
-      }
-      {loading === false &&
-        <div className="loader-hide" />
-      }
+      {loading === true && <div className="loader d-flex justify-content-center align-items-center" />}
+      {loading === false && <div className="loader-hide" />}
       <div className="container mt-3">
         <div className="px-4 mx-2 my-2 border-bot d-flex justify-content-between align-items-center">
           <h1>Checkout</h1>
@@ -95,5 +86,3 @@ export default function CheckoutForm(props) {
     </>
   );
 }
-
-CheckoutForm.contextType = AppContext;
