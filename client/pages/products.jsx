@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { toDollars } from '../lib/';
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
@@ -71,11 +71,10 @@ const styles = {
   }
 };
 export default function ProductDetails(props) {
-
+  const context = useContext(AppContext);
   const [cookie, setCookie] = useState([]);
   const [quantity, setQuantity] = useState(0);
   const [show, setShow] = useState(false);
-  // const [basketData, setBasketData] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
 
@@ -93,7 +92,7 @@ export default function ProductDetails(props) {
 
   const sendTheInfo = event => {
     setLoading(true);
-    // const { cartId, addToBasket } = this.context;
+    const { cartId, addToBasket } = context;
     const addCookie = { cookie, quantity };
     let req;
     const token = localStorage.getItem('basketToken');
@@ -118,32 +117,16 @@ export default function ProductDetails(props) {
     const getCookieData = async () => {
       const response = await fetch('/addToBasket', req);
       if (response.status === 500) { setError(true); }
-      // const cookieAdded = await response.json();
+      const cookieAdded = await response.json();
+      if (!cartId) {
+        addToBasket(cookieAdded);
+      }
       setLoading(false);
-      // setBasketData(cookieAdded);
-
       setShow(true);
     };
     getCookieData()
       .catch(console.error);
   };
-  //   fetch('/addToBasket', req)
-  //     .then(res => {
-  //       if (res.status === 500) {
-  //         setError(true);
-  //       }
-  //       return res.json();
-  //     })
-  //     .then(result => {
-  //       setLoading(false);
-  //       // setBasketData(result);
-  //       setShow(true);
-  //       // if (!cartId) {
-  //       //   addToBasket(result);
-  //       // }
-  //     })
-  //     .catch(err => console.error(err));
-  // }
 
   function closeModal(event) {
     setShow(false);
@@ -227,8 +210,6 @@ export default function ProductDetails(props) {
     </>
   );
 }
-
-ProductDetails.contextType = AppContext;
 
 function BasketModal(props) {
   const { cookie, quantity, closeModal } = props.data;
