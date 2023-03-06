@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
+import { useParams } from 'react-router-dom';
 import { toDollars } from '../lib/';
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
@@ -70,8 +71,10 @@ const styles = {
     height: '500px'
   }
 };
+
 export default function ProductDetails(props) {
   const context = useContext(AppContext);
+  const { cookieId } = useParams();
   const [cookie, setCookie] = useState([]);
   const [quantity, setQuantity] = useState(0);
   const [show, setShow] = useState(false);
@@ -80,7 +83,7 @@ export default function ProductDetails(props) {
 
   useEffect(() => {
     const fetchData = async () => {
-      const response = await fetch(`/cookies/${props.cookieId}`);
+      const response = await fetch(`/cookies/${cookieId}`);
       if (response.status === 500) { setError(true); }
       const selectedCookie = await response.json();
       setCookie(selectedCookie);
@@ -88,7 +91,7 @@ export default function ProductDetails(props) {
     };
     fetchData()
       .catch(console.error);
-  }, [props.cookieId]);
+  }, [cookieId]);
 
   const sendTheInfo = event => {
     setLoading(true);
