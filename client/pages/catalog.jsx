@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { toDollars } from '../lib/';
 import Card from 'react-bootstrap/Card';
+import { Link } from 'react-router-dom';
 
 const styles = {
   product: {
@@ -90,8 +91,8 @@ export default function Catalog() {
 function Product(props) {
   const { cookieId, flavor, price, imageUrl } = props.product;
   return (
-    <a
-      href={`#cookie?cookieId=${cookieId}`}
+    <Link
+      to={`/cookie/${cookieId}`}
       style={styles.product}
       className="mb-4 text-decoration-none">
       <Card className="border-0">
@@ -103,6 +104,6 @@ function Product(props) {
           </Card.Text>
         </Card.Body>
       </Card>
-    </a>
+    </Link>
   );
 }

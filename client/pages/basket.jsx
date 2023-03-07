@@ -1,5 +1,6 @@
 import React from 'react';
 import Card from 'react-bootstrap/Card';
+import { Link } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import { toDollars } from '../lib/';
 
@@ -226,7 +227,7 @@ export default class Basket extends React.Component {
                 You have no cookies in your basket!</h2>
               <h4 style={styles.noBasketSmText} className="text-center w-75">
                 Add some cookies to your basket to get started!</h4>
-              <Button href="#cookies" style={styles.noBasketButton} className="button-more-cookies mt-2" >GET COOKIES</Button>
+              <Link to="/cookies" style={styles.noBasketButton} className="button-more-cookies mt-2" >GET COOKIES</Link>
             </div>
           </div>
         }
@@ -248,7 +249,7 @@ export default class Basket extends React.Component {
             <div className="col-lg-3 mb-3" >
               <div className="py-3 d-flex flex-column align-items-center">
                 <h4 style={styles.subtotalHeader} className="py-2">Need to grab more cookies for a friend in need?</h4>
-                <Button href="#cookies" style={styles.button} className="button-more-cookies" >GET COOKIES</Button>
+                <Link to="/cookies" style={styles.button} className="button-more-cookies" >GET COOKIES</Link>
               </div>
               <div className="d-flex w-100 justify-content-between pt-3 mt-5" style={styles.borderTop}>
                 <h5 style={styles.subtotalHeader}>{`Subtotal (${this.state.cookies.length} items)`}</h5>
@@ -261,7 +262,7 @@ export default class Basket extends React.Component {
               </div>
               <div style={styles.borderBottom} className="w-100 pb-4 d-flex flex-column align-items-center">
                 <p style={styles.weight} className="w-100 text-left py-lg-2">Taxes and shipping calculated at checkout</p>
-                <Button href="#checkout" style={styles.button} className="button-all w-100" >PROCEED TO CHECKOUT</Button>
+                <Link to="/checkout" style={styles.button} className="button-all w-100" >PROCEED TO CHECKOUT</Link>
               </div>
             </div>
           </div>

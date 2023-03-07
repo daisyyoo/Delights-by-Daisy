@@ -3,6 +3,7 @@ import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import Offcanvas from 'react-bootstrap/Offcanvas';
+import { NavLink } from 'react-router-dom';
 
 export default function Header() {
   return (
@@ -18,10 +19,10 @@ export default function Header() {
           </Offcanvas.Header>
           <Offcanvas.Body className="px-4">
             <Nav className="justify-content-end flex-grow-1 pe-3" onSelect={(_, event) => { window.location.href = event.target.href; }} >
-              <Nav.Link className="px-3 px-lg-3 menu-link" href="/">HOME</Nav.Link>
-              <Nav.Link className="px-3 px-lg-3 menu-link" href="/cookies">SHOP</Nav.Link>
-              <Nav.Link className="px-3 px-lg-3 menu-link" href="/myBasket" >MY BASKET</Nav.Link>
-              <Nav.Link className="px-3 px-lg-3 menu-link" href="/aboutMe">ABOUT ME</Nav.Link>
+              <NavLink className="px-3 px-lg-3 menu-link" to="/">HOME</NavLink>
+              <NavLink className="px-3 px-lg-3 menu-link" to="/cookies">SHOP</NavLink>
+              <NavLink className="px-3 px-lg-3 menu-link" to="/myBasket" >MY BASKET</NavLink>
+              <NavLink className="px-3 px-lg-3 menu-link" to="/aboutMe">ABOUT ME</NavLink>
             </Nav>
           </Offcanvas.Body>
         </Navbar.Offcanvas>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { toDollars } from '../lib/';
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
@@ -157,10 +157,10 @@ export default function ProductDetails(props) {
         }
       <div className="container mt-3">
         <div className="d-flex justify-content-start">
-          <a style={styles.backButton} className="text-decoration-none mb-3" href='#cookies'>
+          <Link style={styles.backButton} className="text-decoration-none mb-3" to='/cookies'>
             <i className="fa-solid fa-chevron-left" style={styles.icon} />
             {' Back'}
-          </a>
+          </Link>
         </div>
         <div className="d-flex row align-items-center">
           <div className="col-md-6 d-flex justify-content-center" style={styles.imageContainer}>
@@ -255,7 +255,7 @@ function BasketModal(props) {
           </div>
           <div className="d-flex justify-content-between mt-5">
             <Button onClick={closeModal} className="button-return">KEEP SHOPPING</Button>
-            <Button href="#myBasket" className="button-all">GO TO BASKET</Button>
+            <Link to="/myBasket" className="button-all">GO TO BASKET</Link>
           </div>
         </div>
       </Modal.Body>

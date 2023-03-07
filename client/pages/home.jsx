@@ -1,5 +1,5 @@
 import React from 'react';
-import Button from 'react-bootstrap/Button';
+import { Link } from 'react-router-dom';
 
 const styles = {
   image: {
@@ -31,7 +31,7 @@ export default function Home() {
           I have perfected the classic Chocolate Chip and expanded my
           repertoire to my newest creation, Jasmine Tea Almond Blueberry.
           Take a bite and enjoy a moment of delight!</h6>
-        <Button href="/cookies" className="button-all my-3">Order Now</Button>
+        <Link to="/cookies" className="button-all my-3">Order Now</Link>
       </div>
     </div>
   );

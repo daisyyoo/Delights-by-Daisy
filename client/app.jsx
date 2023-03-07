@@ -3,7 +3,6 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import jwtDecode from 'jwt-decode';
 import Header from './components/header';
 import Footer from './components/footer';
-// import { parseRoute } from './lib';
 import AppContext from './lib/app-context';
 import PageContainer from './components/page-container';
 import NotFound from './pages/not-found';
@@ -42,7 +41,7 @@ export default function App() {
         <Header />
         <PageContainer>
           <Routes>
-            <Route exact path='/' element={<Home />} />
+            <Route index path='/' element={<Home />} />
             <Route path='cookies' element={<Catalog />} />
             <Route path='cookie/:cookieId' element={<ProductDetails />} />
             <Route path='myBasket' element={<Basket />} />
