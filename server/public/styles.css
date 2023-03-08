@@ -76,6 +76,10 @@ h1,
 }
 
 .button-all {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-decoration: none;
   background-color: #ffd8a9;
   color: #693802;
   font-weight: 600;
@@ -87,6 +91,10 @@ h1,
 }
 
 .button-more-cookies {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-decoration: none;
   background-color: #fdeedc;
   color: #693802;
   font-weight: 600;
@@ -195,6 +203,8 @@ i {
 }
 
 .menu-link {
+  text-decoration: none;
+  padding: 0.5rem;
   color: #422300;
   border: solid 2px #fff;
   border-radius: 5px;

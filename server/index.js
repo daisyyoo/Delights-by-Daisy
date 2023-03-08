@@ -198,7 +198,7 @@ app.get('/process-order/:token', (req, res, next) => {
   const params = [cartId, paymentIntent];
   db.query(sql, params)
     .then(result => {
-      res.redirect(302, '/#confirmationPage');
+      res.redirect(302, '/confirmationPage');
     })
     .catch(err => next(err));
 });
