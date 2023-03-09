@@ -3,7 +3,6 @@ import Card from 'react-bootstrap/Card';
 import { Link } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import { toDollars } from '../lib/';
-// import AppContext from '../lib/app-context';
 
 const styles = {
   image: {
@@ -89,7 +88,6 @@ const styles = {
   }
 };
 export default function Basket() {
-  // const context = useContext(AppContext);
   const [cookies, setCookies] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
@@ -99,7 +97,6 @@ export default function Basket() {
     const token = localStorage.getItem('basketToken');
     if (!token) {
       setLoading(false);
-      // this.setState({ loading: false });
     }
     const req = {
       method: 'GET',
@@ -125,22 +122,22 @@ export default function Basket() {
     const token = localStorage.getItem('basketToken');
     const cookieId = Number(event.target.closest('div').id);
     const cookieIndex = cookies.findIndex(cookie => cookie.cookieId === cookieId);
-    const { quantity } = cookies[cookieIndex];
-    let newQuantity;
-    const currentQuantity = Number(event.target.closest('div').textContent);
+    let { quantity } = cookies[cookieIndex];
+    // let newQuantity;
+    // const currentQuantity = Number(event.target.closest('div').textContent);
 
     if (event.target.matches('.fa-circle-minus')) {
-      if (currentQuantity > 1) {
-        newQuantity = quantity - 1;
+      if (quantity > 1) {
+        quantity -= 1;
       } else {
         return;
       }
     } else if (event.target.matches('.fa-circle-plus')) {
-      newQuantity = quantity + 1;
+      quantity += 1;
     } else {
       return;
     }
-    const updatedInfo = { cookieId, quantity: newQuantity };
+    const updatedInfo = { cookieId, quantity };
 
     const req = {
       method: 'PATCH',
@@ -155,9 +152,9 @@ export default function Basket() {
       if (response.status === 500) { setError(true); }
       const updatedCookie = await response.json();
       const currentCookies = cookies.slice();
-      updatedCookie.quantity = newQuantity;
+      // updatedCookie.quantity = quantity;
       currentCookies[cookieIndex] = updatedCookie;
-      setCookies(updatedCookie);
+      setCookies(currentCookies);
       setLoading(false);
     };
     fetchData()

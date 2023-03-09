@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 import jwtDecode from 'jwt-decode';
-import Header from './components/header';
-import Footer from './components/footer';
+
 import AppContext from './lib/app-context';
 import PageContainer from './components/page-container';
 import NotFound from './pages/not-found';
@@ -37,23 +36,18 @@ export default function App() {
   const contextValue = { cartId, addToBasket, checkOut };
   return (
     <AppContext.Provider value={contextValue}>
-      <BrowserRouter>
-        <Header />
-        <PageContainer>
-          <Routes>
-            <Route index path='/' element={<Home />} />
-            <Route path='cookies' element={<Catalog />} />
-            <Route path='cookie/:cookieId' element={<ProductDetails />} />
-            <Route path='myBasket' element={<Basket />} />
-            <Route path='checkout' element={<StripeCheckout />} />
-            <Route path='confirmationPage' element={<ConfirmationPage />} />
-            <Route path='aboutMe' element={<AboutMe />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </PageContainer>
-        <Footer />
-      </BrowserRouter>
+      <Routes>
+        <Route path='/' element={<PageContainer />}>
+          <Route index element ={<Home />}/>
+          <Route path='cookies' element={<Catalog />} />
+          <Route path='cookie/:cookieId' element={<ProductDetails />} />
+          <Route path='myBasket' element={<Basket />} />
+          <Route path='checkout' element={<StripeCheckout />} />
+          <Route path='confirmationPage' element={<ConfirmationPage />} />
+          <Route path='aboutMe' element={<AboutMe />} />
+          <Route path="*" element={<NotFound />} />
+        </Route>
+      </Routes>
     </AppContext.Provider>
   );
-
 }

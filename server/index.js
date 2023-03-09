@@ -1,6 +1,7 @@
 require('dotenv/config');
 const pg = require('pg');
 const express = require('express');
+// const path = require('path');
 const jwt = require('jsonwebtoken');
 const ClientError = require('./client-error');
 const staticMiddleware = require('./static-middleware');
@@ -19,6 +20,16 @@ const db = new pg.Pool({
 
 app.use(express.json());
 app.use(staticMiddleware);
+
+// app.get('*', (req, res) => {
+//   res.sendFile(
+//     path.join(__dirname, 'server/public/index.html'),
+//     function (err) {
+//       if (err) {
+//         res.status(500).send(err);
+//       }
+//     });
+// });
 
 app.get('/cookies', (req, res, next) => {
   const sql = `
