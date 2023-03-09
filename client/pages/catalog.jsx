@@ -62,10 +62,10 @@ export default function Catalog() {
       <div className="container mt-3">
         <h1 className="py-1">Shop All</h1>
         <div className="d-flex justify-content-between">
-          <a style={styles.description} className="text-decoration-none" href='#'>
+          <Link to="/" style={styles.description} className="text-decoration-none">
             <i className="fa-solid fa-chevron-left" style={styles.icon}/>
             {' Home'}
-          </a>
+          </Link>
           <p style={styles.description}>{`${cookies.length} items`}</p>
         </div>
         <div className="row">
