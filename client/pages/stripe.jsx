@@ -17,7 +17,7 @@ export default function StripeCheckout() {
   useEffect(() => {
     // Create PaymentIntent as soon as the page loads
     const token = localStorage.getItem('basketToken');
-    fetch('/create-payment-intent', {
+    fetch('/api/create-payment-intent', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

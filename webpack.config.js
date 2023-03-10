@@ -18,7 +18,11 @@ module.exports = {
     extensions: ['.js', '.jsx']
   },
   output: {
-    path: serverPublicPath
+    path: serverPublicPath,
+    publicPath: '/'
+  },
+  devServer: {
+    historyApiFallback: true
   },
   module: {
     rules: [

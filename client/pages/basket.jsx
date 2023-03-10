@@ -107,7 +107,7 @@ export default function Basket() {
     };
 
     const fetchData = async () => {
-      const response = await fetch('/myBasket', req);
+      const response = await fetch('/api/myBasket', req);
       if (response.status === 500) { setError(true); }
       const selectedCookie = await response.json();
       setCookies(selectedCookie);
@@ -148,7 +148,7 @@ export default function Basket() {
       body: JSON.stringify(updatedInfo)
     };
     const fetchData = async () => {
-      const response = await fetch('/updateQuantity', req);
+      const response = await fetch('/api/updateQuantity', req);
       if (response.status === 500) { setError(true); }
       const updatedCookie = await response.json();
       const currentCookies = cookies.slice();
@@ -182,7 +182,7 @@ export default function Basket() {
       }
     };
     const fetchData = async () => {
-      const response = await fetch(`/removeCookie/${cookieId}`, req);
+      const response = await fetch(`/api/removeCookie/${cookieId}`, req);
       if (response.status === 500) { setError(true); }
       const updatedCookies = await response.json();
       setCookies(updatedCookies);

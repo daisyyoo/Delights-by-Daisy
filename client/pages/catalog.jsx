@@ -37,7 +37,7 @@ export default function Catalog() {
   const [error, setError] = useState(false);
 
   useEffect(() => {
-    fetch('/cookies')
+    fetch('/api/cookies')
       .then(res => {
         if (res.status === 500) {
           setError(true);

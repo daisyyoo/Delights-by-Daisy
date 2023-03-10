@@ -83,7 +83,7 @@ export default function ProductDetails(props) {
 
   useEffect(() => {
     const fetchData = async () => {
-      const response = await fetch(`/cookies/${cookieId}`);
+      const response = await fetch(`/api/cookies/${cookieId}`);
       if (response.status === 500) { setError(true); }
       const selectedCookie = await response.json();
       setCookie(selectedCookie);
@@ -118,7 +118,7 @@ export default function ProductDetails(props) {
       };
     }
     const getCookieData = async () => {
-      const response = await fetch('/addToBasket', req);
+      const response = await fetch('/api/addToBasket', req);
       if (response.status === 500) { setError(true); }
       const cookieAdded = await response.json();
       if (!cartId) {

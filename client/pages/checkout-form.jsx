@@ -50,7 +50,7 @@ export default function CheckoutForm(props) {
     const { error } = await stripe.confirmPayment({
       elements,
       confirmParams: {
-        return_url: new URL(`/process-order/${token}`, window.location).href
+        return_url: new URL(`/api/process-order/${token}`, window.location).href
       }
     });
 

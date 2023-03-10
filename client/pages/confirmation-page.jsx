@@ -85,7 +85,7 @@ export default class ConfirmationPage extends React.Component {
         'x-access-token': token
       }
     };
-    fetch('/confirmationPage', req)
+    fetch('/api/confirmationPage', req)
       .then(res => {
         if (res.status === 500) {
           this.setState({ error: true });
@@ -115,7 +115,7 @@ export default class ConfirmationPage extends React.Component {
       },
       body: JSON.stringify(this.state)
     };
-    fetch('./sendEmail', req)
+    fetch('/api/sendEmail', req)
       .then(res => {
         if (res.status === 500) {
           this.setState({ error: true });

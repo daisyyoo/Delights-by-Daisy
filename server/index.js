@@ -1,7 +1,7 @@
 require('dotenv/config');
 const pg = require('pg');
 const express = require('express');
-// const path = require('path');
+const path = require('path');
 const jwt = require('jsonwebtoken');
 const ClientError = require('./client-error');
 const staticMiddleware = require('./static-middleware');
@@ -21,17 +21,7 @@ const db = new pg.Pool({
 app.use(express.json());
 app.use(staticMiddleware);
 
-// app.get('*', (req, res) => {
-//   res.sendFile(
-//     path.join(__dirname, 'server/public/index.html'),
-//     function (err) {
-//       if (err) {
-//         res.status(500).send(err);
-//       }
-//     });
-// });
-
-app.get('/cookies', (req, res, next) => {
+app.get('/api/cookies', (req, res, next) => {
   const sql = `
   select "cookieId",
         "flavor",
@@ -48,7 +38,7 @@ app.get('/cookies', (req, res, next) => {
 
 });
 
-app.get('/cookies/:cookieId', (req, res, next) => {
+app.get('/api/cookies/:cookieId', (req, res, next) => {
   const cookieId = Number(req.params.cookieId);
   if (!cookieId) {
     throw new ClientError(400, 'cookieId must be a positive integer');
@@ -69,7 +59,7 @@ app.get('/cookies/:cookieId', (req, res, next) => {
     .catch(err => next(err));
 });
 
-app.post('/addToBasket', (req, res, next) => {
+app.post('/api/addToBasket', (req, res, next) => {
   const token = req.get('x-access-token');
   const { quantity } = req.body;
   const { cookieId } = req.body.cookie;
@@ -126,7 +116,7 @@ app.post('/addToBasket', (req, res, next) => {
   }
 });
 
-app.get('/myBasket', (req, res, next) => {
+app.get('/api/myBasket', (req, res, next) => {
   const token = req.get('x-access-token');
   if (!token) {
     next();
@@ -156,7 +146,7 @@ app.get('/myBasket', (req, res, next) => {
   }
 });
 
-app.post('/create-payment-intent', async (req, res, next) => {
+app.post('/api/create-payment-intent', async (req, res, next) => {
   const token = req.get('x-access-token');
   const cartId = jwt.verify(token, process.env.TOKEN_SECRET);
   const sql = `
@@ -197,7 +187,7 @@ app.post('/create-payment-intent', async (req, res, next) => {
     .catch(err => next(err));
 });
 
-app.get('/process-order/:token', (req, res, next) => {
+app.get('/api/process-order/:token', (req, res, next) => {
   const token = req.params.token;
   const cartId = jwt.verify(token, process.env.TOKEN_SECRET);
   const paymentIntent = req.query.payment_intent;
@@ -214,7 +204,7 @@ app.get('/process-order/:token', (req, res, next) => {
     .catch(err => next(err));
 });
 
-app.post('/confirmationPage', (req, res, next) => {
+app.post('/api/confirmationPage', (req, res, next) => {
   const token = req.get('x-access-token');
   const cartId = jwt.verify(token, process.env.TOKEN_SECRET);
   const sql = `
@@ -237,7 +227,7 @@ app.post('/confirmationPage', (req, res, next) => {
     .catch(err => next(err));
 });
 
-app.post('/sendEmail', (req, res, next) => {
+app.post('/api/sendEmail', (req, res, next) => {
   const { email } = req.body;
   const { orderId } = req.body.order[0];
   const sql = `
@@ -301,7 +291,7 @@ app.post('/sendEmail', (req, res, next) => {
     .catch(err => next(err));
 });
 
-app.patch('/updateQuantity', (req, res, next) => {
+app.patch('/api/updateQuantity', (req, res, next) => {
   const token = req.get('x-access-token');
   const cartId = jwt.verify(token, process.env.TOKEN_SECRET);
   const { quantity, cookieId } = req.body;
@@ -347,7 +337,7 @@ app.patch('/updateQuantity', (req, res, next) => {
     .catch(err => next(err));
 });
 
-app.delete('/removeCookie/:cookieId', (req, res, next) => {
+app.delete('/api/removeCookie/:cookieId', (req, res, next) => {
   const token = req.get('x-access-token');
   const cartId = jwt.verify(token, process.env.TOKEN_SECRET);
   const cookieId = req.params.cookieId;
@@ -388,6 +378,14 @@ app.delete('/removeCookie/:cookieId', (req, res, next) => {
       res.json(result.rows);
     })
     .catch(err => next(err));
+});
+
+app.get('/*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public/index.html'), function (err) {
+    if (err) {
+      res.status(500).send(err);
+    }
+  });
 });
 
 app.use(errorMiddleware);
