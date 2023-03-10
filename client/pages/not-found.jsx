@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const styles = {
   pageContent: {
@@ -18,7 +19,7 @@ export default function NotFound(props) {
             Uh oh, we could not find the page you were looking for!
           </h3>
           <p className="text-muted">
-            <a href="#">Return to the Homepage</a>
+            <Link to="/">Return to the Homepage</Link>
           </p>
         </div>
       </div>

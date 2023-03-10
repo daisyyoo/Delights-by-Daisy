@@ -40,7 +40,7 @@ export default function App() {
         <Route path='/' element={<PageContainer />}>
           <Route index element ={<Home />}/>
           <Route path='cookies' element={<Catalog />} />
-          <Route path='cookie/:cookieId' element={<ProductDetails />} />
+          <Route path='cookies/:cookieId' element={<ProductDetails />} />
           <Route path='myBasket' element={<Basket />} />
           <Route path='checkout' element={<StripeCheckout />} />
           <Route path='confirmationPage' element={<ConfirmationPage />} />
