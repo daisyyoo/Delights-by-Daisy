@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import jwtDecode from 'jwt-decode';
-
 import AppContext from './lib/app-context';
 import PageContainer from './components/page-container';
 import NotFound from './pages/not-found';
@@ -12,9 +11,11 @@ import Basket from './pages/basket';
 import StripeCheckout from './pages/stripe';
 import ConfirmationPage from './pages/confirmation-page';
 import AboutMe from './pages/about-me';
+import ProtectedRoute from './pages/protected-route';
 
 export default function App() {
   const [cartId, setCartId] = useState();
+  const [orderId, setOrderId] = useState();
 
   useEffect(() => {
     const token = window.localStorage.getItem('basketToken');
@@ -33,7 +34,7 @@ export default function App() {
     setCartId('');
   };
 
-  const contextValue = { cartId, addToBasket, checkOut };
+  const contextValue = { cartId, addToBasket, checkOut, setOrderId };
   return (
     <AppContext.Provider value={contextValue}>
       <Routes>
@@ -43,7 +44,10 @@ export default function App() {
           <Route path='cookies/:cookieId' element={<ProductDetails />} />
           <Route path='myBasket' element={<Basket />} />
           <Route path='checkout' element={<StripeCheckout />} />
-          <Route path='confirmationPage' element={<ConfirmationPage />} />
+          <Route path='confirmationPage' element={
+            <ProtectedRoute orderId={orderId}>
+              <ConfirmationPage orderId={orderId} />
+            </ProtectedRoute>} />
           <Route path='aboutMe' element={<AboutMe />} />
           <Route path="*" element={<NotFound />} />
         </Route>
