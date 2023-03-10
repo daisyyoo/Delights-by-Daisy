@@ -67,5 +67,5 @@ values
   'flour, granulated sugar, brown sugar, eggs, butter, vanilla, salt, baking soda, baking powder, onyx cocoa powder, dark chocolate, peanut butter, Reese''s peanut butter chips',
   'gluten, egg, dairy, peanuts',
   'My guilty pleasure is dark chocolate peanut butter cups. I also love brownies. So I decided to marry them together and make a cookie that not only showcased the nice fudgy flavor of brownies, but also the flavors of a chocolate covered peanut butter cup.',
-  'image/pb-choc.webp'
+  '/image/pb-choc.webp'
 );
