@@ -37,18 +37,15 @@ export default function Catalog() {
   const [error, setError] = useState(false);
 
   useEffect(() => {
-    fetch('/api/cookies')
-      .then(res => {
-        if (res.status === 500) {
-          setError(true);
-        }
-        return res.json();
-      })
-      .then(cookies => {
-        setCookies(cookies);
-        setLoading(false);
-      })
-      .catch(err => console.error(err));
+    const fetchData = async () => {
+      const response = await fetch('/api/cookies');
+      if (response.status === 500) { setError(true); }
+      const allCookies = await response.json();
+      setCookies(allCookies);
+      setLoading(false);
+    };
+    fetchData()
+      .catch(console.error);
   }, []);
 
   return (
