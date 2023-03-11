@@ -187,7 +187,7 @@ app.post('/api/create-payment-intent', async (req, res, next) => {
     .catch(err => next(err));
 });
 
-app.get('/api/getOrderId', (req, res, next) => {
+app.get('/api/process-order/:token', (req, res, next) => {
   const token = req.params.token;
   const cartId = jwt.verify(token, process.env.TOKEN_SECRET);
   const paymentIntent = req.query.payment_intent;
@@ -199,8 +199,7 @@ app.get('/api/getOrderId', (req, res, next) => {
   const params = [cartId, paymentIntent];
   db.query(sql, params)
     .then(result => {
-      res.json(result);
-      // res.redirect(302, `/api/confirmationPage/${result.orderId}`);
+      res.json(result.rows);
     })
     .catch(err => next(err));
 });

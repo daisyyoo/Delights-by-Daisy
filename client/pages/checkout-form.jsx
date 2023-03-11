@@ -16,7 +16,7 @@ export default function CheckoutForm(props) {
   const context = useContext(AppContext);
   const navigate = useNavigate();
   const { setOrderId } = context;
-  const [paymentIntent, setPaymentIntent] = useState();
+  const { totalAmount } = props;
   const [email, setEmail] = useState('');
   const [address, setAddress] = useState({});
   const [message, setMessage] = useState(null);
@@ -36,7 +36,7 @@ export default function CheckoutForm(props) {
       return;
     }
     stripe.retrievePaymentIntent(clientSecret).then(({ paymentIntent }) => {
-      setPaymentIntent(paymentIntent);
+      // setPaymentIntent(paymentIntent);
       switch (paymentIntent.status) {
         case 'succeeded':
           setMessage('Payment succeeded!');
@@ -61,22 +61,12 @@ export default function CheckoutForm(props) {
     }
     setIsLoading(true);
 
-    const token = localStorage.getItem('basketToken');
-    const req = {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-access-token': token,
-        body: JSON.stringify(paymentIntent)
-      }
-    };
     const fetchData = async () => {
-      const response = await fetch('/api/getOrderId', req);
+      const response = await fetch('/api/process-order');
       if (response.status === 500) { setError(true); }
       const paidOrder = await response.json();
       const { orderId } = paidOrder;
       setOrderId(orderId);
-
     };
     fetchData()
       .catch(console.error);
@@ -101,7 +91,6 @@ export default function CheckoutForm(props) {
   //   layout: 'tabs'
   // };
 
-  const { totalAmount } = props;
   return (
     <>
 
@@ -117,18 +106,18 @@ export default function CheckoutForm(props) {
           <h4>{`Total: ${toDollars(totalAmount)}`}</h4>
         </div>
         <form id="payment-form" onSubmit={handleSubmit} className="mx-auto mt-4 mb-5">
-          <h3>Contact Info</h3>
+          {/* <h3>Contact Info</h3> */}
           <LinkAuthenticationElement
             id="link-authentication-element"
+            value={email}
             options={{
-              email,
               defaultValues: {
-                email: 'email@.com'
+                email: 'email@here.com'
               }
             }}
             onChange={event => setEmail(event.value.email)}
           />
-          <h3>Shipping Address</h3>
+          {/* <h3>Shipping Address</h3> */}
           <AddressElement
         options={{
           mode: 'shipping',
@@ -144,7 +133,7 @@ export default function CheckoutForm(props) {
           }
         }}
         onChange={event => setAddress(event.value.address)}/>
-          <h3>Payment</h3>
+          {/* <h3>Payment</h3> */}
           <PaymentElement id="payment-element"
           options={{
             defaultValues: {
