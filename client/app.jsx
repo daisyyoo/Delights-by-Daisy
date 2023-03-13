@@ -30,6 +30,7 @@ export default function App() {
 
   const checkOut = () => {
     window.localStorage.removeItem('basketToken');
+    window.localStorage.removeItem('paidStatus');
     setCartId('');
   };
 
@@ -43,10 +44,9 @@ export default function App() {
           <Route path='cookies/:cookieId' element={<ProductDetails />} />
           <Route path='myBasket' element={<Basket />} />
           <Route path='checkout' element={<StripeCheckout />} />
-          <Route path='confirmationPage' element={
-            <ProtectedRoute cartId={cartId}>
-              <ConfirmationPage />
-            </ProtectedRoute>} />
+          <Route element={<ProtectedRoute />} >
+            <Route element={<ConfirmationPage />} path='confirmationPage'/>
+          </Route>
           <Route path='aboutMe' element={<AboutMe />} />
           <Route path="*" element={<NotFound />} />
         </Route>

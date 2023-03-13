@@ -52,6 +52,7 @@ export default function CheckoutForm(props) {
 
     setIsLoading(true);
     const token = localStorage.getItem('basketToken');
+    window.localStorage.setItem('paidStatus', true);
     const { error } = await stripe.confirmPayment({
       elements,
       confirmParams: {

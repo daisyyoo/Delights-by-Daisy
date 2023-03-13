@@ -1,11 +1,11 @@
 import React from 'react';
-import { Navigate } from 'react-router-dom';
+import { Outlet, Navigate } from 'react-router-dom';
 
-const ProtectedRoute = ({ children, cartId }) => {
-  if (!cartId) {
-    return <Navigate to="/" />;
-  }
-  return children;
+const ProtectedRoute = () => {
+  const paidStatus = localStorage.getItem('paidStatus');
+  return (
+    paidStatus ? <Outlet/> : <Navigate to='/' />
+  );
 };
 
 export default ProtectedRoute;
