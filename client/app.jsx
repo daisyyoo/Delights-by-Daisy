@@ -15,7 +15,6 @@ import ProtectedRoute from './pages/protected-route';
 
 export default function App() {
   const [cartId, setCartId] = useState();
-  const [orderId, setOrderId] = useState();
 
   useEffect(() => {
     const token = window.localStorage.getItem('basketToken');
@@ -34,7 +33,7 @@ export default function App() {
     setCartId('');
   };
 
-  const contextValue = { cartId, addToBasket, checkOut, setOrderId };
+  const contextValue = { cartId, addToBasket, checkOut };
   return (
     <AppContext.Provider value={contextValue}>
       <Routes>
@@ -45,8 +44,8 @@ export default function App() {
           <Route path='myBasket' element={<Basket />} />
           <Route path='checkout' element={<StripeCheckout />} />
           <Route path='confirmationPage' element={
-            <ProtectedRoute orderId={orderId}>
-              <ConfirmationPage orderId={orderId} />
+            <ProtectedRoute cartId={cartId}>
+              <ConfirmationPage />
             </ProtectedRoute>} />
           <Route path='aboutMe' element={<AboutMe />} />
           <Route path="*" element={<NotFound />} />

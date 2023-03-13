@@ -1,31 +1,22 @@
-import React, { useEffect, useState, useContext } from 'react';
-import { PaymentElement, LinkAuthenticationElement, AddressElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import React, { useEffect, useState } from 'react';
+import {
+  PaymentElement,
+  useStripe,
+  useElements
+} from '@stripe/react-stripe-js';
 import { toDollars } from '../lib/';
 import AppContext from '../lib/app-context';
-import { useNavigate } from 'react-router-dom';
-
-const styles = {
-  errorContent: {
-    height: '500px'
-  }
-};
 
 export default function CheckoutForm(props) {
   const stripe = useStripe();
   const elements = useElements();
-  const context = useContext(AppContext);
-  const navigate = useNavigate();
-  const { setOrderId } = context;
-  const { totalAmount } = props;
-  const [email, setEmail] = useState('');
-  const [address, setAddress] = useState({});
+
   const [message, setMessage] = useState(null);
-  // const [loading, handleLoading] = useState(true);
+  const [loading, handleLoading] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(false);
 
   useEffect(() => {
-    // handleLoading(false);
+    handleLoading(false);
     if (!stripe) {
       return;
     }
@@ -36,7 +27,6 @@ export default function CheckoutForm(props) {
       return;
     }
     stripe.retrievePaymentIntent(clientSecret).then(({ paymentIntent }) => {
-      // setPaymentIntent(paymentIntent);
       switch (paymentIntent.status) {
         case 'succeeded':
           setMessage('Payment succeeded!');
@@ -59,23 +49,13 @@ export default function CheckoutForm(props) {
     if (!stripe || !elements) {
       return;
     }
+
     setIsLoading(true);
-
-    const fetchData = async () => {
-      const response = await fetch('/api/process-order');
-      if (response.status === 500) { setError(true); }
-      const paidOrder = await response.json();
-      const { orderId } = paidOrder;
-      setOrderId(orderId);
-    };
-    fetchData()
-      .catch(console.error);
-
+    const token = localStorage.getItem('basketToken');
     const { error } = await stripe.confirmPayment({
       elements,
       confirmParams: {
-        shipping: address,
-        return_url: navigate('/confirmationPage')
+        return_url: new URL(`/process-order/${token}`, window.location).href
       }
     });
 
@@ -84,65 +64,26 @@ export default function CheckoutForm(props) {
     } else {
       setMessage('An unexpected error occurred.');
     }
+
     setIsLoading(false);
   };
 
-  // const paymentElementOptions = {
-  //   layout: 'tabs'
-  // };
-
+  const { totalAmount } = props;
   return (
     <>
-
-      {error &&
-      <div style={styles.errorContent} className="my-5 text-center d-flex flex-column justify-content-center align-items-center">
-        <h1 className="w-75">There was an error with the connection. Please try again.</h1>
-        <img src="/image/sad-cookie.png" alt="sad-cookie" />
-      </div>
-        }
+      {loading === true &&
+        <div className="loader d-flex justify-content-center align-items-center" />
+      }
+      {loading === false &&
+        <div className="loader-hide" />
+      }
       <div className="container mt-3">
         <div className="px-4 mx-2 my-2 border-bot d-flex justify-content-between align-items-center">
           <h1>Checkout</h1>
           <h4>{`Total: ${toDollars(totalAmount)}`}</h4>
         </div>
         <form id="payment-form" onSubmit={handleSubmit} className="mx-auto mt-4 mb-5">
-          {/* <h3>Contact Info</h3> */}
-          <LinkAuthenticationElement
-            id="link-authentication-element"
-            value={email}
-            options={{
-              defaultValues: {
-                email: 'email@here.com'
-              }
-            }}
-            onChange={event => setEmail(event.value.email)}
-          />
-          {/* <h3>Shipping Address</h3> */}
-          <AddressElement
-        options={{
-          mode: 'shipping',
-          allowedCountries: ['US'],
-          blockPoBox: true,
-          fields: {
-            phone: 'always'
-          },
-          validation: {
-            phone: {
-              required: 'never'
-            }
-          }
-        }}
-        onChange={event => setAddress(event.value.address)}/>
-          {/* <h3>Payment</h3> */}
-          <PaymentElement id="payment-element"
-          options={{
-            defaultValues: {
-              billingDetails: {
-                name: 'name',
-                phone: '888-888-8888'
-              }
-            }
-          }}/>
+          <PaymentElement id="payment-element" />
           <button className="button-all w-100" disabled={isLoading || !stripe || !elements} id="submit">
             <span id="button-text">
               {isLoading ? <div className="spinner" id="spinner" /> : 'Pay now'}
@@ -154,3 +95,5 @@ export default function CheckoutForm(props) {
     </>
   );
 }
+
+CheckoutForm.contextType = AppContext;

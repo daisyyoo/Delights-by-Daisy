@@ -21,7 +21,7 @@ const db = new pg.Pool({
 app.use(express.json());
 app.use(staticMiddleware);
 
-app.get('/api/cookies', (req, res, next) => {
+app.get('/api/cookies', async (req, res, next) => {
   const sql = `
   select "cookieId",
         "flavor",
@@ -38,7 +38,7 @@ app.get('/api/cookies', (req, res, next) => {
 
 });
 
-app.get('/api/cookies/:cookieId', (req, res, next) => {
+app.get('/api/cookies/:cookieId', async (req, res, next) => {
   const cookieId = Number(req.params.cookieId);
   if (!cookieId) {
     throw new ClientError(400, 'cookieId must be a positive integer');
@@ -59,7 +59,7 @@ app.get('/api/cookies/:cookieId', (req, res, next) => {
     .catch(err => next(err));
 });
 
-app.post('/api/addToBasket', (req, res, next) => {
+app.post('/api/addToBasket', async (req, res, next) => {
   const token = req.get('x-access-token');
   const { quantity } = req.body;
   const { cookieId } = req.body.cookie;
@@ -116,7 +116,7 @@ app.post('/api/addToBasket', (req, res, next) => {
   }
 });
 
-app.get('/api/myBasket', (req, res, next) => {
+app.get('/api/myBasket', async (req, res, next) => {
   const token = req.get('x-access-token');
   if (!token) {
     next();
@@ -174,7 +174,7 @@ app.post('/api/create-payment-intent', async (req, res, next) => {
       stripe.paymentIntents.create({
         amount: calculateOrderAmount,
         currency: 'usd',
-        payment_method_types: ['card']
+        payment_method_types: ['link', 'card']
       })
         .then(paymentIntent => {
           res.send({
@@ -187,7 +187,7 @@ app.post('/api/create-payment-intent', async (req, res, next) => {
     .catch(err => next(err));
 });
 
-app.get('/api/process-order/:token', (req, res, next) => {
+app.get('/process-order/:token', (req, res, next) => {
   const token = req.params.token;
   const cartId = jwt.verify(token, process.env.TOKEN_SECRET);
   const paymentIntent = req.query.payment_intent;
@@ -199,14 +199,15 @@ app.get('/api/process-order/:token', (req, res, next) => {
   const params = [cartId, paymentIntent];
   db.query(sql, params)
     .then(result => {
-      res.json(result.rows);
+      res.redirect(302, '/confirmationPage');
     })
     .catch(err => next(err));
 });
 
-app.post('/api/confirmationPage', (req, res, next) => {
+app.get('/api/confirmationPage', async (req, res, next) => {
   const token = req.get('x-access-token');
   const cartId = jwt.verify(token, process.env.TOKEN_SECRET);
+  // console.log('cartId', cartId);
   const sql = `
     select "orders"."orderId",
           "orders"."orderedAt",
@@ -222,12 +223,14 @@ app.post('/api/confirmationPage', (req, res, next) => {
   const params = [cartId];
   db.query(sql, params)
     .then(result => {
+      // console.log('result.rows', result.rows);
       res.json(result.rows);
     })
     .catch(err => next(err));
 });
 
-app.post('/api/sendEmail', (req, res, next) => {
+app.post('/api/sendEmail', async (req, res, next) => {
+  // console.log('req.body', req.body);
   const { email } = req.body;
   const { orderId } = req.body.order[0];
   const sql = `
@@ -291,7 +294,7 @@ app.post('/api/sendEmail', (req, res, next) => {
     .catch(err => next(err));
 });
 
-app.patch('/api/updateQuantity', (req, res, next) => {
+app.patch('/api/updateQuantity', async (req, res, next) => {
   const token = req.get('x-access-token');
   const cartId = jwt.verify(token, process.env.TOKEN_SECRET);
   const { quantity, cookieId } = req.body;
@@ -337,7 +340,7 @@ app.patch('/api/updateQuantity', (req, res, next) => {
     .catch(err => next(err));
 });
 
-app.delete('/api/removeCookie/:cookieId', (req, res, next) => {
+app.delete('/api/removeCookie/:cookieId', async (req, res, next) => {
   const token = req.get('x-access-token');
   const cartId = jwt.verify(token, process.env.TOKEN_SECRET);
   const cookieId = req.params.cookieId;
