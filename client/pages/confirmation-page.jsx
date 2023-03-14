@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useContext } from 'react';
+import { Link } from 'react-router-dom';
 // import AppContext from '../lib/app-context';
 import { toDollars } from '../lib/';
 import Card from 'react-bootstrap/Card';
-import Button from 'react-bootstrap/Button';
 import AppContext from '../lib/app-context';
 
 const styles = {
@@ -84,7 +84,6 @@ export default function ConfirmationPage() {
       const response = await fetch('/api/confirmationPage', req);
       if (response.status === 500) { setError(true); }
       const order = await response.json();
-      // console.log('order', order);
       setOrder(order);
       setSalesTax(0);
       setLoading(false);
@@ -97,7 +96,6 @@ export default function ConfirmationPage() {
   const sendEmail = async event => {
     event.preventDefault();
     const emailInfo = { order, email };
-    // console.log('emailInfo', emailInfo);
     setLoading(true);
     const req = {
       method: 'POST',
@@ -109,15 +107,16 @@ export default function ConfirmationPage() {
     const fetchData = async () => {
       const response = await fetch('/api/sendEmail', req);
       if (response.status === 500) { setError(true); }
-      const emailSent = await response.json();
-      if (emailSent) {
+      if (response.status === 200) {
         const { checkOut } = context;
-        return checkOut();
+        checkOut();
       }
-      // console.log(emailSent);
       setLoading(false);
       setEmailSent(true);
       setEmail('');
+      // const emailSent = await response.json();
+      // console.log('hello', emailSent);
+
     };
     fetchData()
       .catch(console.error);
@@ -205,7 +204,8 @@ export default function ConfirmationPage() {
             </div>
           </form>
           <div className="d-flex justify-content-center mt-5 pt-3">
-            <Button href=" " style={styles.button} className={emailSent ? 'button-all w-100 text-center' : 'd-none'}>RETURN TO HOME</Button>
+            <Link to="/" style={styles.button} className={emailSent ? 'button-all w-100 text-center' : 'd-none'}
+              onClick={event => { window.localStorage.removeItem('paidStatus'); }}>RETURN TO HOME</Link>
           </div>
         </div>
       </div>

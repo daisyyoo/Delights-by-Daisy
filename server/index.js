@@ -207,7 +207,6 @@ app.get('/process-order/:token', (req, res, next) => {
 app.get('/api/confirmationPage', async (req, res, next) => {
   const token = req.get('x-access-token');
   const cartId = jwt.verify(token, process.env.TOKEN_SECRET);
-  // console.log('cartId', cartId);
   const sql = `
     select "orders"."orderId",
           "orders"."orderedAt",
@@ -223,14 +222,12 @@ app.get('/api/confirmationPage', async (req, res, next) => {
   const params = [cartId];
   db.query(sql, params)
     .then(result => {
-      // console.log('result.rows', result.rows);
       res.json(result.rows);
     })
     .catch(err => next(err));
 });
 
 app.post('/api/sendEmail', async (req, res, next) => {
-  // console.log('req.body', req.body);
   const { email } = req.body;
   const { orderId } = req.body.order[0];
   const sql = `
@@ -288,9 +285,7 @@ app.post('/api/sendEmail', async (req, res, next) => {
       };
       return sgMail.send(msg);
     })
-    .then(() => {
-      res.send();
-    })
+    .then(() => res.send())
     .catch(err => next(err));
 });
 

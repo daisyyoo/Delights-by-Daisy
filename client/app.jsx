@@ -30,7 +30,6 @@ export default function App() {
 
   const checkOut = () => {
     window.localStorage.removeItem('basketToken');
-    window.localStorage.removeItem('paidStatus');
     setCartId('');
   };
 
