@@ -292,14 +292,13 @@ app.post('/api/sendEmail', async (req, res, next) => {
 app.patch('/api/updateQuantity', async (req, res, next) => {
   const token = req.get('x-access-token');
   const cartId = jwt.verify(token, process.env.TOKEN_SECRET);
-  const { quantity, cookieId } = req.body;
+  const { updatedQuantity, cookieId } = req.body;
   if (!Number.isInteger(cookieId) || cookieId < 1) {
     throw new ClientError(400, 'cookieId must be a positive integer');
   }
-  if (!Number.isInteger(quantity) || quantity < 1) {
+  if (!Number.isInteger(updatedQuantity) || updatedQuantity < 1) {
     throw new ClientError(400, 'quantity must be a positive integer');
   }
-
   const sql = `
     update "cartItems"
       set "quantity" = $1
@@ -307,24 +306,8 @@ app.patch('/api/updateQuantity', async (req, res, next) => {
       and "cookieId" = $3
       returning *
   `;
-  const params = [quantity, cartId, cookieId];
+  const params = [updatedQuantity, cartId, cookieId];
   db.query(sql, params)
-    .then(result => {
-      const sql = `
-      select "cartItems"."cartId",
-            "cartItems"."cookieId",
-            "cartItems"."quantity",
-            "cookies"."flavor",
-            "cookies"."weight",
-            "cookies"."price",
-            "cookies"."imageUrl"
-      from "cartItems"
-      join "cookies" using ("cookieId")
-      where "cookieId" = $1
-    `;
-      const params = [cookieId];
-      return db.query(sql, params);
-    })
     .then(result => {
       if (!result.rows) {
         throw new ClientError(404, `cannot find basket with cartId ${cartId}`);

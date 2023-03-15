@@ -9,9 +9,8 @@ const root = ReactDOM.createRoot(container);
 // root.render(<App/>);
 
 root.render(
-  <React.StrictMode>
-    <BrowserRouter>
-      <App/>
-    </BrowserRouter>
-  </React.StrictMode>
+  <BrowserRouter>
+    <App/>
+  </BrowserRouter>
+
 );

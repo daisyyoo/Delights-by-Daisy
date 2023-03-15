@@ -128,22 +128,21 @@ export default function Basket() {
     const token = localStorage.getItem('basketToken');
     const cookieId = Number(event.target.closest('div').id);
     const cookieIndex = cookies.findIndex(cookie => cookie.cookieId === cookieId);
-    let { quantity } = cookies[cookieIndex];
-    // let newQuantity;
-    // const currentQuantity = Number(event.target.closest('div').textContent);
+    const { quantity } = cookies[cookieIndex];
+    let updatedQuantity;
 
     if (event.target.matches('.fa-circle-minus')) {
       if (quantity > 1) {
-        quantity -= 1;
+        updatedQuantity = quantity - 1;
       } else {
         return;
       }
     } else if (event.target.matches('.fa-circle-plus')) {
-      quantity += 1;
+      updatedQuantity = quantity + 1;
     } else {
       return;
     }
-    const updatedInfo = { cookieId, quantity };
+    const updatedInfo = { cookieId, updatedQuantity };
 
     const req = {
       method: 'PATCH',
@@ -157,27 +156,18 @@ export default function Basket() {
       const response = await fetch('/api/updateQuantity', req);
       if (response.status === 500) { setError(true); }
       const updatedCookie = await response.json();
-      const currentCookies = cookies.slice();
-      // updatedCookie.quantity = quantity;
-      currentCookies[cookieIndex] = updatedCookie;
-      setCookies(currentCookies);
+      const newQuantity = updatedCookie.quantity;
+      const copyCookies = cookies.slice();
+      copyCookies[cookieIndex].quantity = newQuantity;
+      setCookies(copyCookies);
       setLoading(false);
     };
     fetchData()
       .catch(console.error);
-
-    // .then(updatedCookie => {
-    //   const newCookies = this.state.cookies.slice();
-    //   updatedCookie.quantity = newQuantity;
-    //   newCookies[cookieIndex] = updatedCookie;
-    //   this.setState({ cookies: newCookies });
-    // })
-
   };
 
   const handleRemove = event => {
     setLoading(true);
-    // this.setState({ loading: true });
     const token = localStorage.getItem('basketToken');
     const cookieId = Number(event.target.closest('a').id);
     const req = {
@@ -187,6 +177,7 @@ export default function Basket() {
         'x-access-token': token
       }
     };
+
     const fetchData = async () => {
       const response = await fetch(`/api/removeCookie/${cookieId}`, req);
       if (response.status === 500) { setError(true); }
@@ -196,21 +187,6 @@ export default function Basket() {
     };
     fetchData()
       .catch(console.error);
-
-    // fetch(`/removeCookie/${cookieId}`, req)
-    //   .then(res => {
-    //     if (res.status === 500) {
-    //       setError(true);
-    //       // this.setState({ error: true });
-    //     }
-    //     return res.json();
-    //   })
-    //   .then(updatedBasket => {
-    //     this.setState({ loading: false });
-    //     const updatedCookies = updatedBasket;
-    //     this.setState({ cookies: updatedCookies });
-    //   })
-    //   .catch(err => console.error(err));
   };
 
   if (error) {
