@@ -299,6 +299,24 @@ app.patch('/api/updateQuantity', async (req, res, next) => {
   if (!Number.isInteger(updatedQuantity) || updatedQuantity < 1) {
     throw new ClientError(400, 'quantity must be a positive integer');
   }
+  if (updatedQuantity === 0) {
+    const sql = `
+    delete from "cartItems"
+    where "cartId" = $1
+      and "cookieId" = $2
+    returning *
+  `;
+    const params = [cartId, cookieId];
+    db.query(sql, params)
+      .then(result => {
+        if (!result.rows) {
+          throw new ClientError(404, `cannot find basket with cartId ${cartId}`);
+        }
+        const [deletedCookie] = result.rows;
+        res.json(deletedCookie);
+      })
+      .catch(err => next(err));
+  }
   const sql = `
     update "cartItems"
       set "quantity" = $1

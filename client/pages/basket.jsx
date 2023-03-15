@@ -170,6 +170,7 @@ export default function Basket() {
     setLoading(true);
     const token = localStorage.getItem('basketToken');
     const cookieId = Number(event.target.closest('a').id);
+    const cookieIndex = cookies.findIndex(cookie => cookie.cookieId === cookieId);
     const req = {
       method: 'DELETE',
       headers: {
@@ -181,7 +182,9 @@ export default function Basket() {
     const fetchData = async () => {
       const response = await fetch(`/api/removeCookie/${cookieId}`, req);
       if (response.status === 500) { setError(true); }
-      const updatedCookies = await response.json();
+      await response.json();
+      const copyCookies = cookies.slice();
+      const updatedCookies = copyCookies.splice(cookieIndex, 1);
       setCookies(updatedCookies);
       setLoading(false);
     };
