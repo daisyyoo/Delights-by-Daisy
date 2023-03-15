@@ -296,8 +296,8 @@ app.patch('/api/updateQuantity', async (req, res, next) => {
   if (!Number.isInteger(cookieId) || cookieId < 1) {
     throw new ClientError(400, 'cookieId must be a positive integer');
   }
-  if (!Number.isInteger(updatedQuantity) || updatedQuantity < 1) {
-    throw new ClientError(400, 'quantity must be a positive integer');
+  if (!Number.isInteger(updatedQuantity) || updatedQuantity < 0) {
+    throw new ClientError(400, 'quantity must be zero or a greater integer');
   }
   if (updatedQuantity === 0) {
     const sql = `

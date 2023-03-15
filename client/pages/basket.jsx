@@ -124,15 +124,17 @@ export default function Basket() {
   }, [cartId]);
 
   const handleClick = event => {
-    setLoading(true);
     const token = localStorage.getItem('basketToken');
     const cookieId = Number(event.target.closest('div').id);
     const cookieIndex = cookies.findIndex(cookie => cookie.cookieId === cookieId);
+    setLoading(true);
     const { quantity } = cookies[cookieIndex];
     let updatedQuantity;
 
     if (event.target.matches('.fa-circle-minus')) {
-      if (quantity > 1) {
+      if (quantity === 1) {
+        updatedQuantity = 0;
+      } else if (quantity > 1) {
         updatedQuantity = quantity - 1;
       } else {
         return;
@@ -142,28 +144,35 @@ export default function Basket() {
     } else {
       return;
     }
-    const updatedInfo = { cookieId, updatedQuantity };
 
-    const req = {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-access-token': token
-      },
-      body: JSON.stringify(updatedInfo)
-    };
-    const fetchData = async () => {
-      const response = await fetch('/api/updateQuantity', req);
-      if (response.status === 500) { setError(true); }
-      const updatedCookie = await response.json();
-      const newQuantity = updatedCookie.quantity;
-      const copyCookies = cookies.slice();
-      copyCookies[cookieIndex].quantity = newQuantity;
-      setCookies(copyCookies);
-      setLoading(false);
-    };
-    fetchData()
-      .catch(console.error);
+    if (updatedQuantity > 0) {
+      const updatedInfo = { cookieId, updatedQuantity };
+
+      const req = {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-access-token': token
+        },
+        body: JSON.stringify(updatedInfo)
+      };
+      const fetchData = async () => {
+        const response = await fetch('/api/updateQuantity', req);
+        if (response.status === 500) { setError(true); }
+        const updatedCookie = await response.json();
+        const newQuantity = updatedCookie.quantity;
+        const copyCookies = cookies.slice();
+        copyCookies[cookieIndex].quantity = newQuantity;
+        setCookies(copyCookies);
+        setLoading(false);
+      };
+      fetchData()
+        .catch(console.error);
+    }
+
+    if (updatedQuantity === 0) {
+      handleRemove();
+    }
   };
 
   const handleRemove = event => {
@@ -171,6 +180,7 @@ export default function Basket() {
     const token = localStorage.getItem('basketToken');
     const cookieId = Number(event.target.closest('a').id);
     const cookieIndex = cookies.findIndex(cookie => cookie.cookieId === cookieId);
+
     const req = {
       method: 'DELETE',
       headers: {
@@ -184,8 +194,8 @@ export default function Basket() {
       if (response.status === 500) { setError(true); }
       await response.json();
       const copyCookies = cookies.slice();
-      const updatedCookies = copyCookies.splice(cookieIndex, 1);
-      setCookies(updatedCookies);
+      copyCookies.splice(cookieIndex, 1);
+      setCookies(copyCookies);
       setLoading(false);
     };
     fetchData()
