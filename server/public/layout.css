@@ -9,7 +9,3 @@
 #page-container {
   flex-grow: 1;
 }
-
-#footer-container {
-  align-self: flex-end;
-}

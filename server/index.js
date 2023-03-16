@@ -1,6 +1,7 @@
 require('dotenv/config');
 const pg = require('pg');
 const express = require('express');
+const path = require('path');
 const jwt = require('jsonwebtoken');
 const ClientError = require('./client-error');
 const staticMiddleware = require('./static-middleware');
@@ -20,7 +21,7 @@ const db = new pg.Pool({
 app.use(express.json());
 app.use(staticMiddleware);
 
-app.get('/cookies', (req, res, next) => {
+app.get('/api/cookies', async (req, res, next) => {
   const sql = `
   select "cookieId",
         "flavor",
@@ -37,7 +38,7 @@ app.get('/cookies', (req, res, next) => {
 
 });
 
-app.get('/cookies/:cookieId', (req, res, next) => {
+app.get('/api/cookies/:cookieId', async (req, res, next) => {
   const cookieId = Number(req.params.cookieId);
   if (!cookieId) {
     throw new ClientError(400, 'cookieId must be a positive integer');
@@ -58,7 +59,7 @@ app.get('/cookies/:cookieId', (req, res, next) => {
     .catch(err => next(err));
 });
 
-app.post('/addToBasket', (req, res, next) => {
+app.post('/api/addToBasket', async (req, res, next) => {
   const token = req.get('x-access-token');
   const { quantity } = req.body;
   const { cookieId } = req.body.cookie;
@@ -115,7 +116,7 @@ app.post('/addToBasket', (req, res, next) => {
   }
 });
 
-app.get('/myBasket', (req, res, next) => {
+app.get('/api/myBasket', async (req, res, next) => {
   const token = req.get('x-access-token');
   if (!token) {
     next();
@@ -145,7 +146,7 @@ app.get('/myBasket', (req, res, next) => {
   }
 });
 
-app.post('/create-payment-intent', async (req, res, next) => {
+app.post('/api/create-payment-intent', async (req, res, next) => {
   const token = req.get('x-access-token');
   const cartId = jwt.verify(token, process.env.TOKEN_SECRET);
   const sql = `
@@ -173,7 +174,7 @@ app.post('/create-payment-intent', async (req, res, next) => {
       stripe.paymentIntents.create({
         amount: calculateOrderAmount,
         currency: 'usd',
-        payment_method_types: ['card']
+        payment_method_types: ['link', 'card']
       })
         .then(paymentIntent => {
           res.send({
@@ -198,12 +199,12 @@ app.get('/process-order/:token', (req, res, next) => {
   const params = [cartId, paymentIntent];
   db.query(sql, params)
     .then(result => {
-      res.redirect(302, '/#confirmationPage');
+      res.redirect(302, '/confirmationPage');
     })
     .catch(err => next(err));
 });
 
-app.post('/confirmationPage', (req, res, next) => {
+app.get('/api/confirmationPage', async (req, res, next) => {
   const token = req.get('x-access-token');
   const cartId = jwt.verify(token, process.env.TOKEN_SECRET);
   const sql = `
@@ -226,7 +227,7 @@ app.post('/confirmationPage', (req, res, next) => {
     .catch(err => next(err));
 });
 
-app.post('/sendEmail', (req, res, next) => {
+app.post('/api/sendEmail', async (req, res, next) => {
   const { email } = req.body;
   const { orderId } = req.body.order[0];
   const sql = `
@@ -284,23 +285,38 @@ app.post('/sendEmail', (req, res, next) => {
       };
       return sgMail.send(msg);
     })
-    .then(() => {
-      res.send();
-    })
+    .then(() => res.send())
     .catch(err => next(err));
 });
 
-app.patch('/updateQuantity', (req, res, next) => {
+app.patch('/api/updateQuantity', async (req, res, next) => {
   const token = req.get('x-access-token');
   const cartId = jwt.verify(token, process.env.TOKEN_SECRET);
-  const { quantity, cookieId } = req.body;
+  const { updatedQuantity, cookieId } = req.body;
   if (!Number.isInteger(cookieId) || cookieId < 1) {
     throw new ClientError(400, 'cookieId must be a positive integer');
   }
-  if (!Number.isInteger(quantity) || quantity < 1) {
-    throw new ClientError(400, 'quantity must be a positive integer');
+  if (!Number.isInteger(updatedQuantity) || updatedQuantity < 0) {
+    throw new ClientError(400, 'quantity must be zero or a greater integer');
   }
-
+  if (updatedQuantity === 0) {
+    const sql = `
+    delete from "cartItems"
+    where "cartId" = $1
+      and "cookieId" = $2
+    returning *
+  `;
+    const params = [cartId, cookieId];
+    db.query(sql, params)
+      .then(result => {
+        if (!result.rows) {
+          throw new ClientError(404, `cannot find basket with cartId ${cartId}`);
+        }
+        const [deletedCookie] = result.rows;
+        res.json(deletedCookie);
+      })
+      .catch(err => next(err));
+  }
   const sql = `
     update "cartItems"
       set "quantity" = $1
@@ -308,24 +324,8 @@ app.patch('/updateQuantity', (req, res, next) => {
       and "cookieId" = $3
       returning *
   `;
-  const params = [quantity, cartId, cookieId];
+  const params = [updatedQuantity, cartId, cookieId];
   db.query(sql, params)
-    .then(result => {
-      const sql = `
-      select "cartItems"."cartId",
-            "cartItems"."cookieId",
-            "cartItems"."quantity",
-            "cookies"."flavor",
-            "cookies"."weight",
-            "cookies"."price",
-            "cookies"."imageUrl"
-      from "cartItems"
-      join "cookies" using ("cookieId")
-      where "cookieId" = $1
-    `;
-      const params = [cookieId];
-      return db.query(sql, params);
-    })
     .then(result => {
       if (!result.rows) {
         throw new ClientError(404, `cannot find basket with cartId ${cartId}`);
@@ -336,7 +336,7 @@ app.patch('/updateQuantity', (req, res, next) => {
     .catch(err => next(err));
 });
 
-app.delete('/removeCookie/:cookieId', (req, res, next) => {
+app.delete('/api/removeCookie/:cookieId', async (req, res, next) => {
   const token = req.get('x-access-token');
   const cartId = jwt.verify(token, process.env.TOKEN_SECRET);
   const cookieId = req.params.cookieId;
@@ -377,6 +377,14 @@ app.delete('/removeCookie/:cookieId', (req, res, next) => {
       res.json(result.rows);
     })
     .catch(err => next(err));
+});
+
+app.get('/*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public/index.html'), function (err) {
+    if (err) {
+      res.status(500).send(err);
+    }
+  });
 });
 
 app.use(errorMiddleware);

@@ -1,16 +1,17 @@
-import React from 'react';
-import Container from 'react-bootstrap/Container';
-import Nav from 'react-bootstrap/Nav';
-import Navbar from 'react-bootstrap/Navbar';
-import Offcanvas from 'react-bootstrap/Offcanvas';
+import React, { useState } from 'react';
+import { Container, Navbar, Nav, Offcanvas } from 'react-bootstrap';
+import { NavLink } from 'react-router-dom';
 
-export default class Header extends React.Component {
-  render() {
-    return (
-      <Navbar collapseOnSelect className="color-nav" expand="md" sticky="top" >
+const Header = () => {
+  const [isOpen, setOpen] = useState(false);
+  return (
+    <header>
+      <Navbar className="color-nav" expanded={isOpen} expand="md" sticky="top" >
         <Container fluid>
-          <Navbar.Brand href="#" className="px-sm-5">Delights by Daisy</Navbar.Brand>
-          <Navbar.Toggle aria-controls="offcanvasNavbar-expand" />
+          <Navbar.Brand href="/" className="px-sm-5">Delights by Daisy</Navbar.Brand>
+          <Navbar.Toggle
+            aria-controls="offcanvasNavbar"
+            onClick={() => setOpen(isOpen ? false : 'expanded')} />
           <Navbar.Offcanvas id="offcanvasNavbar-expand" aria-labelledby="offcanvasNavbar-expand" placement="end">
             <Offcanvas.Header className="mx-4 border-bot" closeButton>
               <Offcanvas.Title className="pt-2" id="offcanvasNavbar-expand">
@@ -18,16 +19,18 @@ export default class Header extends React.Component {
               </Offcanvas.Title>
             </Offcanvas.Header>
             <Offcanvas.Body className="px-4">
-              <Nav className="justify-content-end flex-grow-1 pe-3" onSelect={(_, event) => { window.location.href = event.target.href; }} >
-                <Nav.Link className="px-3 px-lg-3 menu-link" href="#">HOME</Nav.Link>
-                <Nav.Link className="px-3 px-lg-3 menu-link" href="#cookies">SHOP</Nav.Link>
-                <Nav.Link className="px-3 px-lg-3 menu-link" href="#myBasket" >MY BASKET</Nav.Link>
-                <Nav.Link className="px-3 px-lg-3 menu-link" href="#aboutMe">ABOUT ME</Nav.Link>
+              <Nav className="justify-content-end flex-grow-1 pe-3" >
+                <NavLink className="px-3 px-lg-3 menu-link" to="/" onClick={() => setOpen(false)}>HOME</NavLink>
+                <NavLink className="px-3 px-lg-3 menu-link" to="/cookies" onClick={() => setOpen(false)}>SHOP</NavLink>
+                <NavLink className="px-3 px-lg-3 menu-link" to="/myBasket" onClick={() => setOpen(false)}>MY BASKET</NavLink>
+                <NavLink className="px-3 px-lg-3 menu-link" to="/aboutMe" onClick={() => setOpen(false)}>ABOUT ME</NavLink>
               </Nav>
             </Offcanvas.Body>
           </Navbar.Offcanvas>
         </Container>
       </Navbar>
-    );
-  }
-}
+    </header>
+  );
+};
+
+export default Header;

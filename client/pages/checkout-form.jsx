@@ -52,6 +52,7 @@ export default function CheckoutForm(props) {
 
     setIsLoading(true);
     const token = localStorage.getItem('basketToken');
+    window.localStorage.setItem('paidStatus', true);
     const { error } = await stripe.confirmPayment({
       elements,
       confirmParams: {
@@ -72,7 +73,7 @@ export default function CheckoutForm(props) {
   return (
     <>
       {loading === true &&
-      <div className="loader d-flex justify-content-center align-items-center" />
+        <div className="loader d-flex justify-content-center align-items-center" />
       }
       {loading === false &&
         <div className="loader-hide" />

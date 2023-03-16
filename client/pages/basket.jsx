@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Card from 'react-bootstrap/Card';
+import { Link } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import { toDollars } from '../lib/';
 
@@ -86,68 +87,69 @@ const styles = {
     height: '500px'
   }
 };
-export default class Basket extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      cookies: [],
-      loading: true,
-      error: false
+export default function Basket() {
+
+  const [cookies, setCookies] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    setLoading(true);
+    const token = localStorage.getItem('basketToken');
+
+    const req = {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-access-token': token
+      }
     };
-    this.handleClick = this.handleClick.bind(this);
-    this.handleRemove = this.handleRemove.bind(this);
-  }
+    const fetchData = async () => {
+      const response = await fetch('/api/myBasket', req);
+      if (response.status === 500) { setError(true); }
+      const selectedCookie = await response.json();
+      setCookies(selectedCookie);
+      setLoading(false);
+    };
+    fetchData()
+      .catch(console.error);
+  }, [cookies.length]);
 
-  componentDidMount() {
-    const token = localStorage.getItem('basketToken');
-    if (!token) {
-      this.setState({ loading: false });
-    }
-    if (token) {
-      const req = {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-access-token': token
-        }
-      };
+  const token = localStorage.getItem('basketToken');
 
-      fetch('/myBasket', req)
-        .then(res => {
-          if (res.status === 500) {
-            this.setState({ error: true });
-          }
-          return res.json();
-        })
-        .then(cookies => {
-          this.setState({ loading: false });
-          this.setState({ cookies });
-        })
-        .catch(err => console.error(err));
-    }
-  }
-
-  handleClick(event) {
-    this.setState({ loading: true });
-    const token = localStorage.getItem('basketToken');
+  const handleClick = event => {
+    setLoading(true);
     const cookieId = Number(event.target.closest('div').id);
-    const cookieIndex = this.state.cookies.findIndex(cookie => cookie.cookieId === cookieId);
-    const { quantity } = this.state.cookies[cookieIndex];
-    let newQuantity;
-    const currentQuantity = Number(event.target.closest('div').textContent);
+    const cookieIndex = cookies.findIndex(cookie => cookie.cookieId === cookieId);
+    const { quantity } = cookies[cookieIndex];
+    let updatedQuantity;
 
     if (event.target.matches('.fa-circle-minus')) {
-      if (currentQuantity > 1) {
-        newQuantity = quantity - 1;
+      if (quantity === 1) {
+        updatedQuantity = 0;
+      } else if (quantity > 1) {
+        updatedQuantity = quantity - 1;
       } else {
-        return;
+        return setLoading(false);
       }
     } else if (event.target.matches('.fa-circle-plus')) {
-      newQuantity = quantity + 1;
+      updatedQuantity = quantity + 1;
+    } else if (event.target.matches('a')) {
+      deleteCookie(cookieId, cookieIndex);
     } else {
-      return;
+      return setLoading(false);
     }
-    const updatedInfo = { cookieId, quantity: newQuantity };
+    if (updatedQuantity === 0) {
+      deleteCookie(cookieId, cookieIndex);
+    }
+    if (updatedQuantity > 0) {
+      updateQuantity(cookieId, cookieIndex, updatedQuantity);
+    }
+    setLoading(false);
+  };
+
+  function updateQuantity(cookieId, cookieIndex, updatedQuantity) {
+    const updatedInfo = { cookieId, updatedQuantity };
 
     const req = {
       method: 'PATCH',
@@ -157,27 +159,21 @@ export default class Basket extends React.Component {
       },
       body: JSON.stringify(updatedInfo)
     };
-    fetch('/updateQuantity', req)
-      .then(res => {
-        if (res.status === 500) {
-          this.setState({ error: true });
-        }
-        return res.json();
-      })
-      .then(updatedCookie => {
-        this.setState({ loading: false });
-        const newCookies = this.state.cookies.slice();
-        updatedCookie.quantity = newQuantity;
-        newCookies[cookieIndex] = updatedCookie;
-        this.setState({ cookies: newCookies });
-      })
-      .catch(err => console.error(err));
+    const fetchData = async () => {
+      const response = await fetch('/api/updateQuantity', req);
+      if (response.status === 500) { setError(true); }
+      const updatedCookie = await response.json();
+      const newQuantity = updatedCookie.quantity;
+      const copyCookies = cookies.slice();
+      copyCookies[cookieIndex].quantity = newQuantity;
+      setCookies(copyCookies);
+      setLoading(false);
+    };
+    fetchData()
+      .catch(console.error);
   }
 
-  handleRemove(event) {
-    this.setState({ loading: true });
-    const token = localStorage.getItem('basketToken');
-    const cookieId = Number(event.target.closest('a').id);
+  function deleteCookie(cookieId, cookieIndex) {
     const req = {
       method: 'DELETE',
       headers: {
@@ -185,62 +181,59 @@ export default class Basket extends React.Component {
         'x-access-token': token
       }
     };
-    fetch(`/removeCookie/${cookieId}`, req)
-      .then(res => {
-        if (res.status === 500) {
-          this.setState({ error: true });
-        }
-        return res.json();
-      })
-      .then(updatedBasket => {
-        this.setState({ loading: false });
-        const updatedCookies = updatedBasket;
-        this.setState({ cookies: updatedCookies });
-      })
-      .catch(err => console.error(err));
+
+    const fetchData = async () => {
+      const response = await fetch(`/api/removeCookie/${cookieId}`, req);
+      if (response.status === 500) { setError(true); }
+      await response.json();
+      const copyCookies = cookies.slice();
+      copyCookies.splice(cookieIndex, 1);
+      setCookies(copyCookies);
+      setLoading(false);
+    };
+    fetchData()
+      .catch(console.error);
   }
 
-  render() {
-    const { loading } = this.state;
-    if (this.state.error) {
-      return (
-        <div style={styles.errorContent} className="my-5 text-center d-flex flex-column justify-content-center align-items-center">
-          <h1 className="w-75">There was an error with the connection. Please try again.</h1>
-          <img src="/image/sad-cookie.png" alt="sad-cookie" />
-        </div>
-      );
-    }
+  if (error) {
     return (
-      <>
-        {loading === true &&
-          <div className="loader d-flex justify-content-center align-items-center" />
+      <div style={styles.errorContent} className="my-5 text-center d-flex flex-column justify-content-center align-items-center">
+        <h1 className="w-75">There was an error with the connection. Please try again.</h1>
+        <img src="/image/sad-cookie.png" alt="sad-cookie" />
+      </div>
+    );
+  }
+  return (
+    <>
+      {loading === true &&
+      <div className="loader d-flex justify-content-center align-items-center" />
         }
-        {loading === false &&
-          <div className="loader-hide" />
-        }
-
-        {this.state.cookies.length === 0 &&
-          <div className="no-basket-image-container">
-            <div style={styles.noBasketImg} className="no-basket-image d-flex flex-column align-items-center">
-              <h2 style={styles.noBasketText} className="text-center w-75">
-                You have no cookies in your basket!</h2>
-              <h4 style={styles.noBasketSmText} className="text-center w-75">
-                Add some cookies to your basket to get started!</h4>
-              <Button href="#cookies" style={styles.noBasketButton} className="button-more-cookies mt-2" >GET COOKIES</Button>
-            </div>
-          </div>
+      {loading === false &&
+      <div className="loader-hide" />
         }
 
-        {this.state.cookies.length > 0 &&
+      {cookies.length === 0 &&
+      <div className="no-basket-image-container">
+        <div style={styles.noBasketImg} className="no-basket-image d-flex flex-column align-items-center">
+          <h2 style={styles.noBasketText} className="text-center w-75">
+            You have no cookies in your basket!</h2>
+          <h4 style={styles.noBasketSmText} className="text-center w-75">
+            Add some cookies to your basket to get started!</h4>
+          <Link to="/cookies" style={styles.noBasketButton} className="button-more-cookies mt-2" >GET COOKIES</Link>
+        </div>
+      </div>
+        }
+
+      {cookies.length > 0 &&
         <div className="container mt-3">
           <h1 className="py-1" >My Basket</h1>
-          <p className="m-0" style={styles.text}>{`${this.state.cookies.length} items`}</p>
+          <p className="m-0" style={styles.text}>{`${cookies.length} items`}</p>
           <div className="d-lg-flex justify-content-lg-between container">
             <div className="row col-lg-9 mb-3">
               {
-            this.state.cookies.map((product, index) => (
+            cookies.map((product, index) => (
               <div key={index} className="d-flex justify-content-lg-start">
-                <BasketItems product={product} handleClick={this.handleClick} handleRemove={this.handleRemove} />
+                <BasketItems product={product} handleClick={handleClick} />
               </div>
             ))
             }
@@ -248,34 +241,32 @@ export default class Basket extends React.Component {
             <div className="col-lg-3 mb-3" >
               <div className="py-3 d-flex flex-column align-items-center">
                 <h4 style={styles.subtotalHeader} className="py-2">Need to grab more cookies for a friend in need?</h4>
-                <Button href="#cookies" style={styles.button} className="button-more-cookies" >GET COOKIES</Button>
+                <Link to="/cookies" style={styles.button} className="button-more-cookies" >GET COOKIES</Link>
               </div>
               <div className="d-flex w-100 justify-content-between pt-3 mt-5" style={styles.borderTop}>
-                <h5 style={styles.subtotalHeader}>{`Subtotal (${this.state.cookies.length} items)`}</h5>
+                <h5 style={styles.subtotalHeader}>{`Subtotal (${cookies.length} items)`}</h5>
                 <h5 style={styles.subtotalHeader}>
                   {toDollars(
-                    this.state.cookies.reduce((previousCookie, currentCookie) => {
+                    cookies.reduce((previousCookie, currentCookie) => {
                       return previousCookie + (currentCookie.quantity * currentCookie.price);
                     }, 0))}
                 </h5>
               </div>
               <div style={styles.borderBottom} className="w-100 pb-4 d-flex flex-column align-items-center">
                 <p style={styles.weight} className="w-100 text-left py-lg-2">Taxes and shipping calculated at checkout</p>
-                <Button href="#checkout" style={styles.button} className="button-all w-100" >PROCEED TO CHECKOUT</Button>
+                <Link to="/checkout" style={styles.button} className="button-all w-100" >PROCEED TO CHECKOUT</Link>
               </div>
             </div>
           </div>
         </div>
         }
-      </>
-    );
-  }
+    </>
+  );
 }
 
 function BasketItems(props) {
   const { cookieId, quantity, flavor, weight, price, imageUrl } = props.product;
   const { handleClick } = props;
-  const { handleRemove } = props;
   return (
     <>
       <div style={styles.imageContainer} className="col-5 col-md-4 p-3 d-flex align-items-center border-bot">
@@ -289,18 +280,20 @@ function BasketItems(props) {
           </div>
           <div className="d-flex flex-column w-50 flex-md-row justify-content-md-between align-items-md-center">
             <Card.Text className="m-0 py-2" style={styles.price}>{`${toDollars(price * quantity)}`}</Card.Text>
-            <div id={cookieId} className="m-0 py-1 d-flex align-items-center" style={styles.text} value={quantity} onClick={handleClick}>
-              <Button className="quantity-button p-0 mr-1">
-                <i className="fa-solid fa-circle-minus"/>
-              </Button>
-              <p style={styles.text} className=" px-2 px-md-3 m-0">{` ${quantity} `}</p>
-              <Button className="quantity-button p-0">
-                <i className="fa-solid fa-circle-plus"/>
-              </Button>
+            <div id={cookieId} className="d-flex flex-column flex-md-row">
+              <div id={cookieId} className="m-0 py-1 px-md-3 d-flex align-items-center" style={styles.text} value={quantity} onClick={handleClick}>
+                <Button className="quantity-button p-0 mr-1">
+                  <i className="fa-solid fa-circle-minus"/>
+                </Button>
+                <p style={styles.text} className=" px-2 px-md-3 m-0">{` ${quantity} `}</p>
+                <Button className="quantity-button p-0">
+                  <i className="fa-solid fa-circle-plus"/>
+                </Button>
+              </div>
+              <Card.Text>
+                <a onClick={handleClick} style={styles.remove}>Remove</a>
+              </Card.Text>
             </div>
-            <Card.Text>
-              <a id={cookieId} onClick={handleRemove} style={styles.remove}>Remove</a>
-            </Card.Text>
           </div>
         </Card.Body>
       </Card>

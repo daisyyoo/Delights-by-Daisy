@@ -1,8 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { Route, Routes } from 'react-router-dom';
 import jwtDecode from 'jwt-decode';
-import Header from './components/header';
-import Footer from './components/footer';
-import { parseRoute } from './lib';
 import AppContext from './lib/app-context';
 import PageContainer from './components/page-container';
 import NotFound from './pages/not-found';
@@ -13,80 +11,45 @@ import Basket from './pages/basket';
 import StripeCheckout from './pages/stripe';
 import ConfirmationPage from './pages/confirmation-page';
 import AboutMe from './pages/about-me';
-export default class App extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      cartId: null,
-      route: parseRoute(window.location.hash)
-    };
-    this.addToBasket = this.addToBasket.bind(this);
-    this.checkOut = this.checkOut.bind(this);
-  }
+import ProtectedRoute from './pages/protected-route';
 
-  componentDidMount() {
-    window.addEventListener('hashchange', event => {
-      const route = parseRoute(window.location.hash);
-      this.setState({ route });
-    });
+export default function App() {
+  const [cartId, setCartId] = useState();
+
+  useEffect(() => {
     const token = window.localStorage.getItem('basketToken');
     const cartId = token ? jwtDecode(token) : null;
-    this.setState({ cartId });
-  }
+    setCartId(cartId);
+  }, []);
 
-  addToBasket(result) {
+  const addToBasket = result => {
     const { cartId, token } = result;
     window.localStorage.setItem('basketToken', token);
-    this.setState({ cartId });
-  }
+    setCartId(cartId);
+  };
 
-  checkOut() {
+  const checkOut = () => {
     window.localStorage.removeItem('basketToken');
-    this.setState({ cartId: null });
-  }
+    setCartId('');
+  };
 
-  renderPage() {
-    const { route } = this.state;
-    if (route.path === '') {
-      return <Home />;
-    }
-    if (route.path === 'cookies') {
-      return <Catalog />;
-    }
-    if (route.path === 'cookie') {
-      const cookieId = route.params.get('cookieId');
-      return <ProductDetails cookieId={cookieId} />;
-    }
-    if (route.path === 'myBasket') {
-      return <Basket />;
-    }
-    if (route.path === 'checkout') {
-      return <StripeCheckout />;
-    }
-    if (route.path === 'confirmationPage') {
-      return <ConfirmationPage />;
-    }
-    if (route.path === 'aboutMe') {
-      return <AboutMe />;
-    }
-    return <NotFound />;
-  }
-
-  render() {
-    const { cartId, route } = this.state;
-    const { addToBasket, checkOut } = this;
-    const contextValue = { cartId, route, addToBasket, checkOut };
-    return (
-      <AppContext.Provider value={contextValue}>
-        <>
-
-          <Header />
-          <PageContainer>
-            { this.renderPage() }
-          </PageContainer>
-          <Footer />
-        </>
-      </AppContext.Provider>
-    );
-  }
+  const contextValue = { cartId, addToBasket, checkOut };
+  return (
+    <AppContext.Provider value={contextValue}>
+      <Routes>
+        <Route path='/' element={<PageContainer />}>
+          <Route index element ={<Home />}/>
+          <Route path='cookies' element={<Catalog />} />
+          <Route path='cookies/:cookieId' element={<ProductDetails />} />
+          <Route path='myBasket' element={<Basket />} />
+          <Route path='checkout' element={<StripeCheckout />} />
+          <Route element={<ProtectedRoute />} >
+            <Route element={<ConfirmationPage />} path='confirmationPage'/>
+          </Route>
+          <Route path='aboutMe' element={<AboutMe />} />
+          <Route path="*" element={<NotFound />} />
+        </Route>
+      </Routes>
+    </AppContext.Provider>
+  );
 }

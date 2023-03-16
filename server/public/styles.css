@@ -76,6 +76,10 @@ h1,
 }
 
 .button-all {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-decoration: none;
   background-color: #ffd8a9;
   color: #693802;
   font-weight: 600;
@@ -87,6 +91,10 @@ h1,
 }
 
 .button-more-cookies {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-decoration: none;
   background-color: #fdeedc;
   color: #693802;
   font-weight: 600;
@@ -134,6 +142,10 @@ h1,
 }
 
 .button-return {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-decoration: none;
   background-color: #fdeedc;
   color: #693802;
   font-weight: 600;
@@ -195,6 +207,8 @@ i {
 }
 
 .menu-link {
+  text-decoration: none;
+  padding: 0.5rem;
   color: #422300;
   border: solid 2px #fff;
   border-radius: 5px;
@@ -248,7 +262,7 @@ i {
 
 .image-container,
 .no-basket-image-container {
-  height: 82vh;
+  height: 95vh;
 }
 
 .loader {
@@ -289,7 +303,7 @@ i {
 @media only screen and (min-width: 568px) {
   .image-container,
   .no-basket-image-container {
-    height: 80vh;
+    height: 95vh;
   }
 
   .no-basket-image {
