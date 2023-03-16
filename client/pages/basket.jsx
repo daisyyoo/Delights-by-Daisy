@@ -121,13 +121,14 @@ export default function Basket() {
         .catch(console.error);
     }
 
-  }, [cartId]);
+  }, [cartId, cookies.length]);
+
+  const token = localStorage.getItem('basketToken');
 
   const handleClick = event => {
-    const token = localStorage.getItem('basketToken');
+    setLoading(true);
     const cookieId = Number(event.target.closest('div').id);
     const cookieIndex = cookies.findIndex(cookie => cookie.cookieId === cookieId);
-    setLoading(true);
     const { quantity } = cookies[cookieIndex];
     let updatedQuantity;
 
@@ -137,50 +138,50 @@ export default function Basket() {
       } else if (quantity > 1) {
         updatedQuantity = quantity - 1;
       } else {
-        return;
+        return setLoading(false);
       }
     } else if (event.target.matches('.fa-circle-plus')) {
       updatedQuantity = quantity + 1;
+    } else if (event.target.matches('a')) {
+      deleteCookie(cookieId, cookieIndex);
     } else {
-      return;
+      return setLoading(false);
     }
-
-    if (updatedQuantity > 0) {
-      const updatedInfo = { cookieId, updatedQuantity };
-
-      const req = {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-access-token': token
-        },
-        body: JSON.stringify(updatedInfo)
-      };
-      const fetchData = async () => {
-        const response = await fetch('/api/updateQuantity', req);
-        if (response.status === 500) { setError(true); }
-        const updatedCookie = await response.json();
-        const newQuantity = updatedCookie.quantity;
-        const copyCookies = cookies.slice();
-        copyCookies[cookieIndex].quantity = newQuantity;
-        setCookies(copyCookies);
-        setLoading(false);
-      };
-      fetchData()
-        .catch(console.error);
-    }
-
     if (updatedQuantity === 0) {
-      handleRemove();
+      deleteCookie(cookieId, cookieIndex);
     }
+    if (updatedQuantity > 0) {
+      updateQuantity(cookieId, cookieIndex, updatedQuantity);
+    }
+    setLoading(false);
   };
 
-  const handleRemove = event => {
-    setLoading(true);
-    const token = localStorage.getItem('basketToken');
-    const cookieId = Number(event.target.closest('a').id);
-    const cookieIndex = cookies.findIndex(cookie => cookie.cookieId === cookieId);
+  function updateQuantity(cookieId, cookieIndex, updatedQuantity) {
+    const updatedInfo = { cookieId, updatedQuantity };
 
+    const req = {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-access-token': token
+      },
+      body: JSON.stringify(updatedInfo)
+    };
+    const fetchData = async () => {
+      const response = await fetch('/api/updateQuantity', req);
+      if (response.status === 500) { setError(true); }
+      const updatedCookie = await response.json();
+      const newQuantity = updatedCookie.quantity;
+      const copyCookies = cookies.slice();
+      copyCookies[cookieIndex].quantity = newQuantity;
+      setCookies(copyCookies);
+      setLoading(false);
+    };
+    fetchData()
+      .catch(console.error);
+  }
+
+  function deleteCookie(cookieId, cookieIndex) {
     const req = {
       method: 'DELETE',
       headers: {
@@ -200,7 +201,7 @@ export default function Basket() {
     };
     fetchData()
       .catch(console.error);
-  };
+  }
 
   if (error) {
     return (
@@ -240,7 +241,7 @@ export default function Basket() {
               {
             cookies.map((product, index) => (
               <div key={index} className="d-flex justify-content-lg-start">
-                <BasketItems product={product} handleClick={handleClick} handleRemove={handleRemove} />
+                <BasketItems product={product} handleClick={handleClick} />
               </div>
             ))
             }
@@ -274,7 +275,6 @@ export default function Basket() {
 function BasketItems(props) {
   const { cookieId, quantity, flavor, weight, price, imageUrl } = props.product;
   const { handleClick } = props;
-  const { handleRemove } = props;
   return (
     <>
       <div style={styles.imageContainer} className="col-5 col-md-4 p-3 d-flex align-items-center border-bot">
@@ -288,18 +288,20 @@ function BasketItems(props) {
           </div>
           <div className="d-flex flex-column w-50 flex-md-row justify-content-md-between align-items-md-center">
             <Card.Text className="m-0 py-2" style={styles.price}>{`${toDollars(price * quantity)}`}</Card.Text>
-            <div id={cookieId} className="m-0 py-1 d-flex align-items-center" style={styles.text} value={quantity} onClick={handleClick}>
-              <Button className="quantity-button p-0 mr-1">
-                <i className="fa-solid fa-circle-minus"/>
-              </Button>
-              <p style={styles.text} className=" px-2 px-md-3 m-0">{` ${quantity} `}</p>
-              <Button className="quantity-button p-0">
-                <i className="fa-solid fa-circle-plus"/>
-              </Button>
+            <div id={cookieId} className="d-flex flex-column flex-md-row">
+              <div id={cookieId} className="m-0 py-1 px-md-3 d-flex align-items-center" style={styles.text} value={quantity} onClick={handleClick}>
+                <Button className="quantity-button p-0 mr-1">
+                  <i className="fa-solid fa-circle-minus"/>
+                </Button>
+                <p style={styles.text} className=" px-2 px-md-3 m-0">{` ${quantity} `}</p>
+                <Button className="quantity-button p-0">
+                  <i className="fa-solid fa-circle-plus"/>
+                </Button>
+              </div>
+              <Card.Text>
+                <a onClick={handleClick} style={styles.remove}>Remove</a>
+              </Card.Text>
             </div>
-            <Card.Text>
-              <a id={cookieId} onClick={handleRemove} style={styles.remove}>Remove</a>
-            </Card.Text>
           </div>
         </Card.Body>
       </Card>
