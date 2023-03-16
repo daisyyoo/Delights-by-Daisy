@@ -96,12 +96,10 @@ export default function ProductDetails(props) {
     fetchData();
   }, [cookieId]);
 
+  let req;
   const handleClick = event => {
     setLoading(true);
-    const { cartId, addToBasket } = context;
     const addCookie = { cookie, quantity };
-    let req;
-
     if (!token) {
       req = {
         method: 'POST',
@@ -120,22 +118,24 @@ export default function ProductDetails(props) {
         body: JSON.stringify(addCookie)
       };
     }
-    const getCookieData = async () => {
-      try {
-        const response = await fetch('/api/addToBasket', req);
-        if (response.status === 500) {
-          setShow(false);
-          setError(true);
-        }
-        const cookieAdded = await response.json();
-        if (!cartId) {
-          addToBasket(cookieAdded);
-        }
-        setLoading(false);
-        setShow(true);
-      } catch (err) { console.error(err); }
-    };
     getCookieData();
+  };
+
+  const getCookieData = async () => {
+    try {
+      const response = await fetch('/api/addToBasket', req);
+      if (response.status === 500) {
+        setShow(false);
+        setError(true);
+      }
+      const cookieAdded = await response.json();
+      const { cartId, addToBasket } = context;
+      if (!cartId) {
+        addToBasket(cookieAdded);
+      }
+      setLoading(false);
+      setShow(true);
+    } catch (err) { console.error(err); }
   };
 
   const { flavor, price, weight, description, ingredients, allergens, backstory, imageUrl } = cookie;

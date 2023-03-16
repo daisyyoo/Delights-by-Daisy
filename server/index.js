@@ -63,9 +63,11 @@ app.post('/api/addToBasket', async (req, res, next) => {
   let token = req.get('x-access-token');
   const { quantity } = req.body;
   const { cookieId } = req.body.cookie;
-  if (!cookieId || !quantity) {
-    next(new ClientError(400, 'cookieId and quantity are required fields'));
-  }
+  let cartId;
+
+  // if (!cookieId || !quantity) {
+  //   next(new ClientError(400, 'cookieId and quantity are required fields'));
+  // }
   try {
     if (!token) {
       const sql = `
@@ -74,12 +76,15 @@ app.post('/api/addToBasket', async (req, res, next) => {
         returning *
       `;
       const result = await db.query(sql);
-      const cartId = result.rows[0].cartId;
-      token = await jwt.sign(cartId, process.env.TOKEN_SECRET);
+      cartId = result.rows[0].cartId;
+      jwt.sign({ cartId }, process.env.TOKEN_SECRET, (err, asyncToken) => {
+        console.error(err);
+        token = asyncToken;
+      });
     } else {
-      const cartId = jwt.verify(token, process.env.TOKEN_SECRET);
-
-      const sql = `
+      cartId = jwt.verify(token, process.env.TOKEN_SECRET);
+    }
+    const sql = `
         insert into "cartItems" ("cartId", "cookieId", "quantity")
         values ($1, $2, $3)
         on conflict ("cartId", "cookieId")
@@ -87,12 +92,11 @@ app.post('/api/addToBasket', async (req, res, next) => {
               set "quantity" = "cartItems"."quantity" + "excluded"."quantity"
         returning *
         `;
-      const params = [cartId, cookieId, quantity];
-      const result3 = await db.query(sql, params);
-      const [cartItem] = result3.rows;
-      const user = { cartId, token, cartItem };
-      res.status(201).json(user);
-    }
+    const params = [cartId, cookieId, quantity];
+    const result3 = await db.query(sql, params);
+    const [cartItem] = result3.rows;
+    const user = { cartId, token, cartItem };
+    res.status(201).json(user);
   } catch (err) { return next(err); }
 }
 );
@@ -102,7 +106,7 @@ app.get('/api/myBasket', async (req, res, next) => {
   if (!token) {
     next();
   } else {
-    const cartId = jwt.verify(token, process.env.TOKEN_SECRET);
+    const { cartId } = jwt.verify(token, process.env.TOKEN_SECRET);
     const sql = `
       select "cartItems"."cartId",
             "cartItems"."cookieId",
