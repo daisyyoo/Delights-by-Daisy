@@ -93,7 +93,7 @@ export default function ProductDetails(props) {
       .catch(console.error);
   }, [cookieId]);
 
-  const sendTheInfo = event => {
+  const handleClick = event => {
     setLoading(true);
     const { cartId, addToBasket } = context;
     const addCookie = { cookie, quantity };
@@ -190,7 +190,7 @@ export default function ProductDetails(props) {
                   <option value="6">6</option>
                 </Form.Select>
               </Form.Group>
-              <Button onClick={sendTheInfo} className="button-all ">ADD TO BASKET</Button>
+              <Button onClick={handleClick} className="button-all ">ADD TO BASKET</Button>
             </Card.Body>
           </Card>
         </div>
