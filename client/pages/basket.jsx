@@ -1,9 +1,8 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import Card from 'react-bootstrap/Card';
 import { Link } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import { toDollars } from '../lib/';
-import AppContext from '../lib/app-context';
 
 const styles = {
   image: {
@@ -89,8 +88,7 @@ const styles = {
   }
 };
 export default function Basket() {
-  const context = useContext(AppContext);
-  const { cartId } = context;
+
   const [cookies, setCookies] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
@@ -98,30 +96,24 @@ export default function Basket() {
   useEffect(() => {
     setLoading(true);
     const token = localStorage.getItem('basketToken');
-    if (!cartId) {
-      setLoading(false);
-      return;
-    }
-    if (cartId) {
-      const req = {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-access-token': token
-        }
-      };
-      const fetchData = async () => {
-        const response = await fetch('/api/myBasket', req);
-        if (response.status === 500) { setError(true); }
-        const selectedCookie = await response.json();
-        setCookies(selectedCookie);
-        setLoading(false);
-      };
-      fetchData()
-        .catch(console.error);
-    }
 
-  }, [cartId, cookies.length]);
+    const req = {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-access-token': token
+      }
+    };
+    const fetchData = async () => {
+      const response = await fetch('/api/myBasket', req);
+      if (response.status === 500) { setError(true); }
+      const selectedCookie = await response.json();
+      setCookies(selectedCookie);
+      setLoading(false);
+    };
+    fetchData()
+      .catch(console.error);
+  }, [cookies.length]);
 
   const token = localStorage.getItem('basketToken');
 
@@ -220,7 +212,7 @@ export default function Basket() {
       <div className="loader-hide" />
         }
 
-      {!cartId &&
+      {cookies.length === 0 &&
       <div className="no-basket-image-container">
         <div style={styles.noBasketImg} className="no-basket-image d-flex flex-column align-items-center">
           <h2 style={styles.noBasketText} className="text-center w-75">
@@ -232,7 +224,7 @@ export default function Basket() {
       </div>
         }
 
-      {cartId &&
+      {cookies.length > 0 &&
         <div className="container mt-3">
           <h1 className="py-1" >My Basket</h1>
           <p className="m-0" style={styles.text}>{`${cookies.length} items`}</p>
