@@ -41,7 +41,7 @@ app.get('/api/cookies', async (req, res, next) => {
 app.get('/api/cookies/:cookieId', async (req, res, next) => {
   const cookieId = Number(req.params.cookieId);
   if (!cookieId) {
-    throw new ClientError(400, 'cookieId must be a positive integer');
+    next(new ClientError(400, 'cookieId must be a positive integer'));
   }
   const sql = `
     select *
@@ -52,7 +52,7 @@ app.get('/api/cookies/:cookieId', async (req, res, next) => {
   db.query(sql, params)
     .then(result => {
       if (!result.rows[0]) {
-        throw new ClientError(404, `cannot find cookie with cookieId ${cookieId}`);
+        next(new ClientError(404, `cannot find cookie with cookieId ${cookieId}`));
       }
       res.json(result.rows[0]);
     })
@@ -64,7 +64,6 @@ app.post('/api/addToBasket', async (req, res, next) => {
   const { quantity } = req.body;
   const { cookieId } = req.body.cookie;
   if (!cookieId || !quantity) {
-    // throw new ClientError(400, 'cookieId and quantity are required fields');
     next(new ClientError(400, 'cookieId and quantity are required fields'));
   }
   try {
@@ -120,7 +119,7 @@ app.get('/api/myBasket', async (req, res, next) => {
     db.query(sql, params)
       .then(result => {
         if (!result.rows) {
-          throw new ClientError(404, `cannot find basket with cartId ${cartId}`);
+          next(new ClientError(404, `cannot find basket with cartId ${cartId}`));
         }
         res.json(result.rows);
       })
@@ -144,7 +143,7 @@ app.post('/api/create-payment-intent', async (req, res, next) => {
   db.query(sql, params)
     .then(result => {
       if (!result.rows) {
-        throw new ClientError(404, `cannot find basket with cartId ${cartId}`);
+        next(new ClientError(404, `cannot find basket with cartId ${cartId}`));
       }
       const cookiesArray = result.rows;
 
@@ -276,10 +275,10 @@ app.patch('/api/updateQuantity', async (req, res, next) => {
   const cartId = jwt.verify(token, process.env.TOKEN_SECRET);
   const { updatedQuantity, cookieId } = req.body;
   if (!Number.isInteger(cookieId) || cookieId < 1) {
-    throw new ClientError(400, 'cookieId must be a positive integer');
+    next(new ClientError(400, 'cookieId must be a positive integer'));
   }
   if (!Number.isInteger(updatedQuantity) || updatedQuantity < 0) {
-    throw new ClientError(400, 'quantity must be zero or a greater integer');
+    next(new ClientError(400, 'quantity must be zero or a greater integer'));
   }
   if (updatedQuantity === 0) {
     const sql = `
@@ -292,7 +291,7 @@ app.patch('/api/updateQuantity', async (req, res, next) => {
     db.query(sql, params)
       .then(result => {
         if (!result.rows) {
-          throw new ClientError(404, `cannot find basket with cartId ${cartId}`);
+          next(new ClientError(404, `cannot find basket with cartId ${cartId}`));
         }
         const [deletedCookie] = result.rows;
         res.json(deletedCookie);
@@ -310,7 +309,7 @@ app.patch('/api/updateQuantity', async (req, res, next) => {
   db.query(sql, params)
     .then(result => {
       if (!result.rows) {
-        throw new ClientError(404, `cannot find basket with cartId ${cartId}`);
+        next(new ClientError(404, `cannot find basket with cartId ${cartId}`));
       }
       const [updatedCookie] = result.rows;
       res.json(updatedCookie);
@@ -323,7 +322,7 @@ app.delete('/api/removeCookie/:cookieId', async (req, res, next) => {
   const cartId = jwt.verify(token, process.env.TOKEN_SECRET);
   const cookieId = req.params.cookieId;
   if (!cookieId) {
-    throw new ClientError(400, 'cookieId must be a positive integer');
+    next(new ClientError(400, 'cookieId must be a positive integer'));
   }
   const sql = `
     delete from "cartItems"
@@ -335,7 +334,7 @@ app.delete('/api/removeCookie/:cookieId', async (req, res, next) => {
   db.query(sql, params)
     .then(result => {
       if (!result.rows) {
-        throw new ClientError(404, `cannot find basket with cartId ${cartId}`);
+        next(new ClientError(404, `cannot find basket with cartId ${cartId}`));
       }
       const sql = `
       select "cartItems"."cartId",
@@ -354,7 +353,7 @@ app.delete('/api/removeCookie/:cookieId', async (req, res, next) => {
     })
     .then(result => {
       if (!result.rows) {
-        throw new ClientError(404, `cannot find basket with cartId ${cartId}`);
+        next(new ClientError(404, `cannot find basket with cartId ${cartId}`));
       }
       res.json(result.rows);
     })
