@@ -131,12 +131,8 @@ export default function ProductDetails(props) {
       .catch(console.error);
   };
 
-  function closeModal(event) {
-    setShow(false);
-  }
-
   const { flavor, price, weight, description, ingredients, allergens, backstory, imageUrl } = cookie;
-  const moreProps = { cookie, quantity, closeModal };
+  const moreProps = { cookie, quantity };
 
   return (
     <>
@@ -215,7 +211,7 @@ export default function ProductDetails(props) {
 }
 
 function BasketModal(props) {
-  const { cookie, quantity, closeModal } = props.data;
+  const { cookie, quantity } = props.data;
   const { show } = props;
   const { flavor, imageUrl, price, weight } = cookie;
 
@@ -254,7 +250,7 @@ function BasketModal(props) {
             </Card>
           </div>
           <div className="d-flex justify-content-between mt-5">
-            <Button onClick={closeModal} className="button-return">KEEP SHOPPING</Button>
+            <Link to="/cookies" className="button-return">KEEP SHOPPING</Link>
             <Link to="/myBasket" className="button-all">GO TO BASKET</Link>
           </div>
         </div>

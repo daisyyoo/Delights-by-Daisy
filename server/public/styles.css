@@ -142,6 +142,10 @@ h1,
 }
 
 .button-return {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-decoration: none;
   background-color: #fdeedc;
   color: #693802;
   font-weight: 600;
