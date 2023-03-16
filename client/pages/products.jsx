@@ -81,16 +81,19 @@ export default function ProductDetails(props) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
 
+  const token = localStorage.getItem('basketToken');
+
   useEffect(() => {
     const fetchData = async () => {
-      const response = await fetch(`/api/cookies/${cookieId}`);
-      if (response.status === 500) { setError(true); }
-      const selectedCookie = await response.json();
-      setCookie(selectedCookie);
-      setLoading(false);
+      try {
+        const response = await fetch(`/api/cookies/${cookieId}`);
+        if (response.status === 500) { setError(true); }
+        const selectedCookie = await response.json();
+        setCookie(selectedCookie);
+        setLoading(false);
+      } catch (err) { console.error(err); }
     };
-    fetchData()
-      .catch(console.error);
+    fetchData();
   }, [cookieId]);
 
   const handleClick = event => {
@@ -98,8 +101,8 @@ export default function ProductDetails(props) {
     const { cartId, addToBasket } = context;
     const addCookie = { cookie, quantity };
     let req;
-    const token = localStorage.getItem('basketToken');
-    if (token === null) {
+
+    if (!token) {
       req = {
         method: 'POST',
         headers: {
@@ -118,17 +121,21 @@ export default function ProductDetails(props) {
       };
     }
     const getCookieData = async () => {
-      const response = await fetch('/api/addToBasket', req);
-      if (response.status === 500) { setError(true); }
-      const cookieAdded = await response.json();
-      if (!cartId) {
-        addToBasket(cookieAdded);
-      }
-      setLoading(false);
-      setShow(true);
+      try {
+        const response = await fetch('/api/addToBasket', req);
+        if (response.status === 500) {
+          setShow(false);
+          setError(true);
+        }
+        const cookieAdded = await response.json();
+        if (!cartId) {
+          addToBasket(cookieAdded);
+        }
+        setLoading(false);
+        setShow(true);
+      } catch (err) { console.error(err); }
     };
-    getCookieData()
-      .catch(console.error);
+    getCookieData();
   };
 
   const { flavor, price, weight, description, ingredients, allergens, backstory, imageUrl } = cookie;

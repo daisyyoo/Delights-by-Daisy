@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Link } from 'react-router-dom';
-// import AppContext from '../lib/app-context';
 import { toDollars } from '../lib/';
 import Card from 'react-bootstrap/Card';
 import AppContext from '../lib/app-context';
@@ -81,16 +80,16 @@ export default function ConfirmationPage() {
       }
     };
     const fetchData = async () => {
-      const response = await fetch('/api/confirmationPage', req);
-      if (response.status === 500) { setError(true); }
-      const order = await response.json();
-      setOrder(order);
-      setSalesTax(0);
-      setLoading(false);
+      try {
+        const response = await fetch('/api/confirmationPage', req);
+        if (response.status === 500) { setError(true); }
+        const order = await response.json();
+        setOrder(order);
+        setSalesTax(0);
+        setLoading(false);
+      } catch (err) { console.error(err); }
     };
-    fetchData()
-      .catch(console.error);
-
+    fetchData();
   }, []);
 
   const sendEmail = async event => {
@@ -105,21 +104,19 @@ export default function ConfirmationPage() {
       body: JSON.stringify(emailInfo)
     };
     const fetchData = async () => {
-      const response = await fetch('/api/sendEmail', req);
-      if (response.status === 500) { setError(true); }
-      if (response.status === 200) {
-        const { checkOut } = context;
-        checkOut();
-      }
-      setLoading(false);
-      setEmailSent(true);
-      setEmail('');
-      // const emailSent = await response.json();
-      // console.log('hello', emailSent);
-
+      try {
+        const response = await fetch('/api/sendEmail', req);
+        if (response.status === 500) { setError(true); }
+        if (response.status === 200) {
+          const { checkOut } = context;
+          checkOut();
+        }
+        setLoading(false);
+        setEmailSent(true);
+        setEmail('');
+      } catch (err) { console.error(err); }
     };
-    fetchData()
-      .catch(console.error);
+    fetchData();
   };
 
   if (error) {

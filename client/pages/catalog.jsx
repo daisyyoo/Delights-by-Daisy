@@ -38,14 +38,15 @@ export default function Catalog() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const response = await fetch('/api/cookies');
-      if (response.status === 500) { setError(true); }
-      const allCookies = await response.json();
-      setCookies(allCookies);
-      setLoading(false);
+      try {
+        const response = await fetch('/api/cookies');
+        if (response.status === 500) { setError(true); }
+        const allCookies = await response.json();
+        setCookies(allCookies);
+        setLoading(false);
+      } catch (err) { console.error(err); }
     };
-    fetchData()
-      .catch(console.error);
+    fetchData();
   }, []);
 
   return (
