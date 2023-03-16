@@ -63,10 +63,8 @@ app.post('/api/addToBasket', async (req, res, next) => {
   let token = req.get('x-access-token');
   const { quantity } = req.body;
   const { cookieId } = req.body.cookie;
+  let cartId;
 
-  // if (!cookieId || !quantity) {
-  //   next(new ClientError(400, 'cookieId and quantity are required fields'));
-  // }
   try {
     if (!token) {
       const sql = `
@@ -75,13 +73,14 @@ app.post('/api/addToBasket', async (req, res, next) => {
         returning *
       `;
       const result = await db.query(sql);
-      const { cartId } = result.rows[0];
+      cartId = result.rows[0].cartId;
       jwt.sign({ cartId }, process.env.TOKEN_SECRET, (err, asyncToken) => {
         if (err) { console.error(err); }
         token = asyncToken;
       });
+    } else {
+      cartId = jwt.verify(token, process.env.TOKEN_SECRET).cartId;
     }
-    const { cartId } = jwt.verify(token, process.env.TOKEN_SECRET);
 
     const sql = `
         insert into "cartItems" ("cartId", "cookieId", "quantity")

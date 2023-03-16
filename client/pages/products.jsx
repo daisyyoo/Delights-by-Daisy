@@ -184,8 +184,8 @@ export default function ProductDetails(props) {
             </Card.Body>
             <Card.Body className="d-flex justify-content-between align-items-center">
               <Form.Group>
-                <Form.Select value={quantity} onChange={event => setQuantity(event.target.value)}>
-                  <option/>
+                <Form.Select required value={quantity} onChange={event => setQuantity(event.target.value)}>
+                  <option >Qty</option>
                   <option value="1">1</option>
                   <option value="2">2</option>
                   <option value="3">3</option>
