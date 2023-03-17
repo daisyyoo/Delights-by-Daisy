@@ -5,7 +5,6 @@ import {
   useElements
 } from '@stripe/react-stripe-js';
 import { toDollars } from '../lib/';
-import AppContext from '../lib/app-context';
 
 export default function CheckoutForm(props) {
   const stripe = useStripe();
@@ -96,5 +95,3 @@ export default function CheckoutForm(props) {
     </>
   );
 }
-
-CheckoutForm.contextType = AppContext;

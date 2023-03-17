@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import Card from 'react-bootstrap/Card';
 import { Link } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import { toDollars } from '../lib/';
+import AppContext from '../lib/app-context';
 
 const styles = {
   image: {
@@ -93,6 +94,7 @@ export default function Basket() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const token = localStorage.getItem('basketToken');
+  const context = useContext(AppContext);
 
   useEffect(() => {
     setLoading(true);
@@ -191,6 +193,10 @@ export default function Basket() {
         const copyCookies = cookies.slice();
         copyCookies.splice(cookieIndex, 1);
         setCookies(copyCookies);
+        if (copyCookies.length === 0) {
+          const { checkOut } = context;
+          checkOut();
+        }
         setLoading(false);
       } catch (err) { console.error(err); }
     };

@@ -22,20 +22,17 @@ app.use(express.json());
 app.use(staticMiddleware);
 
 app.get('/api/cookies', async (req, res, next) => {
-  const sql = `
-  select "cookieId",
-        "flavor",
-        "price",
-        "imageUrl"
-    from "cookies"
-  `;
-
-  db.query(sql)
-    .then(result => {
-      res.json(result.rows);
-    })
-    .catch(err => next(err));
-
+  try {
+    const sql = `
+    select "cookieId",
+          "flavor",
+          "price",
+          "imageUrl"
+      from "cookies"
+    `;
+    const result = await db.query(sql);
+    res.json(result.rows);
+  } catch (err) { return next(err); }
 });
 
 app.get('/api/cookies/:cookieId', async (req, res, next) => {
@@ -43,20 +40,19 @@ app.get('/api/cookies/:cookieId', async (req, res, next) => {
   if (!cookieId) {
     next(new ClientError(400, 'cookieId must be a positive integer'));
   }
-  const sql = `
-    select *
-    from "cookies"
-    where "cookieId" = $1
-  `;
-  const params = [cookieId];
-  db.query(sql, params)
-    .then(result => {
-      if (!result.rows[0]) {
-        next(new ClientError(404, `cannot find cookie with cookieId ${cookieId}`));
-      }
-      res.json(result.rows[0]);
-    })
-    .catch(err => next(err));
+  try {
+    const sql = `
+      select *
+      from "cookies"
+      where "cookieId" = $1
+    `;
+    const params = [cookieId];
+    const result = await db.query(sql, params);
+    if (!result.rows[0]) {
+      next(new ClientError(404, `cannot find cookie with cookieId ${cookieId}`));
+    }
+    res.json(result.rows[0]);
+  } catch (err) { return next(err); }
 });
 
 app.post('/api/addToBasket', async (req, res, next) => {
@@ -101,73 +97,69 @@ app.post('/api/addToBasket', async (req, res, next) => {
 
 app.get('/api/myBasket', async (req, res, next) => {
   const token = req.get('x-access-token');
-  if (!token) {
-    next();
-  } else {
-    const { cartId } = jwt.verify(token, process.env.TOKEN_SECRET);
-    const sql = `
-      select "cartItems"."cartId",
-            "cartItems"."cookieId",
-            "cartItems"."quantity",
-            "cookies"."flavor",
-            "cookies"."weight",
-            "cookies"."price",
-            "cookies"."imageUrl"
-      from "cartItems"
-      join "cookies" using ("cookieId")
-      where "cartId" = $1
-    `;
-    const params = [cartId];
-    db.query(sql, params)
-      .then(result => {
-        if (!result.rows) {
-          next(new ClientError(404, `cannot find basket with cartId ${cartId}`));
-        }
-        res.json(result.rows);
-      })
-      .catch(err => next(err));
-  }
-});
-
-app.post('/api/create-payment-intent', async (req, res, next) => {
-  const token = req.get('x-access-token');
   const { cartId } = jwt.verify(token, process.env.TOKEN_SECRET);
-  const sql = `
+  try {
+    const sql = `
         select "cartItems"."cartId",
               "cartItems"."cookieId",
               "cartItems"."quantity",
-              "cookies"."price"
+              "cookies"."flavor",
+              "cookies"."weight",
+              "cookies"."price",
+              "cookies"."imageUrl"
         from "cartItems"
         join "cookies" using ("cookieId")
         where "cartId" = $1
       `;
-  const params = [cartId];
-  db.query(sql, params)
-    .then(result => {
-      if (!result.rows) {
-        next(new ClientError(404, `cannot find basket with cartId ${cartId}`));
-      }
-      const cookiesArray = result.rows;
+    const params = [cartId];
+    const result = await db.query(sql, params);
+    if (!result.rows) {
+      next(new ClientError(404, `cannot find basket with cartId ${cartId}`));
+    }
+    res.json(result.rows);
+  } catch (err) { return next(err); }
+}
+);
 
-      const calculateOrderAmount = (
-        cookiesArray.reduce((previousCookie, currentCookie) => {
-          return previousCookie + (currentCookie.quantity * currentCookie.price);
-        }, 0));
+app.post('/api/create-payment-intent', async (req, res, next) => {
+  const token = req.get('x-access-token');
+  const { cartId } = jwt.verify(token, process.env.TOKEN_SECRET);
+  try {
+    const sql = `
+          select "cartItems"."cartId",
+                "cartItems"."cookieId",
+                "cartItems"."quantity",
+                "cookies"."price"
+          from "cartItems"
+          join "cookies" using ("cookieId")
+          where "cartId" = $1
+        `;
+    const params = [cartId];
+    const result = await db.query(sql, params);
+    if (!result.rows) {
+      next(new ClientError(404, `cannot find basket with cartId ${cartId}`));
+    }
+    const cookiesArray = result.rows;
 
-      stripe.paymentIntents.create({
-        amount: calculateOrderAmount,
-        currency: 'usd',
-        payment_method_types: ['link', 'card']
-      })
-        .then(paymentIntent => {
-          res.send({
-            clientSecret: paymentIntent.client_secret,
-            totalAmount: paymentIntent.amount
-          });
-        })
-        .catch(err => next(err));
+    const calculateOrderAmount = (
+      cookiesArray.reduce((previousCookie, currentCookie) => {
+        return previousCookie + (currentCookie.quantity * currentCookie.price);
+      }, 0));
+
+    stripe.paymentIntents.create({
+      amount: calculateOrderAmount,
+      currency: 'usd',
+      payment_method_types: ['link', 'card']
     })
-    .catch(err => next(err));
+      .then(paymentIntent => {
+        res.send({
+          clientSecret: paymentIntent.client_secret,
+          totalAmount: paymentIntent.amount
+        });
+      })
+      .catch(err => next(err));
+
+  } catch (err) { return next(err); }
 });
 
 app.get('/process-order/:token', (req, res, next) => {
@@ -190,86 +182,82 @@ app.get('/process-order/:token', (req, res, next) => {
 app.get('/api/confirmationPage', async (req, res, next) => {
   const token = req.get('x-access-token');
   const { cartId } = jwt.verify(token, process.env.TOKEN_SECRET);
-  const sql = `
-    select "orders"."orderId",
-          "orders"."orderedAt",
-          "cartItems"."quantity",
-          "cookies"."flavor",
-          "cookies"."price",
-          "cookies"."imageUrl"
-    from "orders"
-    join "cartItems" using ("cartId")
-    join "cookies" using ("cookieId")
-    where "cartId" = $1
-  `;
-  const params = [cartId];
-  db.query(sql, params)
-    .then(result => {
-      res.json(result.rows);
-    })
-    .catch(err => next(err));
+  try {
+    const sql = `
+      select "orders"."orderId",
+            "orders"."orderedAt",
+            "cartItems"."quantity",
+            "cookies"."flavor",
+            "cookies"."price",
+            "cookies"."imageUrl"
+      from "orders"
+      join "cartItems" using ("cartId")
+      join "cookies" using ("cookieId")
+      where "cartId" = $1
+    `;
+    const params = [cartId];
+    const result = await db.query(sql, params);
+    res.json(result.rows);
+  } catch (err) { return next(err); }
 });
 
 app.post('/api/sendEmail', async (req, res, next) => {
-  const { email } = req.body;
-  const { orderId } = req.body.order[0];
-  const sql = `
-    update "orders"
-      set "email" = $1,
-          "confirmedAt" = now()
-      where "orderId" = $2
-      returning *
-  `;
-  const params = [email, orderId];
-  db.query(sql, params)
-    .then(result => {
-      const orderInfo = result.rows[0];
-      const { cartId } = orderInfo;
-      const sql = `
-        select "orders"."orderId",
-              "orders"."orderedAt",
-              "orders"."email",
-              "cartItems"."quantity",
-              "cookies"."flavor",
-              "cookies"."price"
-        from "orders"
-        join "cartItems" using ("cartId")
-        join "cookies" using ("cookieId")
-        where "cartId" = $1
-      `;
-      const params = [cartId];
-      return db.query(sql, params);
-    })
-    .then(result => {
-      const orderDetails = result.rows;
-      const { orderId, email, orderedAt } = orderDetails[0];
-      const msg = {
-        to: email,
-        from: 'Daisy@delightsbydaisy.de',
-        subject: 'Order Confirmation',
-        text: `
-            Order Details # 00${orderId}
-            Order Date: ${orderedAt}
-            ${(orderDetails.map(cookie => (cookie.flavor + 'Qty: ' + cookie.quantity)).join(''))}
-            Total:
-            ${orderDetails.reduce((previousCookie, currentCookie) => {
-              return previousCookie + (currentCookie.quantity * currentCookie.price);
-            }, 0)}
-            `,
-        html: `
-            <br><h2>Order Details # 00${orderId}</h2>
-            <br><strong>Order Date:</strong> ${orderedAt} <br>
-            ${(orderDetails.map(cookie => ('<br><strong>Flavor: </strong>' + cookie.flavor + '<br><strong>Qty: </strong>' + cookie.quantity + '<br>')).join(''))}
-            <br><strong>Total:</strong> $
-            ${(orderDetails.reduce((previousCookie, currentCookie) => {
+  try {
+    const { email } = req.body;
+    const { orderId } = req.body.order[0];
+    const sql = `
+      update "orders"
+        set "email" = $1,
+            "confirmedAt" = now()
+        where "orderId" = $2
+        returning *
+    `;
+    const params = [email, orderId];
+    const result = await db.query(sql, params);
+    const orderInfo = result.rows[0];
+    const { cartId } = orderInfo;
+    const sql2 = `
+      select "orders"."orderId",
+            "orders"."orderedAt",
+            "orders"."email",
+            "cartItems"."quantity",
+            "cookies"."flavor",
+            "cookies"."price"
+      from "orders"
+      join "cartItems" using ("cartId")
+      join "cookies" using ("cookieId")
+      where "cartId" = $1
+    `;
+    const params2 = [cartId];
+    const result2 = await db.query(sql2, params2);
+    const orderDetails = result2.rows;
+    const { orderedAt } = orderDetails[0];
+    const msg = {
+      to: email,
+      from: 'email@bydaisy.dev',
+      subject: 'Order Confirmation',
+      text: `
+          Order Details # 00${orderId}
+          Order Date: ${orderedAt}
+          ${(orderDetails.map(cookie => (cookie.flavor + 'Qty: ' + cookie.quantity)).join(''))}
+          Total:
+          ${orderDetails.reduce((previousCookie, currentCookie) => {
             return previousCookie + (currentCookie.quantity * currentCookie.price);
-          }, 0) / 100).toFixed(2)}
-            <br><h3><em>Thank you for your purchase!</em></h3>`
-      };
-      return sgMail.send(msg);
-    })
-    .then(() => res.send())
-    .catch(err => next(err));
+          }, 0)}
+          `,
+      html: `
+          <br><h2>Order Details # 00${orderId}</h2>
+          <br><strong>Order Date:</strong> ${orderedAt} <br>
+          ${(orderDetails.map(cookie => ('<br><strong>Flavor: </strong>' + cookie.flavor + '<br><strong>Qty: </strong>' + cookie.quantity + '<br>')).join(''))}
+          <br><strong>Total:</strong> $
+          ${(orderDetails.reduce((previousCookie, currentCookie) => {
+          return previousCookie + (currentCookie.quantity * currentCookie.price);
+        }, 0) / 100).toFixed(2)}
+          <br><h3><em>Thank you for your purchase!</em></h3>`
+    };
+    const sent = await sgMail.send(msg);
+    res.send(sent);
+  } catch (err) { return next(err); }
 });
 
 app.patch('/api/updateQuantity', async (req, res, next) => {
@@ -282,41 +270,37 @@ app.patch('/api/updateQuantity', async (req, res, next) => {
   if (!Number.isInteger(updatedQuantity) || updatedQuantity < 0) {
     next(new ClientError(400, 'quantity must be zero or a greater integer'));
   }
-  if (updatedQuantity === 0) {
-    const sql = `
+  try {
+    if (updatedQuantity === 0) {
+      const sql = `
     delete from "cartItems"
     where "cartId" = $1
       and "cookieId" = $2
     returning *
   `;
-    const params = [cartId, cookieId];
-    db.query(sql, params)
-      .then(result => {
-        if (!result.rows) {
-          next(new ClientError(404, `cannot find basket with cartId ${cartId}`));
-        }
-        const [deletedCookie] = result.rows;
-        res.json(deletedCookie);
-      })
-      .catch(err => next(err));
-  }
-  const sql = `
-    update "cartItems"
-      set "quantity" = $1
-      where "cartId" = $2
-      and "cookieId" = $3
-      returning *
-  `;
-  const params = [updatedQuantity, cartId, cookieId];
-  db.query(sql, params)
-    .then(result => {
+      const params = [cartId, cookieId];
+      const result = await db.query(sql, params);
       if (!result.rows) {
         next(new ClientError(404, `cannot find basket with cartId ${cartId}`));
       }
-      const [updatedCookie] = result.rows;
-      res.json(updatedCookie);
-    })
-    .catch(err => next(err));
+      const [deletedCookie] = result.rows;
+      res.json(deletedCookie);
+    }
+    const sql = `
+    update "cartItems"
+    set "quantity" = $1
+    where "cartId" = $2
+    and "cookieId" = $3
+    returning *
+    `;
+    const params = [updatedQuantity, cartId, cookieId];
+    const result = await db.query(sql, params);
+    if (!result.rows) {
+      next(new ClientError(404, `cannot find basket with cartId ${cartId}`));
+    }
+    const [updatedCookie] = result.rows;
+    res.json(updatedCookie);
+  } catch (err) { return next(err); }
 });
 
 app.delete('/api/removeCookie/:cookieId', async (req, res, next) => {
@@ -326,40 +310,37 @@ app.delete('/api/removeCookie/:cookieId', async (req, res, next) => {
   if (!cookieId) {
     next(new ClientError(400, 'cookieId must be a positive integer'));
   }
-  const sql = `
-    delete from "cartItems"
-    where "cartId" = $1
-      and "cookieId" = $2
-    returning *
-  `;
-  const params = [cartId, cookieId];
-  db.query(sql, params)
-    .then(result => {
-      if (!result.rows) {
-        next(new ClientError(404, `cannot find basket with cartId ${cartId}`));
-      }
-      const sql = `
-      select "cartItems"."cartId",
-            "cartItems"."cookieId",
-            "cartItems"."quantity",
-            "cookies"."flavor",
-            "cookies"."weight",
-            "cookies"."price",
-            "cookies"."imageUrl"
-      from "cartItems"
-      join "cookies" using ("cookieId")
+  try {
+    const sql = `
+      delete from "cartItems"
       where "cartId" = $1
+        and "cookieId" = $2
+      returning *
     `;
-      const params = [cartId];
-      return db.query(sql, params);
-    })
-    .then(result => {
-      if (!result.rows) {
-        next(new ClientError(404, `cannot find basket with cartId ${cartId}`));
-      }
-      res.json(result.rows);
-    })
-    .catch(err => next(err));
+    const params = [cartId, cookieId];
+    const result = await db.query(sql, params);
+    if (!result.rows) {
+      next(new ClientError(404, `cannot find basket with cartId ${cartId}`));
+    }
+    const sql2 = `
+    select "cartItems"."cartId",
+          "cartItems"."cookieId",
+          "cartItems"."quantity",
+          "cookies"."flavor",
+          "cookies"."weight",
+          "cookies"."price",
+          "cookies"."imageUrl"
+    from "cartItems"
+    join "cookies" using ("cookieId")
+    where "cartId" = $1
+  `;
+    const params2 = [cartId];
+    const result2 = await db.query(sql2, params2);
+    if (!result2.rows) {
+      next(new ClientError(404, `cannot find basket with cartId ${cartId}`));
+    }
+    res.json(result2.rows);
+  } catch (err) { return next(err); }
 });
 
 app.get('/*', (req, res) => {
