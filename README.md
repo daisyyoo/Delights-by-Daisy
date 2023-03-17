@@ -19,7 +19,7 @@ I wanted to build an e-commerce website for my cookie side business in my person
 
 ## Live Demo
 
-Try the application live at [https://delights-by-daisy.delightsbydaisy.de/](https://delights-by-daisy.delightsbydaisy.de/)
+Try the application live at [https://delights.bydaisy.dev/](https://delights.bydaisy.dev/)
 
 ## Features
 
