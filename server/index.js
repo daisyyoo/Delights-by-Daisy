@@ -234,7 +234,7 @@ app.post('/api/sendEmail', async (req, res, next) => {
     const { orderedAt } = orderDetails[0];
     const msg = {
       to: email,
-      from: 'email@bydaisy.dev',
+      from: 'email@bydaisy.org',
       subject: 'Order Confirmation',
       text: `
           Order Details # 00${orderId}
@@ -255,8 +255,8 @@ app.post('/api/sendEmail', async (req, res, next) => {
         }, 0) / 100).toFixed(2)}
           <br><h3><em>Thank you for your purchase!</em></h3>`
     };
-    const sent = await sgMail.send(msg);
-    res.send(sent);
+    sgMail.send(msg);
+    res.send();
   } catch (err) { return next(err); }
 });
 
