@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, Navigate } from 'react-router-dom';
 import { toDollars } from '../lib/';
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
@@ -66,9 +66,6 @@ const styles = {
     color: '#693802',
     fontWeight: '600',
     fontSize: '1rem'
-  },
-  errorContent: {
-    height: '500px'
   }
 };
 
@@ -85,6 +82,7 @@ export default function ProductDetails(props) {
   const token = localStorage.getItem('basketToken');
 
   useEffect(() => {
+    setLoading(true);
     const fetchData = async () => {
       try {
         const response = await fetch(`/api/cookies/${cookieId}`);
@@ -131,6 +129,12 @@ export default function ProductDetails(props) {
       }
       const cookieAdded = await response.json();
       const { cartId, addToBasket } = context;
+      if (!cookieAdded.token) {
+        return setError(true);
+      }
+      // need to have a guard clause to make sure the token was properly generated
+      // before assigning it to local storage
+      // ALSO CHECK WHY THE HECK TOKEN IS BEING GENERATED AS UNDEFINED AGAIN!
       if (!cartId) {
         addToBasket(cookieAdded);
       }
@@ -144,48 +148,42 @@ export default function ProductDetails(props) {
 
   return (
     <>
-      {!cookie &&
-      <div className="loader d-flex justify-content-center align-items-center" />
-        }
-      {error &&
-      <div style={styles.errorContent} className="my-5 text-center d-flex flex-column justify-content-center align-items-center">
-        <h1 className="w-75">There was an error with the connection. Please try again.</h1>
-        <img src="/image/sad-cookie.png" alt="sad-cookie" />
-      </div>
-        }
+      {error && (
+        <Navigate to='/not-found' />
+      )}
       {loading &&
       <div className="loader d-flex justify-content-center align-items-center" />
-        }
+    }
       {!loading &&
-      <div className="loader-hide" />
-        }
-      <div className="container mt-3">
-        <div className="d-flex justify-content-start">
-          <Link style={styles.backButton} className="text-decoration-none mb-3" to='/cookies'>
-            <i className="fa-solid fa-chevron-left" style={styles.icon} />
-            {' Back'}
-          </Link>
-        </div>
-        <div className="d-flex row align-items-center">
-          <div className="col-md-6 d-flex justify-content-center" style={styles.imageContainer}>
-            <img src={imageUrl} alt={flavor} style={styles.image} className="w-100 h-100" />
+      <>
+        <div className="loader-hide" />
+        <div className="container mt-3">
+          <div className="d-flex justify-content-start">
+            <Link style={styles.backButton} className="text-decoration-none mb-3" to='/cookies'>
+              <i className="fa-solid fa-chevron-left" style={styles.icon} />
+              {' Back'}
+            </Link>
           </div>
-          <Card className="col-md-6 border-0 d-flex flex-direction-column justify-content-center bg-transparent">
-            <Card.Body className="pb-0">
-              <Card.Text className="h1 py-lg-3 d-flex align-items-center" style={styles.title}>{flavor}</Card.Text>
-              <Card.Text className="h6 d-flex align-items-center" style={styles.weight}>{`${weight} oz`}</Card.Text>
-            </Card.Body>
-            <Card.Body className="d-flex align-items-center">
-              <Card.Text style={styles.description}>
-                {description}
-              </Card.Text>
-            </Card.Body>
-            <Card.Body className="py-0 d-flex align-items-center" style={styles.price}>
-              {toDollars(price)}
-            </Card.Body>
-            <Card.Body className="d-flex justify-content-between align-items-center">
-              <Form.Group>
-                <Form.Select
+          <div className="d-flex row align-items-center">
+            <div className="col-md-6 d-flex justify-content-center" style={styles.imageContainer}>
+              <img src={imageUrl} alt={flavor} style={styles.image} className="w-100 h-100" />
+            </div>
+            <Card className="col-md-6 border-0 d-flex flex-direction-column justify-content-center bg-transparent">
+              <Card.Body className="pb-0">
+                <Card.Text className="h1 py-lg-3 d-flex align-items-center" style={styles.title}>{flavor}</Card.Text>
+                <Card.Text className="h6 d-flex align-items-center" style={styles.weight}>{`${weight} oz`}</Card.Text>
+              </Card.Body>
+              <Card.Body className="d-flex align-items-center">
+                <Card.Text style={styles.description}>
+                  {description}
+                </Card.Text>
+              </Card.Body>
+              <Card.Body className="py-0 d-flex align-items-center" style={styles.price}>
+                {toDollars(price)}
+              </Card.Body>
+              <Card.Body className="d-flex justify-content-between align-items-center">
+                <Form.Group>
+                  <Form.Select
                   required
                   value={quantity}
                   onChange={event => {
@@ -194,35 +192,37 @@ export default function ProductDetails(props) {
                       setDisabled(false);
                     }
                   }}>
-                  <option >Qty</option>
-                  <option value="1">1</option>
-                  <option value="2">2</option>
-                  <option value="3">3</option>
-                  <option value="4">4</option>
-                  <option value="5">5</option>
-                  <option value="6">6</option>
-                </Form.Select>
-              </Form.Group>
-              <Button disabled={disabled} onClick={handleClick} className="button-all ">ADD TO BASKET</Button>
-            </Card.Body>
-          </Card>
+                    <option >Qty</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                  </Form.Select>
+                </Form.Group>
+                <Button disabled={disabled} onClick={handleClick} className="button-all ">ADD TO BASKET</Button>
+              </Card.Body>
+            </Card>
+          </div>
+          <Accordion className="my-4">
+            <Accordion.Item eventKey="0">
+              <Accordion.Header>Ingredients</Accordion.Header>
+              <Accordion.Body style={styles.text}>{ingredients}</Accordion.Body>
+            </Accordion.Item>
+            <Accordion.Item eventKey="1">
+              <Accordion.Header>Allergens</Accordion.Header>
+              <Accordion.Body style={styles.text}>{allergens}</Accordion.Body>
+            </Accordion.Item>
+            <Accordion.Item eventKey="2">
+              <Accordion.Header>Backstory</Accordion.Header>
+              <Accordion.Body style={styles.text}>{backstory}</Accordion.Body>
+            </Accordion.Item>
+          </Accordion>
+          <BasketModal className={show ? 'show' : 'd-none'} data={moreProps} show={show} />
         </div>
-        <Accordion className="my-4">
-          <Accordion.Item eventKey="0">
-            <Accordion.Header>Ingredients</Accordion.Header>
-            <Accordion.Body style={styles.text}>{ingredients}</Accordion.Body>
-          </Accordion.Item>
-          <Accordion.Item eventKey="1">
-            <Accordion.Header>Allergens</Accordion.Header>
-            <Accordion.Body style={styles.text}>{allergens}</Accordion.Body>
-          </Accordion.Item>
-          <Accordion.Item eventKey="2">
-            <Accordion.Header>Backstory</Accordion.Header>
-            <Accordion.Body style={styles.text}>{backstory}</Accordion.Body>
-          </Accordion.Item>
-        </Accordion>
-        <BasketModal className={show ? 'show' : 'd-none'} data={moreProps} show={show} />
-      </div>
+      </>
+      }
     </>
   );
 }

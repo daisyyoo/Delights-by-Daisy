@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import Card from 'react-bootstrap/Card';
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import { toDollars } from '../lib/';
 import AppContext from '../lib/app-context';
@@ -83,9 +83,6 @@ const styles = {
     color: '#693802',
     fontSize: '0.8rem',
     textDecoration: 'underline'
-  },
-  errorContent: {
-    height: '500px'
   }
 };
 export default function Basket() {
@@ -203,16 +200,11 @@ export default function Basket() {
     fetchData();
   }
 
-  if (error) {
-    return (
-      <div style={styles.errorContent} className="my-5 text-center d-flex flex-column justify-content-center align-items-center">
-        <h1 className="w-75">There was an error with the connection. Please try again.</h1>
-        <img src="/image/sad-cookie.png" alt="sad-cookie" />
-      </div>
-    );
-  }
   return (
     <>
+      {error && (
+        <Navigate to='/not-found' />
+      )}
       {loading === true &&
       <div className="loader d-flex justify-content-center align-items-center" />
         }

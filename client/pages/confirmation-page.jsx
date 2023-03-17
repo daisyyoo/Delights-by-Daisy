@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import { toDollars } from '../lib/';
 import Card from 'react-bootstrap/Card';
 import AppContext from '../lib/app-context';
@@ -52,9 +52,6 @@ const styles = {
   },
   borderBottom: {
     borderBottom: 'solid 2px #94540F'
-  },
-  errorContent: {
-    height: '500px'
   },
   button: {
     fontSize: '1rem'
@@ -119,21 +116,15 @@ export default function ConfirmationPage() {
     fetchData();
   };
 
-  if (error) {
-    return (
-      <div style={styles.errorContent} className="my-5 text-center d-flex flex-column justify-content-center align-items-center">
-        <h1 className="w-75">There was an error with the connection. Please try again.</h1>
-        <img src="/image/sad-cookie.png" alt="sad-cookie" />
-      </div>
-    );
-  }
-
   if (order.length === 0) {
     return <div className="loader d-flex justify-content-center align-items-center" />;
   }
 
   return (
     <>
+      {error && (
+        <Navigate to='/not-found' />
+      )}
       {loading === true &&
       <div className="loader d-flex justify-content-center align-items-center" />
         }
