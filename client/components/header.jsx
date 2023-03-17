@@ -13,7 +13,7 @@ const Header = () => {
             aria-controls="offcanvasNavbar"
             onClick={() => setOpen(isOpen ? false : 'expanded')} />
           <Navbar.Offcanvas id="offcanvasNavbar-expand" aria-labelledby="offcanvasNavbar-expand" placement="end">
-            <Offcanvas.Header className="mx-4 border-bot" closeButton>
+            <Offcanvas.Header className="mx-4 border-bot" onClick={() => setOpen(isOpen ? false : 'expanded')} closeButton>
               <Offcanvas.Title className="pt-2" id="offcanvasNavbar-expand">
                 MENU
               </Offcanvas.Title>

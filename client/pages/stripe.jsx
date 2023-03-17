@@ -28,7 +28,8 @@ export default function StripeCheckout() {
       .then(data => {
         setClientSecret(data.clientSecret);
         setTotalAmount(data.totalAmount);
-      });
+      })
+      .catch(console.error);
   }, []);
 
   const appearance = {

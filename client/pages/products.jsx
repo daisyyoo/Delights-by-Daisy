@@ -77,29 +77,31 @@ export default function ProductDetails(props) {
   const { cookieId } = useParams();
   const [cookie, setCookie] = useState([]);
   const [quantity, setQuantity] = useState(0);
+  const [disabled, setDisabled] = useState(true);
   const [show, setShow] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
 
+  const token = localStorage.getItem('basketToken');
+
   useEffect(() => {
     const fetchData = async () => {
-      const response = await fetch(`/api/cookies/${cookieId}`);
-      if (response.status === 500) { setError(true); }
-      const selectedCookie = await response.json();
-      setCookie(selectedCookie);
-      setLoading(false);
+      try {
+        const response = await fetch(`/api/cookies/${cookieId}`);
+        if (response.status === 500) { setError(true); }
+        const selectedCookie = await response.json();
+        setCookie(selectedCookie);
+        setLoading(false);
+      } catch (err) { console.error(err); }
     };
-    fetchData()
-      .catch(console.error);
+    fetchData();
   }, [cookieId]);
 
+  let req;
   const handleClick = event => {
     setLoading(true);
-    const { cartId, addToBasket } = context;
     const addCookie = { cookie, quantity };
-    let req;
-    const token = localStorage.getItem('basketToken');
-    if (token === null) {
+    if (!token) {
       req = {
         method: 'POST',
         headers: {
@@ -117,18 +119,24 @@ export default function ProductDetails(props) {
         body: JSON.stringify(addCookie)
       };
     }
-    const getCookieData = async () => {
+    getCookieData();
+  };
+
+  const getCookieData = async () => {
+    try {
       const response = await fetch('/api/addToBasket', req);
-      if (response.status === 500) { setError(true); }
+      if (response.status === 500) {
+        setShow(false);
+        setError(true);
+      }
       const cookieAdded = await response.json();
+      const { cartId, addToBasket } = context;
       if (!cartId) {
         addToBasket(cookieAdded);
       }
       setLoading(false);
       setShow(true);
-    };
-    getCookieData()
-      .catch(console.error);
+    } catch (err) { console.error(err); }
   };
 
   const { flavor, price, weight, description, ingredients, allergens, backstory, imageUrl } = cookie;
@@ -177,7 +185,16 @@ export default function ProductDetails(props) {
             </Card.Body>
             <Card.Body className="d-flex justify-content-between align-items-center">
               <Form.Group>
-                <Form.Select value={quantity} onChange={event => setQuantity(event.target.value)}>
+                <Form.Select
+                  required
+                  value={quantity}
+                  onChange={event => {
+                    if (parseInt(event.target.value)) {
+                      setQuantity(event.target.value);
+                      setDisabled(false);
+                    }
+                  }}>
+                  <option >Qty</option>
                   <option value="1">1</option>
                   <option value="2">2</option>
                   <option value="3">3</option>
@@ -186,7 +203,7 @@ export default function ProductDetails(props) {
                   <option value="6">6</option>
                 </Form.Select>
               </Form.Group>
-              <Button onClick={handleClick} className="button-all ">ADD TO BASKET</Button>
+              <Button disabled={disabled} onClick={handleClick} className="button-all ">ADD TO BASKET</Button>
             </Card.Body>
           </Card>
         </div>

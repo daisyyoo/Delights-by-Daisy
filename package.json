@@ -26,6 +26,7 @@
     "react-bootstrap": "^2.6.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.8.2",
+    "react-select": "^5.7.0",
     "stripe": "^10.17.0"
   },
   "devDependencies": {

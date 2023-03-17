@@ -41,7 +41,7 @@ app.get('/api/cookies', async (req, res, next) => {
 app.get('/api/cookies/:cookieId', async (req, res, next) => {
   const cookieId = Number(req.params.cookieId);
   if (!cookieId) {
-    throw new ClientError(400, 'cookieId must be a positive integer');
+    next(new ClientError(400, 'cookieId must be a positive integer'));
   }
   const sql = `
     select *
@@ -52,7 +52,7 @@ app.get('/api/cookies/:cookieId', async (req, res, next) => {
   db.query(sql, params)
     .then(result => {
       if (!result.rows[0]) {
-        throw new ClientError(404, `cannot find cookie with cookieId ${cookieId}`);
+        next(new ClientError(404, `cannot find cookie with cookieId ${cookieId}`));
       }
       res.json(result.rows[0]);
     })
@@ -60,68 +60,51 @@ app.get('/api/cookies/:cookieId', async (req, res, next) => {
 });
 
 app.post('/api/addToBasket', async (req, res, next) => {
-  const token = req.get('x-access-token');
+  let token = req.get('x-access-token');
   const { quantity } = req.body;
   const { cookieId } = req.body.cookie;
-  if (!token) {
-    const sql = `
-      insert into "carts"
-      default values
-      returning *
-    `;
-    db.query(sql)
-      .then(result => {
-        const cartId = result.rows[0].cartId;
-        const token = jwt.sign(cartId, process.env.TOKEN_SECRET);
-        if (!cookieId || !quantity) {
-          throw new ClientError(400, 'cookieId and quantity are required fields');
-        }
-        const sql = `
-          insert into "cartItems" ("cartId", "cookieId", "quantity")
-          values ($1, $2, $3)
-          returning *
-        `;
-        const params = [cartId, cookieId, quantity];
-        db.query(sql, params)
-          .then(result => {
-            const [cartItem] = result.rows;
-            const user = { cartId, token, cartItem };
-            res.status(201).json(user);
-          })
-          .catch(err => next(err));
-      })
-      .catch(err => next(err));
-  } else {
-    const cartId = jwt.verify(token, process.env.TOKEN_SECRET);
-    if (!cookieId || !quantity) {
-      throw new ClientError(400, 'cookieId and quantity are required fields');
+  let cartId;
+
+  try {
+    if (!token) {
+      const sql = `
+        insert into "carts"
+        default values
+        returning *
+      `;
+      const result = await db.query(sql);
+      cartId = result.rows[0].cartId;
+      jwt.sign({ cartId }, process.env.TOKEN_SECRET, (err, asyncToken) => {
+        if (err) { console.error(err); }
+        token = asyncToken;
+      });
+    } else {
+      cartId = jwt.verify(token, process.env.TOKEN_SECRET).cartId;
     }
 
     const sql = `
-      insert into "cartItems" ("cartId", "cookieId", "quantity")
-      values ($1, $2, $3)
-      on conflict ("cartId", "cookieId")
-      do update
-            set "quantity" = "cartItems"."quantity" + "excluded"."quantity"
-      returning *
-      `;
+        insert into "cartItems" ("cartId", "cookieId", "quantity")
+        values ($1, $2, $3)
+        on conflict ("cartId", "cookieId")
+        do update
+              set "quantity" = "cartItems"."quantity" + "excluded"."quantity"
+        returning *
+        `;
     const params = [cartId, cookieId, quantity];
-    db.query(sql, params)
-      .then(result => {
-        const [cartItem] = result.rows;
-        const user = { cartId, token, cartItem };
-        res.status(201).json(user);
-      })
-      .catch(err => next(err));
-  }
-});
+    const result3 = await db.query(sql, params);
+    const [cartItem] = result3.rows;
+    const user = { cartId, token, cartItem };
+    res.status(201).json(user);
+  } catch (err) { return next(err); }
+}
+);
 
 app.get('/api/myBasket', async (req, res, next) => {
   const token = req.get('x-access-token');
   if (!token) {
     next();
   } else {
-    const cartId = jwt.verify(token, process.env.TOKEN_SECRET);
+    const { cartId } = jwt.verify(token, process.env.TOKEN_SECRET);
     const sql = `
       select "cartItems"."cartId",
             "cartItems"."cookieId",
@@ -138,7 +121,7 @@ app.get('/api/myBasket', async (req, res, next) => {
     db.query(sql, params)
       .then(result => {
         if (!result.rows) {
-          throw new ClientError(404, `cannot find basket with cartId ${cartId}`);
+          next(new ClientError(404, `cannot find basket with cartId ${cartId}`));
         }
         res.json(result.rows);
       })
@@ -148,7 +131,7 @@ app.get('/api/myBasket', async (req, res, next) => {
 
 app.post('/api/create-payment-intent', async (req, res, next) => {
   const token = req.get('x-access-token');
-  const cartId = jwt.verify(token, process.env.TOKEN_SECRET);
+  const { cartId } = jwt.verify(token, process.env.TOKEN_SECRET);
   const sql = `
         select "cartItems"."cartId",
               "cartItems"."cookieId",
@@ -162,7 +145,7 @@ app.post('/api/create-payment-intent', async (req, res, next) => {
   db.query(sql, params)
     .then(result => {
       if (!result.rows) {
-        throw new ClientError(404, `cannot find basket with cartId ${cartId}`);
+        next(new ClientError(404, `cannot find basket with cartId ${cartId}`));
       }
       const cookiesArray = result.rows;
 
@@ -189,7 +172,7 @@ app.post('/api/create-payment-intent', async (req, res, next) => {
 
 app.get('/process-order/:token', (req, res, next) => {
   const token = req.params.token;
-  const cartId = jwt.verify(token, process.env.TOKEN_SECRET);
+  const { cartId } = jwt.verify(token, process.env.TOKEN_SECRET);
   const paymentIntent = req.query.payment_intent;
   const sql = `
     insert into "orders" ("cartId", "orderedAt", "paymentIntent")
@@ -206,7 +189,7 @@ app.get('/process-order/:token', (req, res, next) => {
 
 app.get('/api/confirmationPage', async (req, res, next) => {
   const token = req.get('x-access-token');
-  const cartId = jwt.verify(token, process.env.TOKEN_SECRET);
+  const { cartId } = jwt.verify(token, process.env.TOKEN_SECRET);
   const sql = `
     select "orders"."orderId",
           "orders"."orderedAt",
@@ -291,13 +274,13 @@ app.post('/api/sendEmail', async (req, res, next) => {
 
 app.patch('/api/updateQuantity', async (req, res, next) => {
   const token = req.get('x-access-token');
-  const cartId = jwt.verify(token, process.env.TOKEN_SECRET);
+  const { cartId } = jwt.verify(token, process.env.TOKEN_SECRET);
   const { updatedQuantity, cookieId } = req.body;
   if (!Number.isInteger(cookieId) || cookieId < 1) {
-    throw new ClientError(400, 'cookieId must be a positive integer');
+    next(new ClientError(400, 'cookieId must be a positive integer'));
   }
   if (!Number.isInteger(updatedQuantity) || updatedQuantity < 0) {
-    throw new ClientError(400, 'quantity must be zero or a greater integer');
+    next(new ClientError(400, 'quantity must be zero or a greater integer'));
   }
   if (updatedQuantity === 0) {
     const sql = `
@@ -310,7 +293,7 @@ app.patch('/api/updateQuantity', async (req, res, next) => {
     db.query(sql, params)
       .then(result => {
         if (!result.rows) {
-          throw new ClientError(404, `cannot find basket with cartId ${cartId}`);
+          next(new ClientError(404, `cannot find basket with cartId ${cartId}`));
         }
         const [deletedCookie] = result.rows;
         res.json(deletedCookie);
@@ -328,7 +311,7 @@ app.patch('/api/updateQuantity', async (req, res, next) => {
   db.query(sql, params)
     .then(result => {
       if (!result.rows) {
-        throw new ClientError(404, `cannot find basket with cartId ${cartId}`);
+        next(new ClientError(404, `cannot find basket with cartId ${cartId}`));
       }
       const [updatedCookie] = result.rows;
       res.json(updatedCookie);
@@ -338,10 +321,10 @@ app.patch('/api/updateQuantity', async (req, res, next) => {
 
 app.delete('/api/removeCookie/:cookieId', async (req, res, next) => {
   const token = req.get('x-access-token');
-  const cartId = jwt.verify(token, process.env.TOKEN_SECRET);
+  const { cartId } = jwt.verify(token, process.env.TOKEN_SECRET);
   const cookieId = req.params.cookieId;
   if (!cookieId) {
-    throw new ClientError(400, 'cookieId must be a positive integer');
+    next(new ClientError(400, 'cookieId must be a positive integer'));
   }
   const sql = `
     delete from "cartItems"
@@ -353,7 +336,7 @@ app.delete('/api/removeCookie/:cookieId', async (req, res, next) => {
   db.query(sql, params)
     .then(result => {
       if (!result.rows) {
-        throw new ClientError(404, `cannot find basket with cartId ${cartId}`);
+        next(new ClientError(404, `cannot find basket with cartId ${cartId}`));
       }
       const sql = `
       select "cartItems"."cartId",
@@ -372,7 +355,7 @@ app.delete('/api/removeCookie/:cookieId', async (req, res, next) => {
     })
     .then(result => {
       if (!result.rows) {
-        throw new ClientError(404, `cannot find basket with cartId ${cartId}`);
+        next(new ClientError(404, `cannot find basket with cartId ${cartId}`));
       }
       res.json(result.rows);
     })

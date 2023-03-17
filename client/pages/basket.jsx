@@ -92,11 +92,11 @@ export default function Basket() {
   const [cookies, setCookies] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
+  const token = localStorage.getItem('basketToken');
 
   useEffect(() => {
     setLoading(true);
-    const token = localStorage.getItem('basketToken');
-
+    if (!token) { return setLoading(false); }
     const req = {
       method: 'GET',
       headers: {
@@ -105,17 +105,16 @@ export default function Basket() {
       }
     };
     const fetchData = async () => {
-      const response = await fetch('/api/myBasket', req);
-      if (response.status === 500) { setError(true); }
-      const selectedCookie = await response.json();
-      setCookies(selectedCookie);
-      setLoading(false);
+      try {
+        const response = await fetch('/api/myBasket', req);
+        if (response.status === 500) { setError(true); }
+        const selectedCookie = await response.json();
+        setCookies(selectedCookie);
+        setLoading(false);
+      } catch (err) { console.error(err); }
     };
-    fetchData()
-      .catch(console.error);
-  }, [cookies.length]);
-
-  const token = localStorage.getItem('basketToken');
+    fetchData();
+  }, [cookies.length, token]);
 
   const handleClick = event => {
     setLoading(true);
@@ -160,17 +159,19 @@ export default function Basket() {
       body: JSON.stringify(updatedInfo)
     };
     const fetchData = async () => {
-      const response = await fetch('/api/updateQuantity', req);
-      if (response.status === 500) { setError(true); }
-      const updatedCookie = await response.json();
-      const newQuantity = updatedCookie.quantity;
-      const copyCookies = cookies.slice();
-      copyCookies[cookieIndex].quantity = newQuantity;
-      setCookies(copyCookies);
-      setLoading(false);
+      try {
+
+        const response = await fetch('/api/updateQuantity', req);
+        if (response.status === 500) { setError(true); }
+        const updatedCookie = await response.json();
+        const newQuantity = updatedCookie.quantity;
+        const copyCookies = cookies.slice();
+        copyCookies[cookieIndex].quantity = newQuantity;
+        setCookies(copyCookies);
+        setLoading(false);
+      } catch (err) { console.error(err); }
     };
-    fetchData()
-      .catch(console.error);
+    fetchData();
   }
 
   function deleteCookie(cookieId, cookieIndex) {
@@ -183,16 +184,17 @@ export default function Basket() {
     };
 
     const fetchData = async () => {
-      const response = await fetch(`/api/removeCookie/${cookieId}`, req);
-      if (response.status === 500) { setError(true); }
-      await response.json();
-      const copyCookies = cookies.slice();
-      copyCookies.splice(cookieIndex, 1);
-      setCookies(copyCookies);
-      setLoading(false);
+      try {
+        const response = await fetch(`/api/removeCookie/${cookieId}`, req);
+        if (response.status === 500) { setError(true); }
+        await response.json();
+        const copyCookies = cookies.slice();
+        copyCookies.splice(cookieIndex, 1);
+        setCookies(copyCookies);
+        setLoading(false);
+      } catch (err) { console.error(err); }
     };
-    fetchData()
-      .catch(console.error);
+    fetchData();
   }
 
   if (error) {
@@ -212,7 +214,7 @@ export default function Basket() {
       <div className="loader-hide" />
         }
 
-      {cookies.length === 0 &&
+      {!token &&
       <div className="no-basket-image-container">
         <div style={styles.noBasketImg} className="no-basket-image d-flex flex-column align-items-center">
           <h2 style={styles.noBasketText} className="text-center w-75">
@@ -224,7 +226,7 @@ export default function Basket() {
       </div>
         }
 
-      {cookies.length > 0 &&
+      {token &&
         <div className="container mt-3">
           <h1 className="py-1" >My Basket</h1>
           <p className="m-0" style={styles.text}>{`${cookies.length} items`}</p>
