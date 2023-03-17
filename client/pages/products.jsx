@@ -77,6 +77,7 @@ export default function ProductDetails(props) {
   const { cookieId } = useParams();
   const [cookie, setCookie] = useState([]);
   const [quantity, setQuantity] = useState(0);
+  const [disabled, setDisabled] = useState(true);
   const [show, setShow] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
@@ -184,7 +185,15 @@ export default function ProductDetails(props) {
             </Card.Body>
             <Card.Body className="d-flex justify-content-between align-items-center">
               <Form.Group>
-                <Form.Select required value={quantity} onChange={event => setQuantity(event.target.value)}>
+                <Form.Select
+                  required
+                  value={quantity}
+                  onChange={event => {
+                    if (parseInt(event.target.value)) {
+                      setQuantity(event.target.value);
+                      setDisabled(false);
+                    }
+                  }}>
                   <option >Qty</option>
                   <option value="1">1</option>
                   <option value="2">2</option>
@@ -194,7 +203,7 @@ export default function ProductDetails(props) {
                   <option value="6">6</option>
                 </Form.Select>
               </Form.Group>
-              <Button onClick={handleClick} className="button-all ">ADD TO BASKET</Button>
+              <Button disabled={disabled} onClick={handleClick} className="button-all ">ADD TO BASKET</Button>
             </Card.Body>
           </Card>
         </div>
