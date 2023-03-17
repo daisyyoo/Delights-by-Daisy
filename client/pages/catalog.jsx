@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { toDollars } from '../lib/';
 import Card from 'react-bootstrap/Card';
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 
 const styles = {
   product: {
@@ -52,10 +52,7 @@ export default function Catalog() {
   return (
     <>
       {error && (
-        <div style={styles.errorContent} className="my-5 text-center d-flex flex-column justify-content-center align-items-center">
-          <h1 className="w-75">There was an error with the connection. Please try again.</h1>
-          <img src="/image/sad-cookie.png" alt="sad-cookie"/>
-        </div>
+        <Navigate to='/not-found' />
       )}
       <div className="container mt-3">
         <h1 className="py-1">Shop All</h1>

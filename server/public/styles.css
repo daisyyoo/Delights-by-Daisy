@@ -226,6 +226,7 @@ i {
 .menu-link:active {
   border: solid 2px #94540f;
   border-radius: 5px;
+  color: #dc924e;
 }
 
 .menu-link:visited {

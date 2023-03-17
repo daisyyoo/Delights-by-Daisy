@@ -47,6 +47,7 @@ export default function App() {
             <Route element={<ConfirmationPage />} path='confirmationPage'/>
           </Route>
           <Route path='aboutMe' element={<AboutMe />} />
+          <Route path='not-found' element={<NotFound />} />
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>
