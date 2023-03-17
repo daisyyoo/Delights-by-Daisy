@@ -132,11 +132,8 @@ export default function ProductDetails(props) {
       if (!cookieAdded.token) {
         return setError(true);
       }
-      // need to have a guard clause to make sure the token was properly generated
-      // before assigning it to local storage
-      // ALSO CHECK WHY THE HECK TOKEN IS BEING GENERATED AS UNDEFINED AGAIN!
       if (!cartId) {
-        addToBasket(cookieAdded);
+        await addToBasket(cookieAdded);
       }
       setLoading(false);
       setShow(true);
