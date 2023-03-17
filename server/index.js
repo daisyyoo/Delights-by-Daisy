@@ -234,7 +234,7 @@ app.post('/api/sendEmail', async (req, res, next) => {
     const { orderedAt } = orderDetails[0];
     const msg = {
       to: email,
-      from: 'Daisy@delightsbydaisy.de',
+      from: 'email@bydaisy.dev',
       subject: 'Order Confirmation',
       text: `
           Order Details # 00${orderId}
