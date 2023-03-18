@@ -23,9 +23,12 @@ export default function App() {
   }, []);
 
   const addToBasket = result => {
-    const { cartId, token } = result;
-    window.localStorage.setItem('basketToken', token);
-    setCartId(cartId);
+    const cartId2 = result.cartId;
+    const token2 = result.token;
+    if (cartId !== cartId2) {
+      window.localStorage.setItem('basketToken', token2);
+      setCartId(cartId2);
+    }
   };
 
   const checkOut = () => {
