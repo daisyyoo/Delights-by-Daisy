@@ -127,20 +127,19 @@ export default function ProductDetails(props) {
         setShow(false);
         setError(true);
       }
-      const cookieAdded = await response.json();
       const { cartId, addToBasket, checkOut } = context;
-      try {
-        if (!cookieAdded.token) {
-          checkOut();
-          setError(true);
-          return;
-        }
-        if (!cartId) {
-          await addToBasket(cookieAdded);
-        }
-      } catch (err) { console.error(err); }
+      const cookieAdded = await response.json();
+      if (!cartId) {
+        setLoading(false);
+        setShow(true);
+        return addToBasket(cookieAdded);
+      }
       setLoading(false);
       setShow(true);
+      if (!cookieAdded.token) {
+        checkOut();
+        setError(true);
+      }
     } catch (err) { console.error(err); }
   };
 
