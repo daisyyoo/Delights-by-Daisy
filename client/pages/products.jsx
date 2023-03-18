@@ -127,16 +127,11 @@ export default function ProductDetails(props) {
         setShow(false);
         setError(true);
       }
-      const { cartId, addToBasket } = context;
-      await response.json()
-        .then(res => {
-          if (!cartId) {
-            addToBasket(res);
-          }
-          setLoading(false);
-          return setShow(true);
-        })
-        .catch(err => console.error(err));
+      const { addToBasket } = context;
+      const cookieAdded = await response.json();
+      await addToBasket(cookieAdded);
+      setLoading(false);
+      setShow(true);
     } catch (err) { console.error(err); }
   };
 
