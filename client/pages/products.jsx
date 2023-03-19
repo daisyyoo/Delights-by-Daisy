@@ -79,8 +79,6 @@ export default function ProductDetails(props) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
 
-  const token = localStorage.getItem('basketToken');
-
   useEffect(() => {
     setLoading(true);
     const fetchData = async () => {
@@ -98,6 +96,7 @@ export default function ProductDetails(props) {
   let req;
   const handleClick = event => {
     setLoading(true);
+    const token = localStorage.getItem('basketToken');
     const addCookie = { cookie, quantity };
     if (!token) {
       req = {
@@ -126,9 +125,11 @@ export default function ProductDetails(props) {
         return response.json();
       })
       .then(cookieAdded => {
+        console.log('cookieAdded', cookieAdded);
         const { cartId, addToBasket } = context;
         if (!cartId) {
           addToBasket(cookieAdded);
+          console.log('testResponse', cookieAdded);
         }
         setLoading(false);
         setShow(true);
