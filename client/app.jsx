@@ -22,9 +22,9 @@ export default function App() {
     setCartId(cartId);
   }, []);
 
-  const addToBasket = async result => {
+  const addToBasket = result => {
     const { cartId, token } = result;
-    await window.localStorage.setItem('basketToken', token);
+    window.localStorage.setItem('basketToken', token);
     setCartId(cartId);
   };
 
