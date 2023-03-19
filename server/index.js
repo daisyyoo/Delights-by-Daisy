@@ -59,8 +59,12 @@ app.post('/api/addToBasket', async (req, res, next) => {
   let token = req.get('x-access-token');
   const { quantity } = req.body;
   const { cookieId } = req.body.cookie;
+  console.log(quantity);
+  console.log(cookieId);
   let cartId;
-
+  if (!quantity || !cookieId) {
+    return next();
+  }
   try {
     if (!token) {
       const sql = `
