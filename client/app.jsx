@@ -23,7 +23,6 @@ export default function App() {
   }, []);
 
   const addToBasket = result => {
-    console.log('result', result);
     const { cartId, token } = result;
     window.localStorage.setItem('basketToken', token);
     setCartId(cartId);

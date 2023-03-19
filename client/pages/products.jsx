@@ -116,7 +116,6 @@ export default function ProductDetails(props) {
         body: JSON.stringify(addCookie)
       };
     }
-    console.log('req', req);
     fetch('/api/addToBasket', req)
       .then(response => {
         if (response.status === 500) {
@@ -126,11 +125,9 @@ export default function ProductDetails(props) {
         return response.json();
       })
       .then(cookieAdded => {
-        console.log('cookieAdded', cookieAdded);
         const { cartId, addToBasket } = context;
         if (!cartId) {
           addToBasket(cookieAdded);
-          console.log('testResponse', cookieAdded);
         }
         setLoading(false);
         setShow(true);
