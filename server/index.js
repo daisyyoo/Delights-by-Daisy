@@ -56,56 +56,50 @@ app.get('/api/cookies/:cookieId', async (req, res, next) => {
 });
 
 app.post('/api/addToBasket', (req, res, next) => {
-  let token = req.get('x-access-token');
+  const token = req.get('x-access-token');
   const { quantity } = req.body;
   const { cookieId } = req.body.cookie;
-  console.log(quantity);
-  console.log(cookieId);
-  let cartId;
-
-  if (!quantity || !cookieId) {
-    return next();
-  }
-
   if (!token) {
     const sql = `
-        insert into "carts"
-        default values
-        returning *
-      `;
+      insert into "carts"
+      default values
+      returning *
+    `;
     db.query(sql)
       .then(result => {
-        cartId = result.rows[0].cartId;
-        token = jwt.sign({ cartId }, process.env.TOKEN_SECRET);
-      })
-      .then(() => {
+        const cartId = result.rows[0].cartId;
+        const token = jwt.sign(cartId, process.env.TOKEN_SECRET);
+        if (!cookieId || !quantity) {
+          throw new ClientError(400, 'cookieId and quantity are required fields');
+        }
         const sql = `
-        insert into "cartItems" ("cartId", "cookieId", "quantity")
-        values ($1, $2, $3)
-        on conflict ("cartId", "cookieId")
-        do update
-              set "quantity" = "cartItems"."quantity" + "excluded"."quantity"
-        returning *
+          insert into "cartItems" ("cartId", "cookieId", "quantity")
+          values ($1, $2, $3)
+          returning *
         `;
         const params = [cartId, cookieId, quantity];
-        return db.query(sql, params);
-      })
-      .then(result => {
-        const [cartItem] = result.rows;
-        const user = { cartId, token, cartItem };
-        res.status(201).json(user);
+        db.query(sql, params)
+          .then(result => {
+            const [cartItem] = result.rows;
+            const user = { cartId, token, cartItem };
+            res.status(201).json(user);
+          })
+          .catch(err => next(err));
       })
       .catch(err => next(err));
   } else {
-    cartId = jwt.verify(token, process.env.TOKEN_SECRET).cartId;
+    const cartId = jwt.verify(token, process.env.TOKEN_SECRET);
+    if (!cookieId || !quantity) {
+      throw new ClientError(400, 'cookieId and quantity are required fields');
+    }
     const sql = `
-        insert into "cartItems" ("cartId", "cookieId", "quantity")
-        values ($1, $2, $3)
-        on conflict ("cartId", "cookieId")
-        do update
-              set "quantity" = "cartItems"."quantity" + "excluded"."quantity"
-        returning *
-        `;
+      insert into "cartItems" ("cartId", "cookieId", "quantity")
+      values ($1, $2, $3)
+      on conflict ("cartId", "cookieId")
+      do update
+            set "quantity" = "cartItems"."quantity" + "excluded"."quantity"
+      returning *
+      `;
     const params = [cartId, cookieId, quantity];
     db.query(sql, params)
       .then(result => {
@@ -116,6 +110,67 @@ app.post('/api/addToBasket', (req, res, next) => {
       .catch(err => next(err));
   }
 });
+
+// app.post('/api/addToBasket', (req, res, next) => {
+//   let token = req.get('x-access-token');
+//   console.log('token', token);
+//   const { quantity } = req.body;
+//   const { cookieId } = req.body.cookie;
+//   let cartId;
+
+//   if (!quantity || !cookieId) {
+//     return next();
+//   }
+
+//   if (!token) {
+//     const sql = `
+//         insert into "carts"
+//         default values
+//         returning *
+//       `;
+//     db.query(sql)
+//       .then(result => {
+//         cartId = result.rows[0].cartId;
+//         token = jwt.sign({ cartId }, process.env.TOKEN_SECRET);
+//       })
+//       .then(() => {
+//         const sql = `
+//         insert into "cartItems" ("cartId", "cookieId", "quantity")
+//         values ($1, $2, $3)
+//         on conflict ("cartId", "cookieId")
+//         do update
+//               set "quantity" = "cartItems"."quantity" + "excluded"."quantity"
+//         returning *
+//         `;
+//         const params = [cartId, cookieId, quantity];
+//         return db.query(sql, params);
+//       })
+//       .then(result => {
+//         const [cartItem] = result.rows;
+//         const user = { cartId, token, cartItem };
+//         res.status(201).json(user);
+//       })
+//       .catch(err => next(err));
+//   } else {
+//     cartId = jwt.verify(token, process.env.TOKEN_SECRET).cartId;
+//     const sql = `
+//         insert into "cartItems" ("cartId", "cookieId", "quantity")
+//         values ($1, $2, $3)
+//         on conflict ("cartId", "cookieId")
+//         do update
+//               set "quantity" = "cartItems"."quantity" + "excluded"."quantity"
+//         returning *
+//         `;
+//     const params = [cartId, cookieId, quantity];
+//     db.query(sql, params)
+//       .then(result => {
+//         const [cartItem] = result.rows;
+//         const user = { cartId, token, cartItem };
+//         res.status(201).json(user);
+//       })
+//       .catch(err => next(err));
+//   }
+// });
 
 app.get('/api/myBasket', async (req, res, next) => {
   const token = req.get('x-access-token');

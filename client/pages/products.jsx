@@ -116,6 +116,7 @@ export default function ProductDetails(props) {
         body: JSON.stringify(addCookie)
       };
     }
+    console.log('req', req);
     fetch('/api/addToBasket', req)
       .then(response => {
         if (response.status === 500) {
