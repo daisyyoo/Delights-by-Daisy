@@ -188,7 +188,7 @@ app.post('/api/addToBasket', (req, res, next) => {
 
 app.get('/api/myBasket', async (req, res, next) => {
   const token = req.get('x-access-token');
-  const { cartId } = jwt.verify(token, process.env.TOKEN_SECRET);
+  const cartId = jwt.verify(token, process.env.TOKEN_SECRET);
   try {
     const sql = `
         select "cartItems"."cartId",
@@ -207,6 +207,7 @@ app.get('/api/myBasket', async (req, res, next) => {
     if (!result.rows) {
       next(new ClientError(404, `cannot find basket with cartId ${cartId}`));
     }
+    console.log('hello3?');
     res.json(result.rows);
   } catch (err) { return next(err); }
 }
@@ -214,7 +215,7 @@ app.get('/api/myBasket', async (req, res, next) => {
 
 app.post('/api/create-payment-intent', async (req, res, next) => {
   const token = req.get('x-access-token');
-  const { cartId } = jwt.verify(token, process.env.TOKEN_SECRET);
+  const cartId = jwt.verify(token, process.env.TOKEN_SECRET);
   try {
     const sql = `
           select "cartItems"."cartId",
@@ -255,7 +256,7 @@ app.post('/api/create-payment-intent', async (req, res, next) => {
 
 app.get('/process-order/:token', (req, res, next) => {
   const token = req.params.token;
-  const { cartId } = jwt.verify(token, process.env.TOKEN_SECRET);
+  const cartId = jwt.verify(token, process.env.TOKEN_SECRET);
   const paymentIntent = req.query.payment_intent;
   const sql = `
     insert into "orders" ("cartId", "orderedAt", "paymentIntent")
@@ -272,7 +273,7 @@ app.get('/process-order/:token', (req, res, next) => {
 
 app.get('/api/confirmationPage', async (req, res, next) => {
   const token = req.get('x-access-token');
-  const { cartId } = jwt.verify(token, process.env.TOKEN_SECRET);
+  const cartId = jwt.verify(token, process.env.TOKEN_SECRET);
   try {
     const sql = `
       select "orders"."orderId",
@@ -353,7 +354,7 @@ app.post('/api/sendEmail', async (req, res, next) => {
 
 app.patch('/api/updateQuantity', async (req, res, next) => {
   const token = req.get('x-access-token');
-  const { cartId } = jwt.verify(token, process.env.TOKEN_SECRET);
+  const cartId = jwt.verify(token, process.env.TOKEN_SECRET);
   const { updatedQuantity, cookieId } = req.body;
   if (!Number.isInteger(cookieId) || cookieId < 1) {
     next(new ClientError(400, 'cookieId must be a positive integer'));
@@ -396,7 +397,7 @@ app.patch('/api/updateQuantity', async (req, res, next) => {
 
 app.delete('/api/removeCookie/:cookieId', async (req, res, next) => {
   const token = req.get('x-access-token');
-  const { cartId } = jwt.verify(token, process.env.TOKEN_SECRET);
+  const cartId = jwt.verify(token, process.env.TOKEN_SECRET);
   const cookieId = req.params.cookieId;
   if (!cookieId) {
     next(new ClientError(400, 'cookieId must be a positive integer'));

@@ -107,8 +107,8 @@ export default function Basket() {
       try {
         const response = await fetch('/api/myBasket', req);
         if (response.status === 500) { setError(true); }
-        const selectedCookie = await response.json();
-        setCookies(selectedCookie);
+        const selectedCookies = await response.json();
+        setCookies(selectedCookies);
         setLoading(false);
       } catch (err) { console.error(err); }
     };
