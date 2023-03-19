@@ -121,18 +121,21 @@ export default function ProductDetails(props) {
   };
 
   const getCookieData = async () => {
-    try {
-      const response = await fetch('/api/addToBasket', req);
-      if (response.status === 500) {
-        setShow(false);
-        setError(true);
-      }
-      const { addToBasket } = context;
-      const cookieAdded = await response.json();
-      await addToBasket(cookieAdded);
-      setLoading(false);
-      setShow(true);
-    } catch (err) { console.error(err); }
+    return await fetch('/api/addToBasket', req)
+      .then(response => {
+        if (response.status === 500) {
+          setShow(false);
+          setError(true);
+        }
+        return response.json();
+      })
+      .then(cookieAdded => {
+        const { addToBasket } = context;
+        addToBasket(cookieAdded);
+        setLoading(false);
+        setShow(true);
+      })
+      .catch(console.error());
   };
 
   const { flavor, price, weight, description, ingredients, allergens, backstory, imageUrl } = cookie;

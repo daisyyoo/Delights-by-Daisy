@@ -22,13 +22,10 @@ export default function App() {
     setCartId(cartId);
   }, []);
 
-  const addToBasket = result => {
-    const cartId2 = result.cartId;
-    const token2 = result.token;
-    if (cartId !== cartId2) {
-      window.localStorage.setItem('basketToken', token2);
-      setCartId(cartId2);
-    }
+  const addToBasket = async result => {
+    const { cartId, token } = result;
+    await window.localStorage.setItem('basketToken', token);
+    setCartId(cartId);
   };
 
   const checkOut = () => {
