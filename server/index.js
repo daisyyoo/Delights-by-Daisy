@@ -70,10 +70,7 @@ app.post('/api/addToBasket', async (req, res, next) => {
       `;
       const result = await db.query(sql);
       cartId = result.rows[0].cartId;
-      await jwt.sign({ cartId }, process.env.TOKEN_SECRET, (err, asyncToken) => {
-        if (err) { console.error(err); }
-        token = asyncToken;
-      });
+      token = jwt.sign({ cartId }, process.env.TOKEN_SECRET);
     } else {
       cartId = jwt.verify(token, process.env.TOKEN_SECRET).cartId;
     }
