@@ -56,10 +56,15 @@ app.get('/api/cookies/:cookieId', async (req, res, next) => {
 });
 
 app.post('/api/addToBasket', (req, res, next) => {
+  console.log('1');
   const token = req.get('x-access-token');
+  console.log('2');
   const { quantity } = req.body;
+  console.log('3');
   const { cookieId } = req.body.cookie;
+  console.log('4');
   if (!token) {
+    console.log('5');
     const sql = `
       insert into "carts"
       default values
@@ -67,8 +72,11 @@ app.post('/api/addToBasket', (req, res, next) => {
     `;
     db.query(sql)
       .then(result => {
+        console.log('6');
         const cartId = result.rows[0].cartId;
+        console.log('7');
         const token = jwt.sign(cartId, process.env.TOKEN_SECRET);
+        console.log('8');
         if (!cookieId || !quantity) {
           throw new ClientError(400, 'cookieId and quantity are required fields');
         }
@@ -80,13 +88,19 @@ app.post('/api/addToBasket', (req, res, next) => {
         const params = [cartId, cookieId, quantity];
         db.query(sql, params)
           .then(result => {
+            console.log('9');
             const [cartItem] = result.rows;
+            console.log('10');
             const user = { cartId, token, cartItem };
+            console.log('11');
             res.status(201).json(user);
           })
-          .catch(err => next(err));
+          .catch(err => {
+            console.log('12');
+            next(err);
+          });
       })
-      .catch(err => next(err));
+      .catch(err => { console.log('8'); next(err); });
   } else {
     const cartId = jwt.verify(token, process.env.TOKEN_SECRET);
     if (!cookieId || !quantity) {
