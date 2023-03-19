@@ -117,11 +117,7 @@ export default function ProductDetails(props) {
         body: JSON.stringify(addCookie)
       };
     }
-    getCookieData();
-  };
-
-  const getCookieData = async () => {
-    return await fetch('/api/addToBasket', req)
+    fetch('/api/addToBasket', req)
       .then(response => {
         if (response.status === 500) {
           setShow(false);
@@ -130,8 +126,10 @@ export default function ProductDetails(props) {
         return response.json();
       })
       .then(cookieAdded => {
-        const { addToBasket } = context;
-        addToBasket(cookieAdded);
+        const { cartId, addToBasket } = context;
+        if (!cartId) {
+          addToBasket(cookieAdded);
+        }
         setLoading(false);
         setShow(true);
       })
