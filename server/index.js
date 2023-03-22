@@ -55,46 +55,31 @@ app.get('/api/cookies/:cookieId', async (req, res, next) => {
   } catch (err) { return next(err); }
 });
 
-app.post('/api/addToBasket', (req, res, next) => {
-  const token = req.get('x-access-token');
-  const { quantity } = req.body;
-  const { cookieId } = req.body.cookie;
-  if (!token) {
-    const sql = `
-      insert into "carts"
-      default values
-      returning *
-    `;
-    db.query(sql)
-      .then(result => {
-        const cartId = result.rows[0].cartId;
-        const token = jwt.sign(cartId, process.env.TOKEN_SECRET);
-        if (!cookieId || !quantity) {
-          throw new ClientError(400, 'cookieId and quantity are required fields');
-        }
-        const sql = `
-          insert into "cartItems" ("cartId", "cookieId", "quantity")
-          values ($1, $2, $3)
-          returning *
-        `;
-        const params = [cartId, cookieId, quantity];
-        db.query(sql, params)
-          .then(result => {
-            const [cartItem] = result.rows;
-            const user = { cartId, token, cartItem };
-            res.status(201).json(user);
-          })
-          .catch(err => {
-            next(err);
-          });
-      })
-      .catch(err => { next(err); });
-  } else {
-    const cartId = jwt.verify(token, process.env.TOKEN_SECRET);
-    if (!cookieId || !quantity) {
-      throw new ClientError(400, 'cookieId and quantity are required fields');
+app.post('/api/addToBasket', async (req, res, next) => {
+  try {
+    let token = req.get('x-access-token');
+    const { quantity } = req.body;
+    const { cookieId } = req.body.cookie;
+    let cartId;
+
+    if (!quantity || !cookieId) {
+      return next(new ClientError(404, 'quantity and cookieId are required.'));
     }
-    const sql = `
+
+    if (!token) {
+      const sql = `
+        insert into "carts"
+        default values
+        returning *
+      `;
+      const result = await db.query(sql);
+      cartId = result.rows[0].cartId;
+      token = jwt.sign(cartId, process.env.TOKEN_SECRET);
+    } else {
+      cartId = jwt.verify(token, process.env.TOKEN_SECRET);
+    }
+
+    const sql2 = `
       insert into "cartItems" ("cartId", "cookieId", "quantity")
       values ($1, $2, $3)
       on conflict ("cartId", "cookieId")
@@ -102,82 +87,17 @@ app.post('/api/addToBasket', (req, res, next) => {
             set "quantity" = "cartItems"."quantity" + "excluded"."quantity"
       returning *
       `;
-    const params = [cartId, cookieId, quantity];
-    db.query(sql, params)
-      .then(result => {
-        const [cartItem] = result.rows;
-        const user = { cartId, token, cartItem };
-        res.status(201).json(user);
-      })
-      .catch(err => next(err));
-  }
+    const params2 = [cartId, cookieId, quantity];
+    const result2 = await db.query(sql2, params2);
+    const [cartItem] = result2.rows;
+    const user = { cartId, token, cartItem };
+    res.status(201).json(user);
+  } catch (err) { console.error(err); }
 });
-
-// app.post('/api/addToBasket', (req, res, next) => {
-//   let token = req.get('x-access-token');
-//   console.log('token', token);
-//   const { quantity } = req.body;
-//   const { cookieId } = req.body.cookie;
-//   let cartId;
-
-//   if (!quantity || !cookieId) {
-//     return next();
-//   }
-
-//   if (!token) {
-//     const sql = `
-//         insert into "carts"
-//         default values
-//         returning *
-//       `;
-//     db.query(sql)
-//       .then(result => {
-//         cartId = result.rows[0].cartId;
-//         token = jwt.sign({ cartId }, process.env.TOKEN_SECRET);
-//       })
-//       .then(() => {
-//         const sql = `
-//         insert into "cartItems" ("cartId", "cookieId", "quantity")
-//         values ($1, $2, $3)
-//         on conflict ("cartId", "cookieId")
-//         do update
-//               set "quantity" = "cartItems"."quantity" + "excluded"."quantity"
-//         returning *
-//         `;
-//         const params = [cartId, cookieId, quantity];
-//         return db.query(sql, params);
-//       })
-//       .then(result => {
-//         const [cartItem] = result.rows;
-//         const user = { cartId, token, cartItem };
-//         res.status(201).json(user);
-//       })
-//       .catch(err => next(err));
-//   } else {
-//     cartId = jwt.verify(token, process.env.TOKEN_SECRET).cartId;
-//     const sql = `
-//         insert into "cartItems" ("cartId", "cookieId", "quantity")
-//         values ($1, $2, $3)
-//         on conflict ("cartId", "cookieId")
-//         do update
-//               set "quantity" = "cartItems"."quantity" + "excluded"."quantity"
-//         returning *
-//         `;
-//     const params = [cartId, cookieId, quantity];
-//     db.query(sql, params)
-//       .then(result => {
-//         const [cartItem] = result.rows;
-//         const user = { cartId, token, cartItem };
-//         res.status(201).json(user);
-//       })
-//       .catch(err => next(err));
-//   }
-// });
 
 app.get('/api/myBasket', async (req, res, next) => {
   const token = req.get('x-access-token');
   const cartId = jwt.verify(token, process.env.TOKEN_SECRET);
-  console.log('cartId 1:', cartId);
   try {
     const sql = `
         select "cartItems"."cartId",
@@ -196,7 +116,6 @@ app.get('/api/myBasket', async (req, res, next) => {
     if (!result.rows) {
       next(new ClientError(404, `cannot find basket with cartId ${cartId}`));
     }
-    console.log('result 2:', result.rows);
     res.json(result.rows);
   } catch (err) { return next(err); }
 }

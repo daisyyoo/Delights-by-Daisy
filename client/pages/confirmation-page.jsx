@@ -131,7 +131,7 @@ export default function ConfirmationPage() {
       {loading === false &&
       <div className="loader-hide" />
         }
-      <div className="container mt-3">
+      <div className="container mt-3 flex-grow-1">
         <h1 className="py-1">Thank you for your order!</h1>
         <div className="mb-3">
           <p className="m-0" style={styles.orderInfo}>{`Order No. : 00${order[0].orderId}`}</p>

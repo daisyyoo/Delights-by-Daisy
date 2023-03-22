@@ -1,14 +1,14 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
-import Header from './header';
-import Footer from './footer';
+
+// const styles = {
+//   style: {
+//     height: '90vh'
+//   }
+// };
 
 export default function PageContainer() {
   return (
-    <>
-      <Header />
-      <Outlet />
-      <Footer />
-    </>
+    <Outlet />
   );
 }

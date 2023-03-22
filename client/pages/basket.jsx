@@ -226,7 +226,7 @@ export default function Basket() {
         }
 
       {token &&
-        <div className="container mt-3">
+        <div className="container mt-3 flex-grow-1">
           <h1 className="py-1" >My Basket</h1>
           <p className="m-0" style={styles.text}>{`${cookies.length} items`}</p>
           <div className="d-lg-flex justify-content-lg-between container">
