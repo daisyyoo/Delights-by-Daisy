@@ -149,7 +149,7 @@ export default function ProductDetails(props) {
       {!loading &&
       <>
         <div className="loader-hide" />
-        <div className="container mt-3">
+        <div className="container mt-3 flex-grow-1">
           <div className="d-flex justify-content-start">
             <Link style={styles.backButton} className="text-decoration-none mb-3" to='/cookies'>
               <i className="fa-solid fa-chevron-left" style={styles.icon} />

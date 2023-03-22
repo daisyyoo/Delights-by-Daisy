@@ -54,7 +54,7 @@ export default function Catalog() {
       {error && (
         <Navigate to='/not-found' />
       )}
-      <div className="container mt-3">
+      <div className="container mt-3 flex-grow-1">
         <h1 className="py-1">Shop All</h1>
         <div className="d-flex justify-content-between">
           <Link to="/" style={styles.description} className="text-decoration-none">

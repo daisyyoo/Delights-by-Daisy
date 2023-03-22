@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import jwtDecode from 'jwt-decode';
 import AppContext from './lib/app-context';
+import Header from './components/header';
+import Footer from './components/footer';
 import PageContainer from './components/page-container';
 import NotFound from './pages/not-found';
 import Home from './pages/home';
@@ -36,6 +38,7 @@ export default function App() {
   const contextValue = { cartId, addToBasket, checkOut };
   return (
     <AppContext.Provider value={contextValue}>
+      <Header />
       <Routes>
         <Route path='/' element={<PageContainer />}>
           <Route index element ={<Home />}/>
@@ -51,6 +54,7 @@ export default function App() {
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>
+      <Footer />
     </AppContext.Provider>
   );
 }
