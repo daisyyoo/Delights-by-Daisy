@@ -250,9 +250,9 @@ app.post('/api/sendEmail', async (req, res, next) => {
           <br><strong>Order Date:</strong> ${orderedAt} <br>
           ${(orderDetails.map(cookie => ('<br><strong>Flavor: </strong>' + cookie.flavor + '<br><strong>Qty: </strong>' + cookie.quantity + '<br>')).join(''))}
           <br><strong>Total:</strong> $
-          ${(orderDetails.reduce((previousCookie, currentCookie) => {
+          ${((orderDetails.reduce((previousCookie, currentCookie) => {
           return previousCookie + (currentCookie.quantity * currentCookie.price);
-        }, 0) / 100).toFixed(2)}
+        }, 0) / 100) * 1.0775).toFixed(2)}
           <br><h3><em>Thank you for your purchase!</em></h3>`
     };
     sgMail.send(msg);
