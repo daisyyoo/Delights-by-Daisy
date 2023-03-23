@@ -60,6 +60,7 @@ const styles = {
 
 export default function ConfirmationPage() {
   const [order, setOrder] = useState([]);
+  const [subtotal, setSubtotal] = useState(0);
   const [salesTax, setSalesTax] = useState(0);
   const [email, setEmail] = useState('');
   const [emailSent, setEmailSent] = useState(false);
@@ -82,7 +83,12 @@ export default function ConfirmationPage() {
         if (response.status === 500) { setError(true); }
         const order = await response.json();
         setOrder(order);
-        setSalesTax(0);
+        const subtotal =
+          order.reduce((previousCookie, currentCookie) => {
+            return previousCookie + (currentCookie.quantity * currentCookie.price);
+          }, 0);
+        setSubtotal(subtotal);
+        setSalesTax(subtotal * 0.0775);
         setLoading(false);
       } catch (err) { console.error(err); }
     };
@@ -154,10 +160,7 @@ export default function ConfirmationPage() {
             <div style={styles.borderTop} className="d-flex justify-content-between pt-1">
               <p className="m-1" style={styles.subtotalHeader}>{`Subtotal (${order.length} items) `}</p>
               <p className="m-1" style={styles.subtotalHeader}>
-                {toDollars(
-                  order.reduce((previousCookie, currentCookie) => {
-                    return previousCookie + (currentCookie.quantity * currentCookie.price);
-                  }, 0))}</p>
+                {toDollars(subtotal)}</p>
             </div>
             <div className="d-flex justify-content-between pb-lg-4">
               <p className="m-1" style={styles.subtotalHeader}>Sales Tax</p>
@@ -166,9 +169,7 @@ export default function ConfirmationPage() {
             <div style={styles.borderBottom} className="d-flex justify-content-between pb-1">
               <p className="m-1" style={styles.total}>Total Paid</p>
               <p className="m-1" style={styles.total}>
-                {toDollars((order.reduce((previousCookie, currentCookie) => {
-                  return previousCookie + (currentCookie.quantity * currentCookie.price);
-                }, 0)) + salesTax)}</p>
+                {toDollars(subtotal + salesTax)}</p>
             </div>
           </div>
         </div>
